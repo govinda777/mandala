@@ -112,5 +112,3 @@ Citations:
 [11] https://docs.github.com/pt/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme
 [12] https://github.com/iuricode/readme-template
 
----
-Resposta do Perplexity: pplx.ai/share
