@@ -1,114 +1,90 @@
-# mandala
+# Mandala Generator
 
-# Mandala
-
-Visualize e desenhe mandalas de forma interativa utilizando TypeScript e React.
+Visualize e desenhe mandalas de forma interativa utilizando TypeScript e React. Este projeto combina arte, matemática e ciência para criar padrões geométricos fascinantes.
 
 ---
 
 ## Índice
 
 - [Sobre o Projeto](#sobre-o-projeto)
-- [Demonstração](#demonstração)
+- [Status Atual](#status-atual)
 - [Funcionalidades](#funcionalidades)
-- [Instalação](#instalação)
-- [Como Usar](#como-usar)
+- [Instalação e Execução](#instalação-e-execução)
+- [Roteiro (Roadmap)](#roteiro-roadmap)
 - [Tecnologias](#tecnologias)
 - [Contribuindo](#contribuindo)
-- [Licença](#licença)
-- [Autor](#autor)
 
 ---
 
 ## Sobre o Projeto
 
-O **Mandala** é um projeto open source que permite criar, visualizar e explorar mandalas diretamente no navegador. Desenvolvido em TypeScript com React, o objetivo é proporcionar uma experiência visual envolvente e personalizável para quem deseja desenhar mandalas digitais de maneira simples e intuitiva.
+O **Mandala** é um projeto open source que permite criar, visualizar e explorar mandalas diretamente no navegador. O objetivo é evoluir para uma ferramenta que incorpora conceitos de **Geometria Sagrada**, **Sequência de Fibonacci**, **Cosmologia** e até **NFTs**.
 
----
+## Status Atual
 
-## Demonstração
+🚧 **Em Construção** 🚧
 
-> *Adicione aqui um GIF ou imagem do funcionamento do projeto, se desejar.*
-
----
+O projeto está passando por uma reestruturação para adotar boas práticas de engenharia de software (BDD, Testes, Modularização).
 
 ## Funcionalidades
 
-- Geração e visualização de mandalas digitais
-- Interface interativa para customização dos desenhos
-- Código-fonte limpo e modular para fácil extensão
+- ✅ Geração procedural de mandalas.
+- ✅ Customização de pétalas, camadas, cores e complexidade.
+- 🔜 **Modo Fibonacci** (Em breve).
+- 🔜 **Exportação para NFT** (Planejado).
+- 🔜 **Temas Astrológicos** (Planejado).
 
 ---
 
-## Instalação
+## Instalação e Execução
 
-Siga os passos abaixo para rodar o projeto localmente:
+### Pré-requisitos
+- Node.js (v16 ou superior)
 
-```bash
-# Clone o repositório
-git clone https://github.com/govinda777/mandala.git
+### Passos
 
-# Acesse a pasta do projeto
-cd mandala
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/govinda777/mandala.git
+   cd mandala
+   ```
 
-# Instale as dependências
-npm install
+2. Instale as dependências:
+   ```bash
+   npm install
+   ```
 
-# Inicie o projeto
-npm start
-```
+3. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+
+4. Acesse `http://localhost:5173` (ou a porta indicada no terminal).
 
 ---
 
-## Como Usar
+## Roteiro (Roadmap)
 
-Após iniciar o projeto, acesse `http://localhost:3000` no seu navegador. Explore as opções disponíveis para criar e visualizar diferentes mandalas.
+Consulte o [BACKLOG.md](./BACKLOG.md) para ver a lista completa de tarefas e ideias futuras.
 
 ---
 
 ## Tecnologias
 
-- [TypeScript](https://www.typescriptlang.org/)
-- [React](https://react.dev/)
-- [Node.js](https://nodejs.org/)
+- [Vite](https://vitejs.dev/) - Build tool rápida.
+- [React](https://react.dev/) - Biblioteca UI.
+- [TypeScript](https://www.typescriptlang.org/) - Tipagem estática.
+- [Vitest](https://vitest.dev/) - Framework de testes.
+- [Tailwind CSS](https://tailwindcss.com/) - Estilização (via CDN ou pacote).
 
 ---
 
 ## Contribuindo
 
-Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, enviar pull requests ou sugerir melhorias.
+Contribuições são bem-vindas! Por favor, leia o Backlog para ver onde pode ajudar.
 
 ---
 
 ## Licença
 
 Este projeto está licenciado sob a licença MIT.
-
----
-
-## Autor
-
-Desenvolvido por [govinda777](https://github.com/govinda777).
-
----
-
-> Sinta-se à vontade para sugerir melhorias ou reportar problemas na [página de issues](https://github.com/govinda777/mandala/issues).
-
----
-
-*README criado seguindo boas práticas de documentação para projetos open source[4][6][7][10].*
-
-Citations:
-[1] https://gist.github.com/lohhans/f8da0b147550df3f96914d3797e9fb89
-[2] https://docs.github.com/pt/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
-[3] https://www.alura.com.br/artigos/escrever-bom-readme
-[4] https://github.com/luong-komorebi/Markdown-Tutorial/blob/master/README_pt-BR.md
-[5] https://blog.rocketseat.com.br/como-fazer-um-bom-readme/
-[6] https://dev.to/guilhermemanzano/como-criar-um-readme-md-para-o-github-do-jeito-certo-2lgg
-[7] https://www.alura.com.br/artigos/como-criar-um-readme-para-seu-perfil-github
-[8] https://www.youtube.com/watch?v=k4Rsy8GbKE0
-[9] https://github.com/Epaminondaslage/Como-montar-seu-README/blob/master/README.md
-[10] https://www.youtube.com/watch?v=jIa8R69pKh8
-[11] https://docs.github.com/pt/account-and-profile/setting-up-and-managing-your-github-profile/customizing-your-profile/managing-your-profile-readme
-[12] https://github.com/iuricode/readme-template
-

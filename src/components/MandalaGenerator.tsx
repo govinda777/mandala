@@ -1,16 +1,45 @@
 import { useState, useEffect, useRef } from 'react';
 
 export default function MandalaGenerator() {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [numPetalas, setNumPetalas] = useState(12);
   const [numCamadas, setNumCamadas] = useState(5);
   const [corBase, setCorBase] = useState(180);
   const [complexidade, setComplexidade] = useState(1);
   const [rotacao, setRotacao] = useState(0);
+  const [modoFibonacci, setModoFibonacci] = useState(false);
+
+  // Fibonacci numbers up to standard petal range
+  const fibonacciNumbers = [3, 5, 8, 13, 21, 34, 55, 89];
+
+  // Helper to find nearest Fibonacci number
+  const getNearestFibonacci = (n: number) => {
+    return fibonacciNumbers.reduce((prev, curr) =>
+      Math.abs(curr - n) < Math.abs(prev - n) ? curr : prev
+    );
+  };
+
+  useEffect(() => {
+    if (modoFibonacci) {
+      setNumPetalas(prev => getNearestFibonacci(prev));
+    }
+  }, [modoFibonacci]);
+
+  const handlePetalasChange = (valor: number) => {
+    if (modoFibonacci) {
+      setNumPetalas(getNearestFibonacci(valor));
+    } else {
+      setNumPetalas(valor);
+    }
+  };
 
   // Gerar mandala aleatória complexa
   const gerarMandalaAleatoria = () => {
-    setNumPetalas(Math.floor(Math.random() * 18) + 6); // 6-24 pétalas
+    let novasPetalas = Math.floor(Math.random() * 18) + 6;
+    if (modoFibonacci) {
+      novasPetalas = getNearestFibonacci(novasPetalas);
+    }
+    setNumPetalas(novasPetalas); // 6-24 pétalas (ou Fibonacci)
     setNumCamadas(Math.floor(Math.random() * 6) + 4);  // 4-10 camadas
     setCorBase(Math.floor(Math.random() * 360));       // Cor base aleatória
     setComplexidade(Math.random() * 2 + 1);           // Complexidade entre 1-3
@@ -23,6 +52,8 @@ export default function MandalaGenerator() {
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     const tamanho = Math.min(400, 400) * 0.9 / 2;
     
     // Limpar o canvas
@@ -72,7 +103,7 @@ export default function MandalaGenerator() {
   };
 
   // Função auxiliar para desenhar pétalas em uma camada
-  const desenharPetalas = (ctx, numPetalas, raioExterno, raioInterno, corInterna, corExterna, complexidade) => {
+  const desenharPetalas = (ctx: CanvasRenderingContext2D, numPetalas: number, raioExterno: number, raioInterno: number, corInterna: string, corExterna: string, complexidade: number) => {
     const anguloIncremento = (Math.PI * 2) / numPetalas;
     
     for (let i = 0; i < numPetalas; i++) {
@@ -141,7 +172,7 @@ export default function MandalaGenerator() {
     }
   };
 
-  const desenharPadraoDetalhes = (ctx, numElementos, raio, matiz) => {
+  const desenharPadraoDetalhes = (ctx: CanvasRenderingContext2D, numElementos: number, raio: number, matiz: number) => {
     const anguloIncremento = (Math.PI * 2) / numElementos;
     
     for (let i = 0; i < numElementos; i++) {
@@ -179,7 +210,7 @@ export default function MandalaGenerator() {
   };
 
   // Função para desenhar círculos concêntricos decorativos no centro
-  const desenharCirculosCentrais = (ctx, numCamadas, tamanho, complexidade) => {
+  const desenharCirculosCentrais = (ctx: CanvasRenderingContext2D, numCamadas: number, tamanho: number, complexidade: number) => {
     // Número de círculos baseado na complexidade
     const numCirculos = Math.floor(numCamadas * complexidade);
     
@@ -250,16 +281,28 @@ export default function MandalaGenerator() {
       />
       
       <div className="mt-4 space-y-4 w-full max-w-md">
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="fibonacci-mode"
+            checked={modoFibonacci}
+            onChange={(e) => setModoFibonacci(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="fibonacci-mode" className="text-white">Modo Fibonacci</label>
+        </div>
+
         <div>
-          <label className="block text-white mb-2">
+          <label htmlFor="petals-input" className="block text-white mb-2">
             Pétalas: {numPetalas}
           </label>
           <input 
+            id="petals-input"
             type="range" 
             min="3" 
             max="24" 
             value={numPetalas} 
-            onChange={(e) => setNumPetalas(parseInt(e.target.value))}
+            onChange={(e) => handlePetalasChange(parseInt(e.target.value))}
             className="w-full"
           />
         </div>
