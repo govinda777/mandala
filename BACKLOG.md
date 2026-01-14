@@ -2,12 +2,18 @@
 
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
-## 🚀 Próximos Passos (Curto Prazo)
+## 🚀 Em Progresso
 
-- [ ] **Configuração do Ambiente**: Configurar Vite, TypeScript, React e testes (Vitest).
 - [ ] **Refatoração Inicial**: Separar lógica de desenho (Canvas) da lógica de estado (React).
+    - [ ] Criar `src/lib/mandala-math.ts` para lógica matemática.
+    - [ ] Criar `src/lib/mandala-renderer.ts` para lógica de renderização.
+    - [ ] Adicionar testes unitários para a lógica matemática.
+
+## 📋 Próximos Passos (Curto Prazo)
+
 - [ ] **Modo Fibonacci**: Implementar opção para restringir o número de pétalas à sequência de Fibonacci (3, 5, 8, 13, 21...).
 - [ ] **Geometria Sagrada**: Adicionar sobreposição da "Flor da Vida" ou "Proporção Áurea".
+- [ ] **Configuração do Ambiente**: Configurar Vite, TypeScript, React e testes (Vitest). (JÁ CONFIGURADO)
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
