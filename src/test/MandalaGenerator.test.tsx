@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi, beforeAll } from 'vitest'
 import MandalaGenerator from '../components/MandalaGenerator'
 
 // Mock canvas context
@@ -19,6 +20,7 @@ const mockGetContext = vi.fn(() => ({
 }))
 
 beforeAll(() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HTMLCanvasElement.prototype.getContext = mockGetContext as any
 })
 

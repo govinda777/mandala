@@ -10,6 +10,7 @@ Visualize e desenhe mandalas de forma interativa utilizando TypeScript e React. 
 - [Status Atual](#status-atual)
 - [Funcionalidades](#funcionalidades)
 - [Instalação e Execução](#instalação-e-execução)
+- [Estrutura do Projeto](#estrutura-do-projeto)
 - [Roteiro (Roadmap)](#roteiro-roadmap)
 - [Tecnologias](#tecnologias)
 - [Contribuindo](#contribuindo)
@@ -60,6 +61,24 @@ O projeto está passando por uma reestruturação para adotar boas práticas de 
    ```
 
 4. Acesse `http://localhost:5173` (ou a porta indicada no terminal).
+
+### Testes
+
+Para rodar os testes unitários:
+
+```bash
+npm test
+```
+
+---
+
+## Estrutura do Projeto
+
+- `src/components`: Componentes React.
+- `src/lib`: Lógica de negócios e matemática (independente de framework).
+  - `mandala-math.ts`: Fórmulas e algoritmos.
+  - `mandala-renderer.ts`: Lógica de desenho no Canvas.
+- `src/test`: Configurações de teste.
 
 ---
 
