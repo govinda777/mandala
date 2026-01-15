@@ -4,16 +4,24 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
-- [ ] **Refatoração Inicial**: Separar lógica de desenho (Canvas) da lógica de estado (React).
-    - [ ] Criar `src/lib/mandala-math.ts` para lógica matemática.
-    - [ ] Criar `src/lib/mandala-renderer.ts` para lógica de renderização.
-    - [ ] Adicionar testes unitários para a lógica matemática.
+- [x] **Geometria Sagrada**: Adicionar sobreposição da "Flor da Vida".
+  - [x] Implementar lógica matemática (`calculateFlowerOfLifeCenters`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
+
+## ✅ Concluído
+
+- [x] **Refatoração Inicial**: Separar lógica de desenho (Canvas) da lógica de estado (React).
+    - [x] Criar `src/lib/mandala-math.ts` para lógica matemática.
+    - [x] Criar `src/lib/mandala-renderer.ts` para lógica de renderização.
+    - [x] Adicionar testes unitários para a lógica matemática.
+- [x] **Modo Fibonacci**: Implementar opção para restringir o número de pétalas à sequência de Fibonacci (3, 5, 8, 13, 21...).
+- [x] **Configuração do Ambiente**: Configurar Vite, TypeScript, React e testes (Vitest).
 
 ## 📋 Próximos Passos (Curto Prazo)
 
-- [ ] **Modo Fibonacci**: Implementar opção para restringir o número de pétalas à sequência de Fibonacci (3, 5, 8, 13, 21...).
-- [ ] **Geometria Sagrada**: Adicionar sobreposição da "Flor da Vida" ou "Proporção Áurea".
-- [ ] **Configuração do Ambiente**: Configurar Vite, TypeScript, React e testes (Vitest). (JÁ CONFIGURADO)
+- [ ] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 

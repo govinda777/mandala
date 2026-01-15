@@ -10,6 +10,7 @@ export default function MandalaGenerator() {
   const [complexidade, setComplexidade] = useState(1);
   const [rotacao, setRotacao] = useState(0);
   const [modoFibonacci, setModoFibonacci] = useState(false);
+  const [flowerOfLife, setFlowerOfLife] = useState(false);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -53,14 +54,15 @@ export default function MandalaGenerator() {
       complexidade,
       rotacao,
       width: canvas.width,
-      height: canvas.height
+      height: canvas.height,
+      flowerOfLife
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -86,6 +88,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fibonacci-mode" className="text-white">Modo Fibonacci</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="flower-of-life"
+            checked={flowerOfLife}
+            onChange={(e) => setFlowerOfLife(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="flower-of-life" className="text-white">Flor da Vida (Geometria Sagrada)</label>
         </div>
 
         <div>
