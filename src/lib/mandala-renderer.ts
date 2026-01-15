@@ -1,3 +1,5 @@
+import { getNearestFibonacci, calculateFlowerOfLifeCenters } from './mandala-math';
+
 export interface MandalaConfig {
   numPetalas: number;
   numCamadas: number;
@@ -6,6 +8,7 @@ export interface MandalaConfig {
   rotacao: number;
   width: number;
   height: number;
+  flowerOfLife?: boolean;
 }
 
 export const drawMandala = (
@@ -20,6 +23,7 @@ export const drawMandala = (
     rotacao,
     width,
     height,
+    flowerOfLife,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -75,6 +79,10 @@ export const drawMandala = (
 
   // Desenhar círculos concêntricos decorativos
   drawCentralCircles(ctx, numCamadas, tamanho, complexidade, corBase, numPetalas);
+
+  if (flowerOfLife) {
+    drawFlowerOfLifeOverlay(ctx, tamanho, complexidade);
+  }
 
   // Restaurar a transformação
   ctx.restore();
@@ -276,4 +284,38 @@ const drawCentralCircles = (
       ctx.stroke();
     }
   }
+};
+
+const drawFlowerOfLifeOverlay = (
+  ctx: CanvasRenderingContext2D,
+  radius: number,
+  complexidade: number
+) => {
+  // Determine circle radius and layers based on complexity or fixed?
+  // Let's use a fixed relative size for now.
+  // The "radius" parameter here is the mandala radius (half screen approx).
+
+  // In Flower of Life, the circles have radius r.
+  // If we want to cover the area, we need to choose r.
+  // Let's say we want 3 layers.
+  const layers = 3;
+  // The extent is approximately 2 * layers * r.
+  // So if extent = radius (mandala size), then r = radius / (2 * layers).
+  const circleRadius = radius / (2 * 1.5); // A bit larger
+
+  const centers = calculateFlowerOfLifeCenters(circleRadius, layers);
+
+  ctx.save();
+  // Use a blending mode or thin lines
+  ctx.globalCompositeOperation = "source-over"; // Normal blending, but transparency helps
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.5)"; // Goldish
+  ctx.lineWidth = 2;
+
+  centers.forEach((center) => {
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, circleRadius, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  ctx.restore();
 };
