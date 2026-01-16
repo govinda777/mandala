@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters } from './mandala-math';
+import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -9,6 +9,7 @@ export interface MandalaConfig {
   width: number;
   height: number;
   flowerOfLife?: boolean;
+  goldenSpiral?: boolean;
 }
 
 export const drawMandala = (
@@ -24,6 +25,7 @@ export const drawMandala = (
     width,
     height,
     flowerOfLife,
+    goldenSpiral,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -82,6 +84,10 @@ export const drawMandala = (
 
   if (flowerOfLife) {
     drawFlowerOfLifeOverlay(ctx, tamanho, complexidade);
+  }
+
+  if (goldenSpiral) {
+    drawGoldenSpiral(ctx, tamanho);
   }
 
   // Restaurar a transformação
@@ -316,6 +322,37 @@ const drawFlowerOfLifeOverlay = (
     ctx.arc(center.x, center.y, circleRadius, 0, Math.PI * 2);
     ctx.stroke();
   });
+
+  ctx.restore();
+};
+
+const drawGoldenSpiral = (
+  ctx: CanvasRenderingContext2D,
+  maxRadius: number
+) => {
+  // We want the spiral to cover the mandala area nicely.
+  // 3-4 turns should be enough to look "hypnotic".
+  const turns = 4;
+  const points = calculateGoldenSpiral(0, 0, maxRadius, turns);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.8)"; // Gold color, more opaque
+  ctx.lineWidth = 3;
+  ctx.shadowColor = "rgba(255, 215, 0, 0.5)";
+  ctx.shadowBlur = 10;
+
+  ctx.beginPath();
+  if (points.length > 0) {
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+  }
+  ctx.stroke();
+
+  // Also draw the symmetrical spirals?
+  // Often golden spirals are drawn mirrored or rotated.
+  // But let's stick to one main spiral for now as per prompt.
 
   ctx.restore();
 };

@@ -11,6 +11,7 @@ export default function MandalaGenerator() {
   const [rotacao, setRotacao] = useState(0);
   const [modoFibonacci, setModoFibonacci] = useState(false);
   const [flowerOfLife, setFlowerOfLife] = useState(false);
+  const [goldenSpiral, setGoldenSpiral] = useState(false);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -55,14 +56,15 @@ export default function MandalaGenerator() {
       rotacao,
       width: canvas.width,
       height: canvas.height,
-      flowerOfLife
+      flowerOfLife,
+      goldenSpiral
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -99,6 +101,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="flower-of-life" className="text-white">Flor da Vida (Geometria Sagrada)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="golden-spiral"
+            checked={goldenSpiral}
+            onChange={(e) => setGoldenSpiral(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="golden-spiral" className="text-white">Espiral Áurea (Proporção de Ouro)</label>
         </div>
 
         <div>

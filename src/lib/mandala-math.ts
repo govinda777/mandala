@@ -88,3 +88,48 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 
   return points;
 };
+
+/**
+ * Calculates points for a Golden Spiral (Logarithmic Spiral).
+ * Radius grows by Phi (1.618...) every quarter turn.
+ * @param centerX Center X coordinate
+ * @param centerY Center Y coordinate
+ * @param maxRadius The maximum radius the spiral should reach
+ * @param turns Number of full rotations
+ * @returns Array of {x, y} coordinates
+ */
+export const calculateGoldenSpiral = (
+  centerX: number,
+  centerY: number,
+  maxRadius: number,
+  turns: number
+): Point[] => {
+  const points: Point[] = [];
+  const PHI = (1 + Math.sqrt(5)) / 2;
+  // Growth factor b for Golden Spiral: r = a * e^(b * theta)
+  // r grows by factor PHI every quarter turn (PI/2)
+  // PHI = e^(b * PI/2) => ln(PHI) = b * PI/2 => b = 2 * ln(PHI) / PI
+  const b = (2 * Math.log(PHI)) / Math.PI;
+
+  const maxTheta = turns * 2 * Math.PI;
+
+  // Calculate 'a' so that at maxTheta, radius is maxRadius
+  // maxRadius = a * e^(b * maxTheta) => a = maxRadius / e^(b * maxTheta)
+  const a = maxRadius / Math.exp(b * maxTheta);
+
+  // Resolution: points per turn
+  const pointsPerTurn = 100;
+  const totalPoints = Math.ceil(turns * pointsPerTurn);
+
+  for (let i = 0; i <= totalPoints; i++) {
+    const theta = (i / totalPoints) * maxTheta;
+    const radius = a * Math.exp(b * theta);
+
+    points.push({
+      x: centerX + radius * Math.cos(theta),
+      y: centerY + radius * Math.sin(theta)
+    });
+  }
+
+  return points;
+};
