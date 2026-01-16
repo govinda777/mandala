@@ -63,4 +63,14 @@ describe('MandalaGenerator', () => {
     // Let's assume we implement it to snap to nearest.
     expect(screen.getByText(/Pétalas: 8/i)).toBeInTheDocument() // or 13
   })
+
+  it('toggles Golden Spiral', () => {
+    render(<MandalaGenerator />)
+    const toggle = screen.getByLabelText(/Espiral Áurea/i)
+    expect(toggle).toBeInTheDocument()
+    expect(toggle).not.toBeChecked()
+
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+  })
 })

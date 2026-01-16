@@ -12,6 +12,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
+  - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
+
 - [x] **Refatoração Inicial**: Separar lógica de desenho (Canvas) da lógica de estado (React).
     - [x] Criar `src/lib/mandala-math.ts` para lógica matemática.
     - [x] Criar `src/lib/mandala-renderer.ts` para lógica de renderização.
@@ -21,7 +27,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
-- [ ] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
