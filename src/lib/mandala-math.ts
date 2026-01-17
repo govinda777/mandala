@@ -19,6 +19,12 @@ export interface Point {
   y: number;
 }
 
+export interface Circle {
+  x: number;
+  y: number;
+  radius: number;
+}
+
 /**
  * Calculates center points for a hexagonal packing of circles (Flower of Life pattern).
  * @param radius Radius of the circles (distance between centers).
@@ -87,6 +93,54 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
   }
 
   return points;
+};
+
+/**
+ * Calculates circles for a recursive fractal pattern.
+ * @param centerX Center X coordinate
+ * @param centerY Center Y coordinate
+ * @param radius Radius of the central circle
+ * @param depth Recursion depth (0 = only center circle)
+ * @param branches Number of branches (circles) around each circle
+ * @returns Array of Circle objects
+ */
+export const calculateFractalCircles = (
+  centerX: number,
+  centerY: number,
+  radius: number,
+  depth: number,
+  branches: number
+): Circle[] => {
+  const circles: Circle[] = [];
+
+  // Add current circle
+  circles.push({ x: centerX, y: centerY, radius });
+
+  if (depth <= 0) return circles;
+
+  // Calculate children
+  // Ratio 0.5 implies the next circle is half the size
+  const ratio = 0.5;
+  const newRadius = radius * ratio;
+
+  // Position children around the current circle
+  // We place them so they touch the current circle (distance = radius + newRadius)
+  // or maybe overlapping? Let's use touching for now.
+  const distance = radius + newRadius;
+
+  const angleStep = (Math.PI * 2) / branches;
+
+  for (let i = 0; i < branches; i++) {
+    const angle = i * angleStep;
+    const cx = centerX + distance * Math.cos(angle);
+    const cy = centerY + distance * Math.sin(angle);
+
+    // Recursive call
+    const children = calculateFractalCircles(cx, cy, newRadius, depth - 1, branches);
+    circles.push(...children);
+  }
+
+  return circles;
 };
 
 /**

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -83,6 +83,32 @@ describe('Mandala Math', () => {
         expect(dist).toBeGreaterThanOrEqual(prevDist);
         prevDist = dist;
       }
+    });
+  });
+
+  describe('calculateFractalCircles', () => {
+    it('should return 1 circle (center) for depth 0', () => {
+      const circles = calculateFractalCircles(0, 0, 100, 0, 6);
+      expect(circles).toHaveLength(1);
+      expect(circles[0]).toEqual({ x: 0, y: 0, radius: 100 });
+    });
+
+    it('should return 1 + branches circles for depth 1', () => {
+      const branches = 6;
+      const circles = calculateFractalCircles(0, 0, 100, 1, branches);
+      expect(circles).toHaveLength(1 + branches);
+      // Verify radius of children is smaller (assuming 0.5 ratio)
+      expect(circles[1].radius).toBe(50);
+    });
+
+    it('should handle depth 2 recursively', () => {
+      const branches = 4;
+      // Depth 0: 1
+      // Depth 1: 4
+      // Depth 2: 4 * 4 = 16
+      // Total: 21
+      const circles = calculateFractalCircles(0, 0, 100, 2, branches);
+      expect(circles).toHaveLength(1 + 4 + 16);
     });
   });
 });

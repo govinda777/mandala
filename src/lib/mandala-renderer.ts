@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral } from './mandala-math';
+import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -10,6 +10,7 @@ export interface MandalaConfig {
   height: number;
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
+  fractalMode?: boolean;
 }
 
 export const drawMandala = (
@@ -26,6 +27,7 @@ export const drawMandala = (
     height,
     flowerOfLife,
     goldenSpiral,
+    fractalMode,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -90,7 +92,43 @@ export const drawMandala = (
     drawGoldenSpiral(ctx, tamanho);
   }
 
+  if (fractalMode) {
+    drawFractalOverlay(ctx, tamanho, complexidade);
+  }
+
   // Restaurar a transformação
+  ctx.restore();
+};
+
+const drawFractalOverlay = (
+  ctx: CanvasRenderingContext2D,
+  radius: number,
+  complexidade: number
+) => {
+  // Adjust depth based on complexity?
+  // Complexity is 1.0 to 3.0.
+  // Depth 2 is good default. 3 might be slow/too detailed.
+  const depth = complexidade > 2 ? 3 : 2;
+  const branches = 6;
+
+  // Initial radius for the central fractal circle
+  // Making it relative to the mandala radius
+  const startRadius = radius * 0.25;
+
+  const circles = calculateFractalCircles(0, 0, startRadius, depth, branches);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(100, 200, 255, 0.7)"; // Cyan/Blueish for fractal
+  ctx.lineWidth = 1.5;
+
+  circles.forEach(circle => {
+    ctx.beginPath();
+    ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(100, 200, 255, 0.1)";
+    ctx.fill();
+  });
+
   ctx.restore();
 };
 

@@ -4,13 +4,20 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+
+## ✅ Concluído
+
+- [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
+  - [x] Implementar lógica matemática (`calculateFractalCircles`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
+
 - [x] **Geometria Sagrada**: Adicionar sobreposição da "Flor da Vida".
   - [x] Implementar lógica matemática (`calculateFlowerOfLifeCenters`).
   - [x] Adicionar testes unitários.
   - [x] Implementar renderização no Canvas.
   - [x] Adicionar controle na UI.
-
-## ✅ Concluído
 
 - [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
   - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
@@ -31,7 +38,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
 ### 📐 Matemática e Geometria
-- **Modo Fractal**: Gerar mandalas baseadas em fractais (Mandelbrot/Julia sets) ou recursão geométrica.
 - **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
 - **Tesselação**: Criar padrões que se repetem infinitamente sem lacunas.
 
