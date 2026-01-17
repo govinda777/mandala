@@ -41,6 +41,16 @@ describe('MandalaGenerator', () => {
     expect(toggle).toBeChecked()
   })
 
+  it('toggles Fractal Mode', () => {
+    render(<MandalaGenerator />)
+    const toggle = screen.getByLabelText(/Modo Fractal/i)
+    expect(toggle).toBeInTheDocument()
+    expect(toggle).not.toBeChecked()
+
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+  })
+
   it('snaps petal count to Fibonacci numbers when mode is enabled', () => {
     render(<MandalaGenerator />)
     const toggle = screen.getByLabelText(/Modo Fibonacci/i)
