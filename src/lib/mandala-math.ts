@@ -96,6 +96,21 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 };
 
 /**
+ * Calculates a scale factor that oscillates over time to simulate breathing/pulsing.
+ * @param time Current time (e.g., from performance.now() or a frame counter)
+ * @param speed Speed of the pulse (frequency)
+ * @param amplitude Intensity of the pulse (how much it grows/shrinks)
+ * @returns A scale factor (e.g., oscillating between 1-amplitude and 1+amplitude)
+ */
+export const calculatePulseScale = (
+  time: number,
+  speed: number = 0.002,
+  amplitude: number = 0.05
+): number => {
+  return 1 + Math.sin(time * speed) * amplitude;
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate
