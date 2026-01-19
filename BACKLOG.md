@@ -4,6 +4,11 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+- [ ] **Animação de Respiração/Pulsação**: Adicionar efeito de "respiração" (scale/pulse) à mandala.
+  - [ ] Implementar lógica matemática (`calculateOscillation`).
+  - [ ] Adicionar testes unitários.
+  - [ ] Implementar loop de animação no React.
+  - [ ] Atualizar renderização para usar parâmetro de tempo.
 
 ## ✅ Concluído
 

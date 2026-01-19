@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateOscillation } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -109,6 +109,21 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculateOscillation', () => {
+    it('should return 0 when time is 0 (sin(0) = 0)', () => {
+      expect(calculateOscillation(0, 1, 10)).toBe(0);
+    });
+
+    it('should return amplitude when phase is PI/2 (sin(PI/2) = 1)', () => {
+      // time * freq = PI/2. If freq=1, time=PI/2
+      expect(calculateOscillation(Math.PI / 2, 1, 10)).toBeCloseTo(10);
+    });
+
+    it('should return -amplitude when phase is 3PI/2', () => {
+      expect(calculateOscillation(3 * Math.PI / 2, 1, 10)).toBeCloseTo(-10);
     });
   });
 });

@@ -13,6 +13,27 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [animating, setAnimating] = useState(false);
+  const [animationTime, setAnimationTime] = useState(0);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const animate = (time: number) => {
+      setAnimationTime(time);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    if (animating) {
+      animationFrameId = requestAnimationFrame(animate);
+    } else {
+      setAnimationTime(0);
+    }
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [animating]);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -59,14 +80,15 @@ export default function MandalaGenerator() {
       height: canvas.height,
       flowerOfLife,
       goldenSpiral,
-      fractalMode
+      fractalMode,
+      animationTime
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, animationTime]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -125,6 +147,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="animating"
+            checked={animating}
+            onChange={(e) => setAnimating(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="animating" className="text-white">Animar (Respiração)</label>
         </div>
 
         <div>

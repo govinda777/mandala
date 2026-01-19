@@ -187,3 +187,18 @@ export const calculateGoldenSpiral = (
 
   return points;
 };
+
+/**
+ * Calculates a sinusoidal oscillation value.
+ * @param time Current time value
+ * @param frequency Frequency of oscillation
+ * @param amplitude Amplitude of oscillation
+ * @returns Oscillated value between -amplitude and +amplitude
+ */
+export const calculateOscillation = (
+  time: number,
+  frequency: number,
+  amplitude: number
+): number => {
+  return Math.sin(time * frequency) * amplitude;
+};

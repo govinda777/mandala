@@ -41,6 +41,16 @@ describe('MandalaGenerator', () => {
     expect(toggle).toBeChecked()
   })
 
+  it('toggles Animation mode', () => {
+    render(<MandalaGenerator />)
+    const toggle = screen.getByLabelText(/Animar/i)
+    expect(toggle).toBeInTheDocument()
+    expect(toggle).not.toBeChecked()
+
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+  })
+
   it('toggles Fractal Mode', () => {
     render(<MandalaGenerator />)
     const toggle = screen.getByLabelText(/Modo Fractal/i)

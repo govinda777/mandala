@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateOscillation } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -11,6 +11,7 @@ export interface MandalaConfig {
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
+  animationTime?: number;
 }
 
 export const drawMandala = (
@@ -28,6 +29,7 @@ export const drawMandala = (
     flowerOfLife,
     goldenSpiral,
     fractalMode,
+    animationTime = 0,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -39,6 +41,13 @@ export const drawMandala = (
   ctx.save();
   ctx.translate(width / 2, height / 2);
   ctx.rotate((rotacao * Math.PI) / 180);
+
+  // Apply breathing animation
+  if (animationTime > 0) {
+    // Oscillate scale between 0.95 and 1.05
+    const scale = 1 + calculateOscillation(animationTime, 0.002, 0.05);
+    ctx.scale(scale, scale);
+  }
 
   // Desenhar camadas da mandala
   for (let camada = 1; camada <= numCamadas; camada++) {
@@ -333,7 +342,7 @@ const drawCentralCircles = (
 const drawFlowerOfLifeOverlay = (
   ctx: CanvasRenderingContext2D,
   radius: number,
-  complexidade: number
+  _complexidade: number
 ) => {
   // Determine circle radius and layers based on complexity or fixed?
   // Let's use a fixed relative size for now.
