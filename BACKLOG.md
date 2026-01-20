@@ -7,6 +7,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Animação**: Fazer a mandala "respirar" (pulsar).
+  - [x] Implementar lógica matemática (`calculatePulse`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar loop de animação no React.
+  - [x] Atualizar renderização.
+
 - [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
   - [x] Implementar lógica matemática (`calculateFractalCircles`).
   - [x] Adicionar testes unitários.
@@ -34,12 +40,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
+- **Tesselação**: Criar padrões que se repetem infinitamente sem lacunas.
+- **Exportação PNG**: Exportar em alta resolução.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
 ### 📐 Matemática e Geometria
 - **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
-- **Tesselação**: Criar padrões que se repetem infinitamente sem lacunas.
 
 ### 🌌 Cosmologia e Astrologia
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
@@ -56,5 +63,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.
