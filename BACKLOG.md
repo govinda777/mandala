@@ -4,8 +4,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
-
 ## ✅ Concluído
+
+- [x] **Animação de Respiração/Pulsação**: Adicionar efeito de pulsação suave à mandala.
+  - [x] Implementar função matemática de pulsação (`calculatePulseScale`).
+  - [x] Adicionar suporte a escala na renderização (`drawMandala`).
+  - [x] Implementar loop de animação (`requestAnimationFrame`) no componente React.
+  - [x] Adicionar controle de UI para ativar/desativar animação.
 
 - [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
   - [x] Implementar lógica matemática (`calculateFractalCircles`).
