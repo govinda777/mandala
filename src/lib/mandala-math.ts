@@ -96,6 +96,31 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 };
 
 /**
+ * Calculates a scale factor for a pulsing animation (sine wave).
+ * @param time Current time (timestamp or frame count)
+ * @param speed Speed of the pulse (frequency)
+ * @param min Minimum scale
+ * @param max Maximum scale
+ * @returns Current scale factor
+ */
+export const calculatePulseScale = (
+  time: number,
+  speed: number = 0.002,
+  min: number = 0.95,
+  max: number = 1.05
+): number => {
+  // Sine wave oscillates between -1 and 1
+  // We want to map it to [min, max]
+  const sine = Math.sin(time * speed);
+
+  // Normalize sine to [0, 1]: (sine + 1) / 2
+  const normalized = (sine + 1) / 2;
+
+  // Map to [min, max]
+  return min + normalized * (max - min);
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate

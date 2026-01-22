@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePulseScale } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -109,6 +109,37 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculatePulseScale', () => {
+    it('should return a value within min and max range', () => {
+      const min = 0.8;
+      const max = 1.2;
+      // Test various time points
+      for (let t = 0; t < 100; t += 10) {
+        const scale = calculatePulseScale(t, 0.001, min, max);
+        expect(scale).toBeGreaterThanOrEqual(min);
+        expect(scale).toBeLessThanOrEqual(max);
+      }
+    });
+
+    it('should return a sinusoidal pattern', () => {
+      // At t=0, sine is 0. Scale should be mid point?
+      // Or if using sin(t), range is [-1, 1].
+      // scale = min + (sin(t) + 1)/2 * (max - min)
+
+      // Let's assume standard implementation logic:
+      // sine wave mapped to [min, max]
+
+      const t0 = 0; // sin(0) = 0
+      const scale0 = calculatePulseScale(t0, 1, 1.0, 2.0);
+
+      // sin(0) = 0. Map to range.
+      // If we use (sin(t) + 1) / 2 -> 0.5.
+      // scale = 1.0 + 0.5 * (1.0) = 1.5.
+
+      expect(scale0).toBeCloseTo(1.5);
     });
   });
 });

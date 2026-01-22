@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci } from '../lib/mandala-math';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { getNearestFibonacci, calculatePulseScale } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const requestRef = useRef<number>();
   const [numPetalas, setNumPetalas] = useState(12);
   const [numCamadas, setNumCamadas] = useState(5);
   const [corBase, setCorBase] = useState(180);
@@ -13,6 +14,7 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [animar, setAnimar] = useState(false);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -42,12 +44,17 @@ export default function MandalaGenerator() {
   };
   
   // Função para desenhar a mandala
-  const renderizarMandala = () => {
+  const renderizarMandala = useCallback((time: number = 0) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    let pulseScale = 1;
+    if (animar) {
+      pulseScale = calculatePulseScale(time, 0.002, 0.95, 1.05);
+    }
 
     drawMandala(ctx, {
       numPetalas,
@@ -59,19 +66,38 @@ export default function MandalaGenerator() {
       height: canvas.height,
       flowerOfLife,
       goldenSpiral,
-      fractalMode
+      fractalMode,
+      pulseScale
     });
-  };
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, animar]);
 
-  // Redesenhar quando os parâmetros mudarem
-  useEffect(() => {
-    renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+  const animate = useCallback((time: number) => {
+    renderizarMandala(time);
+    requestRef.current = requestAnimationFrame(animate);
+  }, [renderizarMandala]);
 
-  // Redesenhar quando o componente montar
   useEffect(() => {
-    renderizarMandala();
-  }, []);
+    if (animar) {
+      requestRef.current = requestAnimationFrame(animate);
+    } else {
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
+      renderizarMandala(0);
+    }
+    return () => {
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
+    };
+  }, [animar, animate, renderizarMandala]);
+
+  // Redesenhar quando os parâmetros mudarem (se não estiver animando)
+  useEffect(() => {
+    if (!animar) {
+      renderizarMandala(0);
+    }
+  }, [renderizarMandala, animar]);
 
   return (
     <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
@@ -125,6 +151,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="animar-mode"
+            checked={animar}
+            onChange={(e) => setAnimar(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="animar-mode" className="text-white">Animar (Respiração)</label>
         </div>
 
         <div>
