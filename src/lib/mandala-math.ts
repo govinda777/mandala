@@ -96,6 +96,21 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 };
 
 /**
+ * Calculates a pulse scaling factor based on time (sine wave).
+ * @param time Current time or tick
+ * @param speed Speed of oscillation (frequency)
+ * @param amplitude Intensity of the pulse (max deviation from 1.0)
+ * @returns A scale factor (e.g., 1.0 to 1.1)
+ */
+export const calculatePulse = (
+  time: number,
+  speed: number = 0.002,
+  amplitude: number = 0.05
+): number => {
+  return 1 + amplitude * Math.sin(time * speed);
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate

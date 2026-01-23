@@ -7,6 +7,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Animação de Respiração/Pulsação**: Adicionar efeito visual de pulsação na mandala.
+  - [x] Implementar lógica matemática (`calculatePulse`).
+  - [x] Adicionar testes unitários.
+  - [x] Atualizar renderizador para aceitar escala dinâmica.
+  - [x] Adicionar controle de animação na UI.
+
 - [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
   - [x] Implementar lógica matemática (`calculateFractalCircles`).
   - [x] Adicionar testes unitários.
