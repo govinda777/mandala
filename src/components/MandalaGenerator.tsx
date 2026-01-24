@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
@@ -13,6 +13,7 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(false);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -42,7 +43,7 @@ export default function MandalaGenerator() {
   };
   
   // Função para desenhar a mandala
-  const renderizarMandala = () => {
+  const renderizarMandala = (pulseScale?: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -59,19 +60,37 @@ export default function MandalaGenerator() {
       height: canvas.height,
       flowerOfLife,
       goldenSpiral,
-      fractalMode
+      fractalMode,
+      pulseScale
     });
   };
 
-  // Redesenhar quando os parâmetros mudarem
+  // Redesenhar quando os parâmetros mudarem e gerenciar animação
   useEffect(() => {
-    renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+    let animationFrameId: number;
 
-  // Redesenhar quando o componente montar
-  useEffect(() => {
-    renderizarMandala();
-  }, []);
+    const animate = (time: number) => {
+      if (isPulsing) {
+        const scale = calculatePulseScale(time);
+        renderizarMandala(scale);
+        animationFrameId = requestAnimationFrame(animate);
+      } else {
+        renderizarMandala();
+      }
+    };
+
+    if (isPulsing) {
+      animationFrameId = requestAnimationFrame(animate);
+    } else {
+      renderizarMandala();
+    }
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, isPulsing]);
 
   return (
     <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
@@ -125,6 +144,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="pulsing-mode"
+            checked={isPulsing}
+            onChange={(e) => setIsPulsing(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="pulsing-mode" className="text-white">Animação de Respiração/Pulsação</label>
         </div>
 
         <div>
