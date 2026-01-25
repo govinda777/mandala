@@ -19,6 +19,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Implementar renderização no Canvas.
   - [x] Adicionar controle na UI.
 
+- [x] **Animação de Respiração/Pulsação**: Implementar efeito de respiração (MHS).
+  - [x] Implementar lógica matemática (`calculatePulseScale`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
+
 - [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
   - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
   - [x] Adicionar testes unitários.
@@ -56,5 +62,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.

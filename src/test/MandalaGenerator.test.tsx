@@ -7,6 +7,7 @@ const mockGetContext = vi.fn(() => ({
   clearRect: vi.fn(),
   save: vi.fn(),
   translate: vi.fn(),
+  scale: vi.fn(),
   rotate: vi.fn(),
   restore: vi.fn(),
   beginPath: vi.fn(),

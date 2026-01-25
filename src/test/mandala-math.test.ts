@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePulseScale } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -109,6 +109,32 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculatePulseScale', () => {
+    it('should oscillate between min and max based on amplitude', () => {
+      // Base = 1, Amplitude = 0.1 => [0.9, 1.1]
+      // Formula: 1 + amp * sin(t * freq * 2PI)
+      const amp = 0.1;
+      const freq = 1; // 1 Hz
+
+      // t=0 => sin(0) = 0 => 1
+      expect(calculatePulseScale(0, freq, amp)).toBeCloseTo(1);
+
+      // t=0.25 (1/4 period) => sin(0.5PI) = 1 => 1.1
+      expect(calculatePulseScale(0.25, freq, amp)).toBeCloseTo(1.1);
+
+      // t=0.75 (3/4 period) => sin(1.5PI) = -1 => 0.9
+      expect(calculatePulseScale(0.75, freq, amp)).toBeCloseTo(0.9);
+    });
+
+    it('should respect frequency', () => {
+      const amp = 0.1;
+      const freq = 2; // 2 Hz, period 0.5s
+
+      // t=0.125 (1/4 of 0.5s) => sin(0.125 * 2 * 2PI) = sin(0.5PI) = 1 => 1.1
+      expect(calculatePulseScale(0.125, freq, amp)).toBeCloseTo(1.1);
     });
   });
 });

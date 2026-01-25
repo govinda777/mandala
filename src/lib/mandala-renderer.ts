@@ -11,6 +11,7 @@ export interface MandalaConfig {
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
+  pulseScale?: number;
 }
 
 export const drawMandala = (
@@ -28,6 +29,7 @@ export const drawMandala = (
     flowerOfLife,
     goldenSpiral,
     fractalMode,
+    pulseScale = 1,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -38,6 +40,10 @@ export const drawMandala = (
   // Mover para o centro do canvas
   ctx.save();
   ctx.translate(width / 2, height / 2);
+
+  // Aplicar escala de pulsação
+  ctx.scale(pulseScale, pulseScale);
+
   ctx.rotate((rotacao * Math.PI) / 180);
 
   // Desenhar camadas da mandala
