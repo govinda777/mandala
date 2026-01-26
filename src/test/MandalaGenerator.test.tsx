@@ -6,6 +6,7 @@ import MandalaGenerator from '../components/MandalaGenerator'
 const mockGetContext = vi.fn(() => ({
   clearRect: vi.fn(),
   save: vi.fn(),
+  scale: vi.fn(),
   translate: vi.fn(),
   rotate: vi.fn(),
   restore: vi.fn(),

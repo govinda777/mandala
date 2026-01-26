@@ -4,6 +4,11 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+- [ ] **Animação**: Fazer a mandala "respirar" (pulsar).
+  - [ ] Implementar lógica matemática (`calculatePulseScale`).
+  - [ ] Adicionar testes unitários.
+  - [ ] Implementar renderização no Canvas (`pulseScale`).
+  - [ ] Adicionar controle de animação na UI (`requestAnimationFrame`).
 
 ## ✅ Concluído
 
@@ -56,5 +61,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.

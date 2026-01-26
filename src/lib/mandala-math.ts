@@ -48,9 +48,6 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
       // Start at a vertex of the hexagon: (l * radius, 0)
       // Then move along the edge 'l' times.
 
-      let x = l * radius;
-      let y = 0;
-
       for (let i = 0; i < 6; i++) {
           // Direction of the edge: (i + 2) * 60 degrees.
           // Wait, standard algorithm:
@@ -62,7 +59,6 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
           // Walk around the hexagon of radius l.
 
           const startAngle = i * angle60;
-          const endAngle = ((i + 1) % 6) * angle60;
 
           // Vertices of the layer hexagon
           // But we need points ALONG the edge too.
@@ -93,6 +89,21 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
   }
 
   return points;
+};
+
+/**
+ * Calculates a scaling factor for pulsing animation.
+ * @param time Current time in seconds.
+ * @param frequency Frequency of the pulse in Hertz (cycles per second).
+ * @param amplitude Amplitude of the pulse (e.g., 0.1 for +/- 10% scale).
+ * @returns Scale factor (1 +/- amplitude).
+ */
+export const calculatePulseScale = (
+  time: number,
+  frequency: number,
+  amplitude: number
+): number => {
+  return 1 + amplitude * Math.sin(time * frequency * 2 * Math.PI);
 };
 
 /**
