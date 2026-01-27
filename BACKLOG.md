@@ -31,6 +31,11 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
     - [x] Adicionar testes unitários para a lógica matemática.
 - [x] **Modo Fibonacci**: Implementar opção para restringir o número de pétalas à sequência de Fibonacci (3, 5, 8, 13, 21...).
 - [x] **Configuração do Ambiente**: Configurar Vite, TypeScript, React e testes (Vitest).
+- [x] **Animação**: Adicionar modo de "Respiração/Pulsação".
+  - [x] Implementar lógica matemática (`calculatePulseScale`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas (ajuste de escala).
+  - [x] Adicionar controle na UI (checkbox e slider de frequência).
 
 ## 📋 Próximos Passos (Curto Prazo)
 

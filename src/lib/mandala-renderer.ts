@@ -11,6 +11,7 @@ export interface MandalaConfig {
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
+  pulseScale?: number;
 }
 
 export const drawMandala = (
@@ -28,9 +29,10 @@ export const drawMandala = (
     flowerOfLife,
     goldenSpiral,
     fractalMode,
+    pulseScale = 1,
   } = config;
 
-  const tamanho = Math.min(width, height) * 0.9 / 2;
+  const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
 
   // Limpar o canvas
   ctx.clearRect(0, 0, width, height);
