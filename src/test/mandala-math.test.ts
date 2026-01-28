@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePulse } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -109,6 +109,36 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculatePulse', () => {
+    it('should return 1 when amplitude is 0', () => {
+      const scale = calculatePulse(1234, 1, 0);
+      expect(scale).toBe(1);
+    });
+
+    it('should return 1 at time 0', () => {
+      const scale = calculatePulse(0, 1, 0.5);
+      expect(scale).toBe(1);
+    });
+
+    it('should oscillate between 1-amplitude and 1+amplitude', () => {
+      const amplitude = 0.2;
+      // Frequency 1Hz. Quarter cycle at 0.25s
+      const peak = calculatePulse(0.25, 1, amplitude);
+      expect(peak).toBeCloseTo(1 + amplitude);
+
+      // Three quarter cycle at 0.75s
+      const trough = calculatePulse(0.75, 1, amplitude);
+      expect(trough).toBeCloseTo(1 - amplitude);
+    });
+
+    it('should handle frequency correctly (2pi conversion)', () => {
+        // If freq is 2Hz, period is 0.5s. Peak at 0.125s (1/8s)
+        const amplitude = 0.1;
+        const scale = calculatePulse(0.125, 2, amplitude);
+        expect(scale).toBeCloseTo(1 + amplitude);
     });
   });
 });

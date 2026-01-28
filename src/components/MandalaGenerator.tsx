@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci } from '../lib/mandala-math';
-import { drawMandala } from '../lib/mandala-renderer';
+import { getNearestFibonacci, calculatePulse } from '../lib/mandala-math';
+import { drawMandala, MandalaConfig } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,6 +13,10 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  const animationRef = useRef<number>();
+  const configRef = useRef<MandalaConfig>();
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -41,29 +45,70 @@ export default function MandalaGenerator() {
     setRotacao(Math.random() * 360);                  // Rotação aleatória
   };
   
-  // Função para desenhar a mandala
-  const renderizarMandala = () => {
+  // Atualizar a ref de configuração sempre que o estado mudar
+  useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    drawMandala(ctx, {
+    configRef.current = {
       numPetalas,
       numCamadas,
       corBase,
       complexidade,
       rotacao,
-      width: canvas.width,
-      height: canvas.height,
+      width: canvas?.width || 400,
+      height: canvas?.height || 400,
       flowerOfLife,
       goldenSpiral,
       fractalMode
-    });
+    };
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+
+  // Função para desenhar a mandala
+  const renderizarMandala = () => {
+    // Se estiver animando, o loop de animação cuida do desenho
+    if (animating) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (configRef.current) {
+        drawMandala(ctx, configRef.current);
+    }
   };
 
-  // Redesenhar quando os parâmetros mudarem
+  // Loop de Animação
+  useEffect(() => {
+    if (!animating) {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      renderizarMandala(); // Garantir que desenhe o estado estático ao parar
+      return;
+    }
+
+    const startTime = Date.now();
+    const animate = () => {
+      const time = (Date.now() - startTime) / 1000;
+      // Frequência de 0.2Hz (5 segundos por ciclo) e Amplitude 5%
+      const pulse = calculatePulse(time, 0.2, 0.05);
+
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d');
+      if (ctx && configRef.current) {
+        drawMandala(ctx, { ...configRef.current, pulseScale: pulse });
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [animating]);
+
+  // Redesenhar quando os parâmetros mudarem (e não estiver animando)
   useEffect(() => {
     renderizarMandala();
   }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
@@ -125,6 +170,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="animating"
+            checked={animating}
+            onChange={(e) => setAnimating(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="animating" className="text-white">Animar (Respiração/Pulso)</label>
         </div>
 
         <div>
