@@ -1,7 +1,38 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePulse } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
+  describe('calculatePulse', () => {
+    it('should return 1 when amplitude is 0', () => {
+      expect(calculatePulse(1000, 1, 0)).toBe(1);
+    });
+
+    it('should oscillate within range [1-amplitude, 1+amplitude]', () => {
+      const amplitude = 0.1;
+      const scale = calculatePulse(1234, 0.5, amplitude);
+      expect(scale).toBeGreaterThanOrEqual(1 - amplitude);
+      expect(scale).toBeLessThanOrEqual(1 + amplitude);
+    });
+
+    it('should handle time correctly based on frequency', () => {
+      // frequency 1Hz => period 1000ms.
+      // at t=0, sin(0)=0 => 1
+      // at t=250, sin(PI/2)=1 => 1 + amp
+      // at t=500, sin(PI)=0 => 1
+      // at t=750, sin(3PI/2)=-1 => 1 - amp
+      // at t=1000, sin(2PI)=0 => 1
+
+      const amp = 0.1;
+      const freq = 1;
+
+      expect(calculatePulse(0, freq, amp)).toBeCloseTo(1);
+      expect(calculatePulse(250, freq, amp)).toBeCloseTo(1 + amp);
+      expect(calculatePulse(500, freq, amp)).toBeCloseTo(1);
+      expect(calculatePulse(750, freq, amp)).toBeCloseTo(1 - amp);
+      expect(calculatePulse(1000, freq, amp)).toBeCloseTo(1);
+    });
+  });
+
   describe('fibonacciNumbers', () => {
     it('should be an array of numbers', () => {
       expect(Array.isArray(fibonacciNumbers)).toBe(true);

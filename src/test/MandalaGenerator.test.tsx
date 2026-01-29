@@ -17,6 +17,7 @@ const mockGetContext = vi.fn(() => ({
   stroke: vi.fn(),
   createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
   quadraticCurveTo: vi.fn(),
+  scale: vi.fn(),
 }))
 
 beforeAll(() => {
@@ -34,6 +35,16 @@ describe('MandalaGenerator', () => {
   it('toggles Fibonacci mode', () => {
     render(<MandalaGenerator />)
     const toggle = screen.getByLabelText(/Modo Fibonacci/i)
+    expect(toggle).toBeInTheDocument()
+    expect(toggle).not.toBeChecked()
+
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+  })
+
+  it('toggles Breathing Animation', () => {
+    render(<MandalaGenerator />)
+    const toggle = screen.getByLabelText(/Animação de Respiração/i)
     expect(toggle).toBeInTheDocument()
     expect(toggle).not.toBeChecked()
 

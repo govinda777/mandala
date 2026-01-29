@@ -187,3 +187,21 @@ export const calculateGoldenSpiral = (
 
   return points;
 };
+
+/**
+ * Calculates a pulsing scale factor based on a sine wave.
+ * @param time Time in milliseconds
+ * @param frequency Frequency in Hertz (cycles per second)
+ * @param amplitude Amplitude of the pulse (0.1 means scale varies from 0.9 to 1.1)
+ * @returns The scale factor
+ */
+export const calculatePulse = (
+  time: number,
+  frequency: number,
+  amplitude: number
+): number => {
+  // Convert time (ms) to seconds for Hz calculation
+  const t = time / 1000;
+  // Sin wave: 1 + amp * sin(2 * PI * freq * t)
+  return 1 + amplitude * Math.sin(2 * Math.PI * frequency * t);
+};

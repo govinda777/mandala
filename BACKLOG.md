@@ -4,6 +4,11 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+- [ ] **Animação de Respiração/Pulsação**: Adicionar efeito visual de pulsação na mandala.
+  - [x] Implementar lógica matemática (`calculatePulse`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar suporte a escala no renderizador.
+  - [x] Adicionar controle na UI e loop de animação.
 
 ## ✅ Concluído
 
