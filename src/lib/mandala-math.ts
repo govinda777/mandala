@@ -96,6 +96,25 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 };
 
 /**
+ * Calculates a scaling factor for pulsing animation.
+ * @param time Current time in milliseconds.
+ * @param frequency Frequency of the pulse in Hertz (cycles per second).
+ * @param amplitude Maximum deviation from 1 (e.g., 0.1 means scale varies 0.9 to 1.1).
+ * @returns The scaling factor.
+ */
+export const calculatePulseScale = (
+  time: number,
+  frequency: number,
+  amplitude: number
+): number => {
+  if (amplitude === 0) return 1;
+  // sin(2 * PI * f * t) where t is in seconds
+  const tSeconds = time / 1000;
+  const sineValue = Math.sin(tSeconds * frequency * 2 * Math.PI);
+  return 1 + amplitude * sineValue;
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate
