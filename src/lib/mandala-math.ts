@@ -96,6 +96,22 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 };
 
 /**
+ * Calculates a scaling factor for breathing/pulsing animation.
+ * Uses a sine wave: 1 + amplitude * sin(frequency * time * 2PI)
+ * @param time Current time in seconds
+ * @param frequency Frequency in Hertz
+ * @param amplitude Amplitude of the pulse (e.g. 0.05 for +/- 5%)
+ * @returns Scale factor (e.g. 0.95 to 1.05)
+ */
+export const calculatePulseScale = (
+  time: number,
+  frequency: number,
+  amplitude: number
+): number => {
+  return 1 + amplitude * Math.sin(time * frequency * 2 * Math.PI);
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate

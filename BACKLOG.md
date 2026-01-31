@@ -7,6 +7,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Animação de Respiração**: Fazer a mandala "respirar" (pulsar).
+  - [x] Implementar lógica matemática (`calculatePulseScale`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
+
 - [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
   - [x] Implementar lógica matemática (`calculateFractalCircles`).
   - [x] Adicionar testes unitários.
@@ -56,5 +62,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.

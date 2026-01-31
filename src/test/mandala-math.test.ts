@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePulseScale } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -109,6 +109,31 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculatePulseScale', () => {
+    it('should return 1 at time 0', () => {
+      expect(calculatePulseScale(0, 1, 0.1)).toBe(1);
+    });
+
+    it('should oscillate within amplitude', () => {
+      // amplitude 0.1 means range [0.9, 1.1]
+      const scale = calculatePulseScale(1.23, 1, 0.1); // arbitrary time
+      expect(scale).toBeGreaterThanOrEqual(0.9);
+      expect(scale).toBeLessThanOrEqual(1.1);
+    });
+
+    it('should return max value at peak', () => {
+      // frequency 1 Hz => peak at t = 0.25s (1/4 cycle)
+      const scale = calculatePulseScale(0.25, 1, 0.1);
+      expect(scale).toBeCloseTo(1.1);
+    });
+
+    it('should return min value at trough', () => {
+      // frequency 1 Hz => trough at t = 0.75s (3/4 cycle)
+      const scale = calculatePulseScale(0.75, 1, 0.1);
+      expect(scale).toBeCloseTo(0.9);
     });
   });
 });

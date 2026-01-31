@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
@@ -13,6 +13,33 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const [pulseScale, setPulseScale] = useState(1);
+
+  useEffect(() => {
+    if (!isPulsing) {
+      setPulseScale(1);
+      return;
+    }
+
+    let animationFrameId: number;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const now = Date.now();
+      const time = (now - startTime) / 1000;
+      // Frequency: 0.2 Hz (5 seconds cycle), Amplitude: 0.05 (5%)
+      const scale = calculatePulseScale(time, 0.2, 0.05);
+      setPulseScale(scale);
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isPulsing]);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -59,14 +86,15 @@ export default function MandalaGenerator() {
       height: canvas.height,
       flowerOfLife,
       goldenSpiral,
-      fractalMode
+      fractalMode,
+      pulseScale
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, pulseScale]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -125,6 +153,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="breathing-mode"
+            checked={isPulsing}
+            onChange={(e) => setIsPulsing(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="breathing-mode" className="text-white">Modo Respiração (Animação)</label>
         </div>
 
         <div>
