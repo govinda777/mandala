@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -11,6 +11,7 @@ export interface MandalaConfig {
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
+  pulseScale?: number;
 }
 
 export const drawMandala = (
@@ -28,9 +29,11 @@ export const drawMandala = (
     flowerOfLife,
     goldenSpiral,
     fractalMode,
+    pulseScale = 1,
   } = config;
 
-  const tamanho = Math.min(width, height) * 0.9 / 2;
+  const baseSize = Math.min(width, height) * 0.9 / 2;
+  const tamanho = baseSize * pulseScale;
 
   // Limpar o canvas
   ctx.clearRect(0, 0, width, height);
@@ -342,7 +345,9 @@ const drawFlowerOfLifeOverlay = (
   // In Flower of Life, the circles have radius r.
   // If we want to cover the area, we need to choose r.
   // Let's say we want 3 layers.
-  const layers = 3;
+  // Adjust layers based on complexity
+  const layers = Math.max(2, Math.floor(complexidade * 2));
+
   // The extent is approximately 2 * layers * r.
   // So if extent = radius (mandala size), then r = radius / (2 * layers).
   const circleRadius = radius / (2 * 1.5); // A bit larger

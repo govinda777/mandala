@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulse } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
@@ -13,6 +13,31 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [pulseScale, setPulseScale] = useState(1);
+  const animationRef = useRef<number>();
+
+  useEffect(() => {
+    if (isAnimating) {
+      const startTime = Date.now();
+      const animate = () => {
+        const currentTime = (Date.now() - startTime) / 1000;
+        // Pulse freq 0.2Hz (5 sec period), amplitude 0.05
+        const scale = calculatePulse(currentTime, 0.2, 0.05);
+        setPulseScale(scale);
+        animationRef.current = requestAnimationFrame(animate);
+      };
+      animationRef.current = requestAnimationFrame(animate);
+    } else {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      setPulseScale(1);
+    }
+    return () => {
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    };
+  }, [isAnimating]);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -59,14 +84,15 @@ export default function MandalaGenerator() {
       height: canvas.height,
       flowerOfLife,
       goldenSpiral,
-      fractalMode
+      fractalMode,
+      pulseScale
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, pulseScale]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -125,6 +151,17 @@ export default function MandalaGenerator() {
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
           <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="animation-mode"
+            checked={isAnimating}
+            onChange={(e) => setIsAnimating(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="animation-mode" className="text-white">Animação (Respiração)</label>
         </div>
 
         <div>
