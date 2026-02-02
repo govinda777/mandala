@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -11,6 +11,7 @@ export interface MandalaConfig {
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
+  pulseScale?: number;
 }
 
 export const drawMandala = (
@@ -28,6 +29,7 @@ export const drawMandala = (
     flowerOfLife,
     goldenSpiral,
     fractalMode,
+    pulseScale = 1,
   } = config;
 
   const tamanho = Math.min(width, height) * 0.9 / 2;
@@ -38,6 +40,7 @@ export const drawMandala = (
   // Mover para o centro do canvas
   ctx.save();
   ctx.translate(width / 2, height / 2);
+  ctx.scale(pulseScale, pulseScale);
   ctx.rotate((rotacao * Math.PI) / 180);
 
   // Desenhar camadas da mandala
@@ -335,17 +338,15 @@ const drawFlowerOfLifeOverlay = (
   radius: number,
   complexidade: number
 ) => {
-  // Determine circle radius and layers based on complexity or fixed?
-  // Let's use a fixed relative size for now.
-  // The "radius" parameter here is the mandala radius (half screen approx).
+  // Determine circle radius and layers based on complexity
+  const layers = Math.max(2, Math.floor(complexidade * 2));
 
+  // The "radius" parameter here is the mandala radius (half screen approx).
   // In Flower of Life, the circles have radius r.
   // If we want to cover the area, we need to choose r.
-  // Let's say we want 3 layers.
-  const layers = 3;
   // The extent is approximately 2 * layers * r.
   // So if extent = radius (mandala size), then r = radius / (2 * layers).
-  const circleRadius = radius / (2 * 1.5); // A bit larger
+  const circleRadius = radius / (layers * 1.5);
 
   const centers = calculateFlowerOfLifeCenters(circleRadius, layers);
 

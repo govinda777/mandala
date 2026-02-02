@@ -25,6 +25,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Implementar renderização no Canvas.
   - [x] Adicionar controle na UI.
 
+- [x] **Animação de Respiração/Pulsação**: Adicionar efeito de "respiração" à mandala.
+  - [x] Implementar função de escala sinusoidal em `mandala-math.ts`.
+  - [x] Adicionar testes unitários.
+  - [x] Atualizar renderer para suportar escala dinâmica.
+  - [x] Adicionar controle de animação na UI com loop `requestAnimationFrame`.
+
 - [x] **Refatoração Inicial**: Separar lógica de desenho (Canvas) da lógica de estado (React).
     - [x] Criar `src/lib/mandala-math.ts` para lógica matemática.
     - [x] Criar `src/lib/mandala-renderer.ts` para lógica de renderização.
@@ -56,5 +62,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.
