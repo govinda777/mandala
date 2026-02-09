@@ -206,3 +206,32 @@ export const calculateGoldenSpiral = (
 
   return points;
 };
+
+// Planetary Configuration
+export interface PlanetConfig {
+  name: string;
+  baseHue: number;
+  frequencyHz: number;
+}
+
+export const PLANETARY_DATA: Record<string, PlanetConfig> = {
+  Sun: { name: 'Sun', baseHue: 50, frequencyHz: 0.5 },
+  Moon: { name: 'Moon', baseHue: 200, frequencyHz: 0.6 },
+  Mercury: { name: 'Mercury', baseHue: 30, frequencyHz: 1.8 },
+  Venus: { name: 'Venus', baseHue: 300, frequencyHz: 0.8 },
+  Earth: { name: 'Earth', baseHue: 220, frequencyHz: 1.0 },
+  Mars: { name: 'Mars', baseHue: 0, frequencyHz: 1.2 },
+  Jupiter: { name: 'Jupiter', baseHue: 270, frequencyHz: 0.2 },
+  Saturn: { name: 'Saturn', baseHue: 40, frequencyHz: 0.15 },
+  Uranus: { name: 'Uranus', baseHue: 180, frequencyHz: 0.1 },
+  Neptune: { name: 'Neptune', baseHue: 240, frequencyHz: 0.1 },
+};
+
+/**
+ * Retrieves the configuration for a given planet.
+ * @param planetName The name of the planet.
+ * @returns The PlanetConfig or undefined if not found.
+ */
+export const getPlanetaryConfig = (planetName: string): PlanetConfig | undefined => {
+  return PLANETARY_DATA[planetName];
+};

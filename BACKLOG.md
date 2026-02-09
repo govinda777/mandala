@@ -4,6 +4,10 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+- [ ] **Frequências Planetárias**: Adicionar seleção de planetas para configurar cores e frequências de pulsação.
+  - [ ] Criar testes unitários para configuração planetária.
+  - [ ] Implementar mapa de cores e frequências.
+  - [ ] Adicionar controle na UI.
 
 ## ✅ Concluído
 
@@ -48,7 +52,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🌌 Cosmologia e Astrologia
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
-- **Frequências Planetárias**: Ajustar cores e formas baseadas em "frequências" associadas a planetas (ex: Kepler's Harmonies).
 - **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
 
 ### 🔬 Ciência e Natureza
