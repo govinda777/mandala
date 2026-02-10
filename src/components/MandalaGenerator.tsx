@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci, calculatePulseScale } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale, getPlanetaryConfig, PLANETARY_DATA } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 
 export default function MandalaGenerator() {
@@ -51,6 +51,18 @@ export default function MandalaGenerator() {
       setNumPetalas(getNearestFibonacci(valor));
     } else {
       setNumPetalas(valor);
+    }
+  };
+
+  const handlePlanetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const planetName = e.target.value;
+    if (!planetName) return;
+
+    const config = getPlanetaryConfig(planetName);
+    if (config) {
+      setCorBase(config.baseHue);
+      setPulseFrequency(config.frequencyHz);
+      setPulsing(true);
     }
   };
 
@@ -110,6 +122,20 @@ export default function MandalaGenerator() {
       />
       
       <div className="mt-4 space-y-4 w-full max-w-md">
+        <div className="flex flex-col space-y-2">
+          <label className="text-white">Frequência Planetária</label>
+          <select
+            onChange={handlePlanetChange}
+            className="bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
+            defaultValue=""
+          >
+            <option value="" disabled>Selecione um Planeta</option>
+            {Object.keys(PLANETARY_DATA).map(planet => (
+              <option key={planet} value={planet}>{planet}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="flex items-center space-x-2">
           <input
             type="checkbox"
