@@ -4,12 +4,17 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
-- [ ] **Frequências Planetárias**: Adicionar seleção de planetas para configurar cores e frequências de pulsação.
-  - [ ] Criar testes unitários para configuração planetária.
-  - [ ] Implementar mapa de cores e frequências.
-  - [ ] Adicionar controle na UI.
+- [ ] **Exportação PNG de Alta Resolução**: Adicionar funcionalidade para baixar a mandala em alta resolução.
+  - [ ] Criar função de geração de imagem.
+  - [ ] Adicionar botão de download na UI.
+  - [ ] Testar geração de imagem.
 
 ## ✅ Concluído
+
+- [x] **Frequências Planetárias**: Adicionar seleção de planetas para configurar cores e frequências de pulsação.
+  - [x] Criar testes unitários para configuração planetária.
+  - [x] Implementar mapa de cores e frequências.
+  - [x] Adicionar controle na UI.
 
 - [x] **Modo Fractal**: Adicionar modo de círculos recursivos.
   - [x] Implementar lógica matemática (`calculateFractalCircles`).
@@ -43,16 +48,16 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
+- **Tesselação de Padrões**: Criar padrões que se repetem infinitamente sem lacunas.
+- **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
 ### 📐 Matemática e Geometria
 - **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
-- **Tesselação**: Criar padrões que se repetem infinitamente sem lacunas.
 
 ### 🌌 Cosmologia e Astrologia
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
-- **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
 
 ### 🔬 Ciência e Natureza
 - **Cimática**: Simular padrões de Chladni (areia em prato vibratório) baseados em input de som ou frequência.

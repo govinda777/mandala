@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { getNearestFibonacci, calculatePulseScale, getPlanetaryConfig, PLANETARY_DATA } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
+import { generateHighResDataURL, triggerDownload } from '../lib/mandala-export';
 
 export default function MandalaGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,6 +65,27 @@ export default function MandalaGenerator() {
       setPulseFrequency(config.frequencyHz);
       setPulsing(true);
     }
+  };
+
+  const handleDownload = async () => {
+    const config = {
+      numPetalas,
+      numCamadas,
+      corBase,
+      complexidade,
+      rotacao,
+      width: 0, // Will be overridden
+      height: 0, // Will be overridden
+      flowerOfLife,
+      goldenSpiral,
+      fractalMode,
+      pulseScale: currentPulseScale
+    };
+
+    const width = 2048;
+    const height = 2048;
+    const dataUrl = await generateHighResDataURL(config, width, height);
+    triggerDownload(dataUrl, `mandala-${Date.now()}.png`);
   };
 
   // Gerar mandala aleatória complexa
@@ -285,6 +307,13 @@ export default function MandalaGenerator() {
           className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
         >
           Gerar Mandala Aleatória
+        </button>
+
+        <button
+          onClick={handleDownload}
+          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
+        >
+          Baixar Alta Resolução (PNG)
         </button>
       </div>
     </div>
