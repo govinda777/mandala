@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from './mandala-math';
+import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -12,6 +12,7 @@ export interface MandalaConfig {
   goldenSpiral?: boolean;
   fractalMode?: boolean;
   pulseScale?: number;
+  tessellation?: boolean;
 }
 
 export const drawMandala = (
@@ -30,6 +31,7 @@ export const drawMandala = (
     goldenSpiral,
     fractalMode,
     pulseScale = 1,
+    tessellation,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -100,6 +102,58 @@ export const drawMandala = (
 
   // Restaurar a transformação
   ctx.restore();
+
+  // Draw tessellation overlay in screen coordinates
+  if (tessellation) {
+    drawHexagonGrid(ctx, width, height, complexidade, corBase);
+  }
+};
+
+const drawHexagonGrid = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  complexidade: number,
+  corBase: number
+) => {
+  // Determine hexagon radius based on complexity or fixed size
+  // Use a scale relative to canvas size or fixed pixels?
+  // Let's use fixed range adjusted by complexity
+  const minRadius = 30;
+  const maxRadius = 80;
+  // Higher complexity -> smaller hexagons (more detailed)
+  const radius = maxRadius - (complexidade - 1) * (maxRadius - minRadius) / 2;
+
+  const points = calculateHexagonGrid(width, height, radius);
+
+  ctx.save();
+  ctx.strokeStyle = `hsla(${corBase}, 70%, 70%, 0.3)`;
+  ctx.lineWidth = 1;
+
+  points.forEach(point => {
+    drawHexagon(ctx, point.x, point.y, radius);
+  });
+
+  ctx.restore();
+};
+
+const drawHexagon = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number
+) => {
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    // Pointy topped hexagons: angles at 30, 90, 150... (PI/6, PI/2...)
+    const angle = Math.PI / 6 + i * Math.PI / 3;
+    const hx = x + radius * Math.cos(angle);
+    const hy = y + radius * Math.sin(angle);
+    if (i === 0) ctx.moveTo(hx, hy);
+    else ctx.lineTo(hx, hy);
+  }
+  ctx.closePath();
+  ctx.stroke();
 };
 
 const drawFractalOverlay = (

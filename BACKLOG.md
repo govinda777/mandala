@@ -4,12 +4,18 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
-- [ ] **Exportação PNG de Alta Resolução**: Adicionar funcionalidade para baixar a mandala em alta resolução.
-  - [ ] Criar função de geração de imagem.
-  - [ ] Adicionar botão de download na UI.
-  - [ ] Testar geração de imagem.
+- [ ] **Tesselação de Padrões**: Adicionar sobreposição de grade hexagonal (tesselação).
+  - [ ] Criar testes unitários para cálculo da grade.
+  - [ ] Implementar lógica matemática (`calculateHexagonGrid`).
+  - [ ] Implementar renderização no Canvas.
+  - [ ] Adicionar controle na UI.
 
 ## ✅ Concluído
+
+- [x] **Exportação PNG de Alta Resolução**: Adicionar funcionalidade para baixar a mandala em alta resolução.
+  - [x] Criar função de geração de imagem.
+  - [x] Adicionar botão de download na UI.
+  - [x] Testar geração de imagem.
 
 - [x] **Frequências Planetárias**: Adicionar seleção de planetas para configurar cores e frequências de pulsação.
   - [x] Criar testes unitários para configuração planetária.
@@ -48,7 +54,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
-- **Tesselação de Padrões**: Criar padrões que se repetem infinitamente sem lacunas.
 - **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)

@@ -207,6 +207,54 @@ export const calculateGoldenSpiral = (
   return points;
 };
 
+/**
+ * Calculates center points for a hexagonal grid filling the specified dimensions.
+ * @param width Width of the area to cover.
+ * @param height Height of the area to cover.
+ * @param radius Radius of the hexagons (side length).
+ * @returns Array of {x, y} coordinates for the centers of the hexagons.
+ */
+export const calculateHexagonGrid = (
+  width: number,
+  height: number,
+  radius: number
+): Point[] => {
+  const points: Point[] = [];
+
+  if (radius <= 0) return points;
+
+  // Horizontal spacing: sqrt(3) * radius
+  const dx = Math.sqrt(3) * radius;
+  // Vertical spacing: 1.5 * radius
+  const dy = 1.5 * radius;
+
+  // Calculate number of columns and rows needed to cover the area + buffer
+  // We center the grid roughly or just start from 0 with buffer.
+
+  const buffer = radius * 2;
+  const startX = -buffer;
+  const endX = width + buffer;
+  const startY = -buffer;
+  const endY = height + buffer;
+
+  const cols = Math.ceil((endX - startX) / dx);
+  const rows = Math.ceil((endY - startY) / dy);
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      // Offset for odd rows
+      const xOffset = (row % 2) !== 0 ? dx / 2 : 0;
+
+      const x = startX + col * dx + xOffset;
+      const y = startY + row * dy;
+
+      points.push({ x, y });
+    }
+  }
+
+  return points;
+};
+
 // Planetary Configuration
 export interface PlanetConfig {
   name: string;
