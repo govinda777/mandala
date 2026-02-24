@@ -14,6 +14,7 @@ export default function MandalaGenerator() {
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
+  const [tessellation, setTessellation] = useState(false);
   const [pulsing, setPulsing] = useState(false);
   const [pulseFrequency, setPulseFrequency] = useState(0.2); // Hz
   const [currentPulseScale, setCurrentPulseScale] = useState(1);
@@ -79,6 +80,7 @@ export default function MandalaGenerator() {
       flowerOfLife,
       goldenSpiral,
       fractalMode,
+      tessellation,
       pulseScale: currentPulseScale
     };
 
@@ -120,6 +122,7 @@ export default function MandalaGenerator() {
       flowerOfLife,
       goldenSpiral,
       fractalMode,
+      tessellation,
       pulseScale: currentPulseScale
     });
   };
@@ -127,7 +130,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, currentPulseScale]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -156,6 +159,17 @@ export default function MandalaGenerator() {
               <option key={planet} value={planet}>{planet}</option>
             ))}
           </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="tessellation-mode"
+            checked={tessellation}
+            onChange={(e) => setTessellation(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="tessellation-mode" className="text-white">Tesselação (Grade Hexagonal)</label>
         </div>
 
         <div className="flex items-center space-x-2">
