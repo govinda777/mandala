@@ -1,5 +1,7 @@
 import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid } from './mandala-math';
 
+import { getMoonIllumination } from './mandala-math';
+
 export interface MandalaConfig {
   numPetalas: number;
   numCamadas: number;
@@ -13,6 +15,7 @@ export interface MandalaConfig {
   fractalMode?: boolean;
   pulseScale?: number;
   tessellation?: boolean;
+  moonPhaseAge?: number;
 }
 
 export const drawMandala = (
@@ -32,9 +35,26 @@ export const drawMandala = (
     fractalMode,
     pulseScale = 1,
     tessellation,
+    moonPhaseAge,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
+
+  // Calculate luminosity adjustment based on moon phase (if provided)
+  // Default luminosity is around 50%. Moon phase modulates this from 20% to 80%.
+  let luminosityInner = 50;
+  let luminosityOuter = 50;
+  let petalOpeningRatio = 0.8; // Default inner/outer radius ratio
+
+  if (moonPhaseAge !== undefined) {
+    const illumination = getMoonIllumination(moonPhaseAge); // 0.0 to 1.0
+    // Adjust luminosity: New Moon (0) -> 20%, Full Moon (1) -> 80%
+    luminosityInner = 20 + (illumination * 60);
+    luminosityOuter = 20 + (illumination * 60);
+
+    // Adjust petal opening: New Moon (0) -> tight (0.9), Full Moon (1) -> open (0.6)
+    petalOpeningRatio = 0.9 - (illumination * 0.3);
+  }
 
   // Limpar o canvas
   ctx.clearRect(0, 0, width, height);
@@ -51,8 +71,8 @@ export const drawMandala = (
 
     // Definir cores para esta camada
     const matiz = (corBase + (camada * 360) / numCamadas) % 360;
-    const corInterna = `hsl(${matiz}, 70%, 50%)`;
-    const corExterna = `hsl(${(matiz + 30) % 360}, 70%, 50%)`;
+    const corInterna = `hsl(${matiz}, 70%, ${luminosityInner}%)`;
+    const corExterna = `hsl(${(matiz + 30) % 360}, 70%, ${luminosityOuter}%)`;
 
     // Aumentar num de pétalas com base na complexidade para camadas mais internas
     const petalasCamada = Math.floor(
@@ -64,7 +84,7 @@ export const drawMandala = (
       ctx,
       petalasCamada,
       raio,
-      raio * 0.8,
+      raio * petalOpeningRatio,
       corInterna,
       corExterna,
       complexidade
@@ -73,7 +93,7 @@ export const drawMandala = (
     // Desenhar círculo interno desta camada
     ctx.beginPath();
     ctx.arc(0, 0, raio * 0.4, 0, Math.PI * 2);
-    ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, 50%, 0.5)`;
+    ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, ${luminosityInner}%, 0.5)`;
     ctx.fill();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 2;

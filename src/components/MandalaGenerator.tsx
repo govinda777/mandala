@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci, calculatePulseScale, getPlanetaryConfig, PLANETARY_DATA } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 import { generateHighResDataURL, triggerDownload } from '../lib/mandala-export';
 
@@ -18,6 +18,8 @@ export default function MandalaGenerator() {
   const [pulsing, setPulsing] = useState(false);
   const [pulseFrequency, setPulseFrequency] = useState(0.2); // Hz
   const [currentPulseScale, setCurrentPulseScale] = useState(1);
+  const [useMoonPhase, setUseMoonPhase] = useState(false);
+  const [moonPhaseAge, setMoonPhaseAge] = useState(14.76); // Full moon by default
 
   // Animation Loop
   useEffect(() => {
@@ -81,7 +83,8 @@ export default function MandalaGenerator() {
       goldenSpiral,
       fractalMode,
       tessellation,
-      pulseScale: currentPulseScale
+      pulseScale: currentPulseScale,
+      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined
     };
 
     const width = 2048;
@@ -123,14 +126,15 @@ export default function MandalaGenerator() {
       goldenSpiral,
       fractalMode,
       tessellation,
-      pulseScale: currentPulseScale
+      pulseScale: currentPulseScale,
+      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -239,6 +243,42 @@ export default function MandalaGenerator() {
               step="0.1"
               value={pulseFrequency}
               onChange={(e) => setPulseFrequency(parseFloat(e.target.value))}
+              className="w-full"
+            />
+          </div>
+        )}
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="moon-phase-mode"
+            checked={useMoonPhase}
+            onChange={(e) => setUseMoonPhase(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="moon-phase-mode" className="text-white">Influência da Fase da Lua</label>
+        </div>
+
+        {useMoonPhase && (
+          <div className="bg-gray-700 p-3 rounded-lg border border-gray-600">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-white">
+                Fase: {getMoonPhaseName(moonPhaseAge)} ({(moonPhaseAge).toFixed(1)} dias)
+              </label>
+              <button
+                onClick={() => setMoonPhaseAge(calculateMoonPhase())}
+                className="text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1 px-2 rounded transition-colors duration-300"
+              >
+                Fase de Hoje
+              </button>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="29.53"
+              step="0.1"
+              value={moonPhaseAge}
+              onChange={(e) => setMoonPhaseAge(parseFloat(e.target.value))}
               className="w-full"
             />
           </div>
