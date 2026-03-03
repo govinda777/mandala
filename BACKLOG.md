@@ -4,13 +4,19 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
-- [ ] **Tesselação de Padrões**: Adicionar sobreposição de grade hexagonal (tesselação).
-  - [ ] Criar testes unitários para cálculo da grade.
-  - [ ] Implementar lógica matemática (`calculateHexagonGrid`).
-  - [ ] Implementar renderização no Canvas.
-  - [ ] Adicionar controle na UI.
-
 ## ✅ Concluído
+
+- [x] **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
+  - [x] Criar testes unitários para cálculo da fase lunar.
+  - [x] Implementar lógica matemática (`calculateMoonPhase`, `getMoonIllumination`).
+  - [x] Implementar ajuste de luminosidade e "abertura" das pétalas no Canvas (`mandala-renderer.ts`).
+  - [x] Adicionar controle na UI para fase da lua e botão "Fase de Hoje".
+
+- [x] **Tesselação de Padrões**: Adicionar sobreposição de grade hexagonal (tesselação).
+  - [x] Criar testes unitários para cálculo da grade.
+  - [x] Implementar lógica matemática (`calculateHexagonGrid`).
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controle na UI.
 
 - [x] **Exportação PNG de Alta Resolução**: Adicionar funcionalidade para baixar a mandala em alta resolução.
   - [x] Criar função de geração de imagem.
@@ -54,7 +60,7 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
-- **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
+- **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
 
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 

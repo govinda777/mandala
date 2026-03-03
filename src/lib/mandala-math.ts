@@ -283,3 +283,56 @@ export const PLANETARY_DATA: Record<string, PlanetConfig> = {
 export const getPlanetaryConfig = (planetName: string): PlanetConfig | undefined => {
   return PLANETARY_DATA[planetName];
 };
+
+/**
+ * Calculates the current moon phase.
+ * @param date The date to calculate the phase for (defaults to now).
+ * @returns The phase of the moon from 0 to 29.530588853 (days in a lunar month).
+ */
+export const calculateMoonPhase = (date: Date = new Date()): number => {
+  // Known new moon timestamp (e.g., Jan 6, 2000, 18:14 UTC)
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z').getTime();
+  const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000; // in milliseconds
+  const currentTimestamp = date.getTime();
+
+  const timeDiff = currentTimestamp - knownNewMoon;
+  const phaseIndex = (timeDiff % lunarCycle) / lunarCycle;
+
+  // Handle dates before the known new moon
+  let finalPhase = phaseIndex;
+  if (finalPhase < 0) {
+    finalPhase += 1;
+  }
+
+  return finalPhase * 29.530588853;
+};
+
+/**
+ * Gets the name of the moon phase based on its age.
+ * @param age The age of the moon in days (0 to 29.53).
+ * @returns The name of the moon phase in Portuguese.
+ */
+export const getMoonPhaseName = (age: number): string => {
+  if (age < 1.84) return 'Nova';
+  if (age < 5.53) return 'Crescente';
+  if (age < 9.22) return 'Quarto Crescente';
+  if (age < 12.91) return 'Gibosa Crescente';
+  if (age < 16.61) return 'Cheia';
+  if (age < 20.30) return 'Gibosa Minguante';
+  if (age < 23.99) return 'Quarto Minguante';
+  if (age < 27.68) return 'Minguante';
+  return 'Nova';
+};
+
+/**
+ * Calculates the percentage of the moon's surface that is illuminated.
+ * @param age The age of the moon in days (0 to 29.53).
+ * @returns A value between 0.0 (New Moon) and 1.0 (Full Moon).
+ */
+export const getMoonIllumination = (age: number): number => {
+  const lunarCycle = 29.530588853;
+  // Illumination follows a cosine curve based on the angle
+  // 0 -> 0, 14.76 -> 1, 29.53 -> 0
+  const phaseAngle = (age / lunarCycle) * 2 * Math.PI;
+  return 0.5 * (1 - Math.cos(phaseAngle));
+};
