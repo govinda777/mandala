@@ -199,14 +199,15 @@ export default function MandalaGenerator() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="golden-spiral"
-            checked={goldenSpiral}
-            onChange={(e) => setGoldenSpiral(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="golden-spiral" className="text-white">Espiral Áurea (Proporção de Ouro)</label>
+          <label>
+            <input
+              type="checkbox"
+              checked={goldenSpiral}
+              onChange={(e) => setGoldenSpiral(e.target.checked)}
+              className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 mr-2"
+            />
+            <span className="text-white">Exibir Espiral Áurea</span>
+          </label>
         </div>
 
         <div className="flex items-center space-x-2">
