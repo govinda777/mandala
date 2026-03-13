@@ -164,19 +164,19 @@ export const calculateFractalCircles = (
 
 /**
  * Calculates points for a Golden Spiral (Logarithmic Spiral).
- * Radius grows by Phi (1.618...) every quarter turn.
+ * Radius grows exponentially by Phi (1.618...) every quarter turn.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate
  * @param maxRadius The maximum radius the spiral should reach
- * @param turns Number of full rotations
+ * @param turns Number of full rotations (used here instead of steps to calculate the full spiral)
  * @returns Array of {x, y} coordinates
  */
-export const calculateGoldenSpiral = (
+export function calculateGoldenSpiral(
   centerX: number,
   centerY: number,
   maxRadius: number,
   turns: number
-): Point[] => {
+): Point[] {
   const points: Point[] = [];
   const PHI = (1 + Math.sqrt(5)) / 2;
   // Growth factor b for Golden Spiral: r = a * e^(b * theta)
@@ -205,7 +205,7 @@ export const calculateGoldenSpiral = (
   }
 
   return points;
-};
+}
 
 /**
  * Calculates center points for a hexagonal grid filling the specified dimensions.

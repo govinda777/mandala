@@ -113,7 +113,8 @@ export const drawMandala = (
   }
 
   if (goldenSpiral) {
-    drawGoldenSpiral(ctx, tamanho);
+    const spiralPoints = calculateGoldenSpiral(0, 0, tamanho, 4);
+    drawGoldenSpiral(ctx, spiralPoints, "rgba(255, 215, 0, 0.8)");
   }
 
   if (fractalMode) {
@@ -440,33 +441,21 @@ const drawFlowerOfLifeOverlay = (
   ctx.restore();
 };
 
-const drawGoldenSpiral = (
+export function drawGoldenSpiral(
   ctx: CanvasRenderingContext2D,
-  maxRadius: number
-) => {
-  // We want the spiral to cover the mandala area nicely.
-  // 3-4 turns should be enough to look "hypnotic".
-  const turns = 4;
-  const points = calculateGoldenSpiral(0, 0, maxRadius, turns);
-
+  spiral: {x: number, y: number}[],
+  color: string
+): void {
   ctx.save();
-  ctx.strokeStyle = "rgba(255, 215, 0, 0.8)"; // Gold color, more opaque
+  ctx.strokeStyle = color;
   ctx.lineWidth = 3;
   ctx.shadowColor = "rgba(255, 215, 0, 0.5)";
   ctx.shadowBlur = 10;
-
   ctx.beginPath();
-  if (points.length > 0) {
-    ctx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i].x, points[i].y);
-    }
-  }
+  spiral.forEach((point, i) => {
+    if (i === 0) ctx.moveTo(point.x, point.y);
+    else ctx.lineTo(point.x, point.y);
+  });
   ctx.stroke();
-
-  // Also draw the symmetrical spirals?
-  // Often golden spirals are drawn mirrored or rotated.
-  // But let's stick to one main spiral for now as per prompt.
-
   ctx.restore();
-};
+}

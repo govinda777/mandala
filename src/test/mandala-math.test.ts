@@ -69,20 +69,17 @@ describe('Mandala Math', () => {
     });
   });
 
-  describe('calculateGoldenSpiral', () => {
-    it('should generate points for a spiral', () => {
-      const points = calculateGoldenSpiral(0, 0, 100, 2);
-      expect(points.length).toBeGreaterThan(10);
-    });
+  describe('Golden Ratio Spiral', () => {
+    it('should generate spiral points using phi ratio', () => {
+      const spiral = calculateGoldenSpiral(0, 0, 100, 4);
+      expect(spiral.length).toBeGreaterThan(10);
 
-    it('should have increasing distance from center', () => {
-      const points = calculateGoldenSpiral(0, 0, 100, 2);
-      let prevDist = 0;
-      for (let i = 1; i < points.length; i++) {
-        const dist = Math.sqrt(points[i].x ** 2 + points[i].y ** 2);
-        expect(dist).toBeGreaterThanOrEqual(prevDist);
-        prevDist = dist;
-      }
+      let prevRadius = -1;
+      spiral.forEach((point) => {
+        const radius = Math.sqrt(point.x ** 2 + point.y ** 2);
+        expect(radius).toBeGreaterThanOrEqual(prevRadius);
+        prevRadius = radius;
+      });
     });
   });
 

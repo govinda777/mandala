@@ -6,6 +6,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
+  - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas (`drawGoldenSpiral`).
+  - [x] Adicionar controle na UI (`showGoldenSpiral`).
+
 - [x] **Fases da Lua**: Influenciar a luminosidade ou "abertura" da mandala baseado na fase lunar atual.
   - [x] Criar testes unitários para cálculo da fase lunar.
   - [x] Implementar lógica matemática (`calculateMoonPhase`, `getMoonIllumination`).
@@ -36,12 +42,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 - [x] **Geometria Sagrada**: Adicionar sobreposição da "Flor da Vida".
   - [x] Implementar lógica matemática (`calculateFlowerOfLifeCenters`).
-  - [x] Adicionar testes unitários.
-  - [x] Implementar renderização no Canvas.
-  - [x] Adicionar controle na UI.
-
-- [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
-  - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
   - [x] Adicionar testes unitários.
   - [x] Implementar renderização no Canvas.
   - [x] Adicionar controle na UI.
