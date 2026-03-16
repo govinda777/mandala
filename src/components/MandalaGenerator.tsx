@@ -20,6 +20,7 @@ export default function MandalaGenerator() {
   const [currentPulseScale, setCurrentPulseScale] = useState(1);
   const [useMoonPhase, setUseMoonPhase] = useState(false);
   const [moonPhaseAge, setMoonPhaseAge] = useState(14.76); // Full moon by default
+  const [formaBase, setFormaBase] = useState(0); // 0 = Circle
 
   // Animation Loop
   useEffect(() => {
@@ -79,6 +80,7 @@ export default function MandalaGenerator() {
       rotacao,
       width: 0, // Will be overridden
       height: 0, // Will be overridden
+      formaBase: formaBase > 0 ? formaBase : undefined,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -122,6 +124,7 @@ export default function MandalaGenerator() {
       rotacao,
       width: canvas.width,
       height: canvas.height,
+      formaBase: formaBase > 0 ? formaBase : undefined,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -134,7 +137,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -151,6 +154,23 @@ export default function MandalaGenerator() {
       />
       
       <div className="mt-4 space-y-4 w-full max-w-md">
+        <div className="flex flex-col space-y-2">
+          <label className="text-white">Forma Base (Simetria Poligonal)</label>
+          <select
+            value={formaBase}
+            onChange={(e) => setFormaBase(parseInt(e.target.value))}
+            className="bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
+          >
+            <option value={0}>Círculo (Padrão)</option>
+            <option value={3}>Triângulo</option>
+            <option value={4}>Quadrado</option>
+            <option value={5}>Pentágono</option>
+            <option value={6}>Hexágono</option>
+            <option value={8}>Octógono</option>
+            <option value={12}>Dodecágono</option>
+          </select>
+        </div>
+
         <div className="flex flex-col space-y-2">
           <label className="text-white">Frequência Planetária</label>
           <select

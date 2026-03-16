@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid } from './mandala-math';
+import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier } from './mandala-math';
 
 import { getMoonIllumination } from './mandala-math';
 
@@ -10,6 +10,7 @@ export interface MandalaConfig {
   rotacao: number;
   width: number;
   height: number;
+  formaBase?: number; // 0 for circle, 3 for triangle, 4 for square, etc.
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
@@ -87,12 +88,27 @@ export const drawMandala = (
       raio * petalOpeningRatio,
       corInterna,
       corExterna,
-      complexidade
+      complexidade,
+      config.formaBase
     );
 
-    // Desenhar círculo interno desta camada
+    // Desenhar círculo interno desta camada (adaptado para forma base)
     ctx.beginPath();
-    ctx.arc(0, 0, raio * 0.4, 0, Math.PI * 2);
+    const rInt = raio * 0.4;
+    if (config.formaBase && config.formaBase >= 3) {
+      for (let i = 0; i <= 360; i += 5) {
+        const ang = (i * Math.PI) / 180;
+        const mult = calculatePolygonRadiusMultiplier(ang, config.formaBase);
+        const ptX = Math.cos(ang) * rInt * mult;
+        const ptY = Math.sin(ang) * rInt * mult;
+        if (i === 0) ctx.moveTo(ptX, ptY);
+        else ctx.lineTo(ptX, ptY);
+      }
+      ctx.closePath();
+    } else {
+      ctx.arc(0, 0, rInt, 0, Math.PI * 2);
+    }
+
     ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, ${luminosityInner}%, 0.5)`;
     ctx.fill();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
@@ -101,12 +117,12 @@ export const drawMandala = (
 
     // Adicionar detalhes extras baseados em complexidade
     if (complexidade > 1.5 && camada % 2 === 0) {
-      drawDetailPattern(ctx, petalasCamada * 2, raio * 0.6, matiz);
+      drawDetailPattern(ctx, petalasCamada * 2, raio * 0.6, matiz, config.formaBase);
     }
   }
 
   // Desenhar círculos concêntricos decorativos
-  drawCentralCircles(ctx, numCamadas, tamanho, complexidade, corBase, numPetalas);
+  drawCentralCircles(ctx, numCamadas, tamanho, complexidade, corBase, numPetalas, config.formaBase);
 
   if (flowerOfLife) {
     drawFlowerOfLifeOverlay(ctx, tamanho, complexidade);
@@ -216,21 +232,30 @@ const drawPetals = (
   raioInterno: number,
   corInterna: string,
   corExterna: string,
-  complexidade: number
+  complexidade: number,
+  formaBase?: number
 ) => {
   const anguloIncremento = (Math.PI * 2) / numPetalas;
 
   for (let i = 0; i < numPetalas; i++) {
     const angulo = i * anguloIncremento;
 
+    // Calcular multiplicadores da forma base
+    const multCentro = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo, formaBase) : 1;
+    const mult1 = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo - anguloIncremento / 4, formaBase) : 1;
+    const mult2 = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo + anguloIncremento / 4, formaBase) : 1;
+
+    const rE = raioExterno * multCentro;
+    const rI = raioInterno * multCentro;
+
     // Criar um gradiente para cada pétala
     const gradiente = ctx.createRadialGradient(
       0,
       0,
-      raioInterno * 0.2,
+      rI * 0.2,
       0,
       0,
-      raioExterno
+      rE
     );
     gradiente.addColorStop(0, corInterna);
     gradiente.addColorStop(1, corExterna);
@@ -242,13 +267,16 @@ const drawPetals = (
     // Ajustar forma das pétalas baseado em complexidade
     const ajusteForma = 1 + (complexidade - 1) * 0.4;
 
-    // Calcular pontos de controle para a curva de Bézier
-    const x1 = Math.cos(angulo - anguloIncremento / 4) * raioExterno;
-    const y1 = Math.sin(angulo - anguloIncremento / 4) * raioExterno;
-    const x2 = Math.cos(angulo + anguloIncremento / 4) * raioExterno;
-    const y2 = Math.sin(angulo + anguloIncremento / 4) * raioExterno;
-    const xm = Math.cos(angulo) * raioExterno * ajusteForma;
-    const ym = Math.sin(angulo) * raioExterno * ajusteForma;
+    // Calcular pontos de controle para a curva de Bézier (com multiplicadores)
+    const rE1 = raioExterno * mult1;
+    const rE2 = raioExterno * mult2;
+
+    const x1 = Math.cos(angulo - anguloIncremento / 4) * rE1;
+    const y1 = Math.sin(angulo - anguloIncremento / 4) * rE1;
+    const x2 = Math.cos(angulo + anguloIncremento / 4) * rE2;
+    const y2 = Math.sin(angulo + anguloIncremento / 4) * rE2;
+    const xm = Math.cos(angulo) * rE * ajusteForma;
+    const ym = Math.sin(angulo) * rE * ajusteForma;
 
     // Desenhar a curva
     ctx.quadraticCurveTo(xm, ym, x1, y1);
@@ -264,13 +292,13 @@ const drawPetals = (
     ctx.stroke();
 
     // Desenhar detalhes adicionais
-    if (raioExterno > 50) {
+    if (rE > 50) {
       // Adicionar pontos decorativos
       ctx.beginPath();
       ctx.arc(
-        Math.cos(angulo) * raioExterno * 0.7,
-        Math.sin(angulo) * raioExterno * 0.7,
-        raioExterno * 0.05,
+        Math.cos(angulo) * rE * 0.7,
+        Math.sin(angulo) * rE * 0.7,
+        rE * 0.05,
         0,
         Math.PI * 2
       );
@@ -281,8 +309,8 @@ const drawPetals = (
       if (complexidade > 1.2) {
         const numLinhas = Math.floor(complexidade);
         for (let j = 1; j <= numLinhas; j++) {
-          const raioLinha = raioExterno * (0.3 + j * 0.2);
-          if (raioLinha < raioExterno) {
+          const raioLinha = raioExterno * (0.3 + j * 0.2) * multCentro;
+          if (raioLinha < rE) {
             ctx.beginPath();
             ctx.moveTo(
               Math.cos(angulo) * raioLinha * 0.7,
@@ -308,14 +336,17 @@ const drawDetailPattern = (
   ctx: CanvasRenderingContext2D,
   numElementos: number,
   raio: number,
-  matiz: number
+  matiz: number,
+  formaBase?: number
 ) => {
   const anguloIncremento = (Math.PI * 2) / numElementos;
 
   for (let i = 0; i < numElementos; i++) {
     const angulo = i * anguloIncremento;
-    const x = Math.cos(angulo) * raio;
-    const y = Math.sin(angulo) * raio;
+    const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo, formaBase) : 1;
+    const r = raio * mult;
+    const x = Math.cos(angulo) * r;
+    const y = Math.sin(angulo) * r;
 
     // Desenhar pequenos círculos ou outras formas
     ctx.beginPath();
@@ -352,18 +383,31 @@ const drawCentralCircles = (
   tamanho: number,
   complexidade: number,
   corBase: number,
-  numPetalas: number
+  numPetalas: number,
+  formaBase?: number
 ) => {
-  // Número de círculos baseado na complexidade
+  // Número de círculos/formas concêntricas no centro baseado na complexidade
   const numCirculos = Math.floor(numCamadas * complexidade);
 
-  // Desenhar círculos concêntricos no centro
+  // Desenhar formas concêntricas no centro
   for (let i = 0; i < numCirculos; i++) {
     const raio = tamanho * (0.1 - (i * 0.015) / Math.sqrt(complexidade));
     if (raio <= 0) break;
 
     ctx.beginPath();
-    ctx.arc(0, 0, raio, 0, Math.PI * 2);
+    if (formaBase && formaBase >= 3) {
+      for (let j = 0; j <= 360; j += 5) {
+        const ang = (j * Math.PI) / 180;
+        const mult = calculatePolygonRadiusMultiplier(ang, formaBase);
+        const ptX = Math.cos(ang) * raio * mult;
+        const ptY = Math.sin(ang) * raio * mult;
+        if (j === 0) ctx.moveTo(ptX, ptY);
+        else ctx.lineTo(ptX, ptY);
+      }
+      ctx.closePath();
+    } else {
+      ctx.arc(0, 0, raio, 0, Math.PI * 2);
+    }
 
     // Cores mais variadas baseadas na complexidade
     if (complexidade > 2 && i % 3 === 0) {

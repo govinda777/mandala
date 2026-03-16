@@ -208,6 +208,29 @@ export function calculateGoldenSpiral(
 }
 
 /**
+ * Calculates a radius multiplier for a regular polygon based on the given angle.
+ * This is used to morph a circle into a polygon.
+ * @param angle Angle in radians.
+ * @param sides Number of sides of the polygon (0, 1, or 2 return 1 for a circle).
+ * @returns A multiplier between Math.cos(PI/sides) and 1.0.
+ */
+export const calculatePolygonRadiusMultiplier = (angle: number, sides: number): number => {
+  if (sides < 3) return 1.0; // Circle fallback
+  const pi = Math.PI;
+  const sectorAngle = 2 * pi / sides;
+
+  // Normalize angle to [0, 2pi)
+  const a = ((angle % (2 * pi)) + 2 * pi) % (2 * pi);
+
+  // Find angle within the current sector (from 0 to sectorAngle)
+  const aMod = a % sectorAngle;
+
+  // Polar equation of a regular polygon:
+  // r(theta) = cos(pi / n) / cos(theta_mod_sector - pi / n)
+  return Math.cos(pi / sides) / Math.cos(aMod - pi / sides);
+};
+
+/**
  * Calculates center points for a hexagonal grid filling the specified dimensions.
  * @param width Width of the area to cover.
  * @param height Height of the area to cover.
