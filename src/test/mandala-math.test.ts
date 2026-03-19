@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -80,6 +80,30 @@ describe('Mandala Math', () => {
         expect(radius).toBeGreaterThanOrEqual(prevRadius);
         prevRadius = radius;
       });
+    });
+  });
+
+  describe('calculatePolygonRadiusMultiplier', () => {
+    it('should return 1 for a circle (sides < 3)', () => {
+      expect(calculatePolygonRadiusMultiplier(0, 0)).toBe(1);
+      expect(calculatePolygonRadiusMultiplier(Math.PI, 2)).toBe(1);
+    });
+
+    it('should return 1 at the vertices of a square', () => {
+      const sides = 4;
+      // Vertices for a square are at 0, PI/2, PI, 3PI/2
+      expect(calculatePolygonRadiusMultiplier(0, sides)).toBeCloseTo(1, 5);
+      expect(calculatePolygonRadiusMultiplier(Math.PI / 2, sides)).toBeCloseTo(1, 5);
+      expect(calculatePolygonRadiusMultiplier(Math.PI, sides)).toBeCloseTo(1, 5);
+      expect(calculatePolygonRadiusMultiplier((3 * Math.PI) / 2, sides)).toBeCloseTo(1, 5);
+    });
+
+    it('should return Math.cos(PI/4) at the midpoints of a square edges', () => {
+      const sides = 4;
+      // Midpoints are at PI/4, 3PI/4, 5PI/4, 7PI/4
+      const expected = Math.cos(Math.PI / 4);
+      expect(calculatePolygonRadiusMultiplier(Math.PI / 4, sides)).toBeCloseTo(expected, 5);
+      expect(calculatePolygonRadiusMultiplier((3 * Math.PI) / 4, sides)).toBeCloseTo(expected, 5);
     });
   });
 

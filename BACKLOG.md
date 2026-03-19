@@ -60,12 +60,9 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 📋 Próximos Passos (Curto Prazo)
 
-- **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
-
 ## 🌟 Funcionalidades Futuras (Médio/Longo Prazo)
 
 ### 📐 Matemática e Geometria
-- **Simetria Personalizada**: Permitir simetrias não radiais ou simetrias baseadas em grupos cristalográficos.
 
 ### 🌌 Cosmologia e Astrologia
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
