@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -130,6 +130,32 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculateFibonacciRadius', () => {
+    it('should calculate radius based on fibonacci sequence for layers', () => {
+      const baseRadius = 10;
+
+      // Layer 1 (index 0) -> fib(1) = 1
+      expect(calculateFibonacciRadius(baseRadius, 1)).toBe(10 * 1);
+
+      // Layer 2 (index 1) -> fib(2) = 2
+      expect(calculateFibonacciRadius(baseRadius, 2)).toBe(10 * 2);
+
+      // Layer 3 (index 2) -> fib(3) = 3
+      expect(calculateFibonacciRadius(baseRadius, 3)).toBe(10 * 3);
+
+      // Layer 4 (index 3) -> fib(4) = 5
+      expect(calculateFibonacciRadius(baseRadius, 4)).toBe(10 * 5);
+
+      // Layer 5 (index 4) -> fib(5) = 8
+      expect(calculateFibonacciRadius(baseRadius, 5)).toBe(10 * 8);
+    });
+
+    it('should return baseRadius if layer <= 0', () => {
+      expect(calculateFibonacciRadius(10, 0)).toBe(10);
+      expect(calculateFibonacciRadius(10, -1)).toBe(10);
     });
   });
 });

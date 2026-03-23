@@ -6,6 +6,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Modo Fibonacci Avançado**
+  - [x] Testes unitários criados e passando
+  - [x] Função matemática implementada em `mandala-math.ts` (`calculateFibonacciRadius`)
+  - [x] Renderização implementada em `mandala-renderer.ts`
+  - [x] Controle de UI adicionado no `MandalaGenerator.tsx`
+  - [x] Documentação atualizada no BACKLOG.md
+
 - [x] **Geometria Sagrada - Proporção Áurea**: Adicionar sobreposição de espiral áurea.
   - [x] Implementar lógica matemática (`calculateGoldenSpiral`).
   - [x] Adicionar testes unitários.

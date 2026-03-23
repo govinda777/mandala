@@ -11,6 +11,7 @@ export default function MandalaGenerator() {
   const [complexidade, setComplexidade] = useState(1);
   const [rotacao, setRotacao] = useState(0);
   const [modoFibonacci, setModoFibonacci] = useState(false);
+  const [modoFibonacciAvancado, setModoFibonacciAvancado] = useState(false);
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
@@ -86,7 +87,8 @@ export default function MandalaGenerator() {
       fractalMode,
       tessellation,
       pulseScale: currentPulseScale,
-      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined
+      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
+      fibonacciAdvancedMode: modoFibonacciAvancado
     };
 
     const width = 2048;
@@ -130,14 +132,15 @@ export default function MandalaGenerator() {
       fractalMode,
       tessellation,
       pulseScale: currentPulseScale,
-      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined
+      moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
+      fibonacciAdvancedMode: modoFibonacciAvancado
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -204,7 +207,18 @@ export default function MandalaGenerator() {
             onChange={(e) => setModoFibonacci(e.target.checked)}
             className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
           />
-          <label htmlFor="fibonacci-mode" className="text-white">Modo Fibonacci</label>
+          <label htmlFor="fibonacci-mode" className="text-white">Modo Fibonacci (Pétalas)</label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="fibonacci-advanced-mode"
+            checked={modoFibonacciAvancado}
+            onChange={(e) => setModoFibonacciAvancado(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="fibonacci-advanced-mode" className="text-white">Modo Fibonacci Avançado (Raio)</label>
         </div>
 
         <div className="flex items-center space-x-2">
