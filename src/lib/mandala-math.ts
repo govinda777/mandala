@@ -14,6 +14,30 @@ export const getNearestFibonacci = (n: number): number => {
   );
 };
 
+/**
+ * Calculates a radius based on the Fibonacci sequence for advanced Fibonacci mode.
+ * @param baseRadius The initial base radius unit.
+ * @param layerIndex The layer index (1-based) to use for calculating the Fibonacci multiplier.
+ * @returns The new radius.
+ */
+export const calculateFibonacciRadius = (baseRadius: number, layerIndex: number): number => {
+  if (layerIndex <= 0) return baseRadius;
+
+  const fib = (n: number): number => {
+    if (n === 1) return 1;
+    if (n === 2) return 2;
+    let n1 = 1, n2 = 2, next = 0;
+    for (let i = 3; i <= n; i++) {
+      next = n1 + n2;
+      n1 = n2;
+      n2 = next;
+    }
+    return n2;
+  };
+
+  return baseRadius * fib(layerIndex);
+};
+
 export interface Point {
   x: number;
   y: number;
@@ -48,9 +72,6 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
       // Start at a vertex of the hexagon: (l * radius, 0)
       // Then move along the edge 'l' times.
 
-      let x = l * radius;
-      let y = 0;
-
       for (let i = 0; i < 6; i++) {
           // Direction of the edge: (i + 2) * 60 degrees.
           // Wait, standard algorithm:
@@ -62,7 +83,6 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
           // Walk around the hexagon of radius l.
 
           const startAngle = i * angle60;
-          const endAngle = ((i + 1) % 6) * angle60;
 
           // Vertices of the layer hexagon
           // But we need points ALONG the edge too.

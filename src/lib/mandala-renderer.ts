@@ -1,4 +1,4 @@
-import { getNearestFibonacci, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius } from './mandala-math';
 
 import { getMoonIllumination } from './mandala-math';
 
@@ -17,6 +17,7 @@ export interface MandalaConfig {
   pulseScale?: number;
   tessellation?: boolean;
   moonPhaseAge?: number;
+  fibonacciAdvancedMode?: boolean;
 }
 
 export const drawMandala = (
@@ -37,6 +38,7 @@ export const drawMandala = (
     pulseScale = 1,
     tessellation,
     moonPhaseAge,
+    fibonacciAdvancedMode,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -68,7 +70,15 @@ export const drawMandala = (
   // Desenhar camadas da mandala
   for (let camada = 1; camada <= numCamadas; camada++) {
     // Calcular raio da camada atual
-    const raio = (tamanho / numCamadas) * camada;
+    let raio = (tamanho / numCamadas) * camada;
+
+    if (fibonacciAdvancedMode) {
+      // Calculate a base unit so that the last layer doesn't exceed the canvas
+      // The max Fibonacci multiplier will be fib(numCamadas)
+      const maxFib = calculateFibonacciRadius(1, numCamadas);
+      const baseUnit = tamanho / maxFib;
+      raio = calculateFibonacciRadius(baseUnit, camada);
+    }
 
     // Definir cores para esta camada
     const matiz = (corBase + (camada * 360) / numCamadas) % 360;
@@ -150,7 +160,7 @@ const drawHexagonGrid = (
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  complexidade: number,
+  _complexidade: number,
   corBase: number
 ) => {
   // Determine hexagon radius based on complexity or fixed size
@@ -159,7 +169,7 @@ const drawHexagonGrid = (
   const minRadius = 30;
   const maxRadius = 80;
   // Higher complexity -> smaller hexagons (more detailed)
-  const radius = maxRadius - (complexidade - 1) * (maxRadius - minRadius) / 2;
+  const radius = maxRadius - (_complexidade - 1) * (maxRadius - minRadius) / 2;
 
   const points = calculateHexagonGrid(width, height, radius);
 
@@ -454,7 +464,7 @@ const drawCentralCircles = (
 const drawFlowerOfLifeOverlay = (
   ctx: CanvasRenderingContext2D,
   radius: number,
-  complexidade: number
+  _complexidade: number
 ) => {
   // Determine circle radius and layers based on complexity or fixed?
   // Let's use a fixed relative size for now.

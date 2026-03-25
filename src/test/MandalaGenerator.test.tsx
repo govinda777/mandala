@@ -27,13 +27,13 @@ beforeAll(() => {
 describe('MandalaGenerator', () => {
   it('renders correctly', () => {
     render(<MandalaGenerator />)
-    expect(screen.getByText(/Pétalas/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/Pétalas/i)[0]).toBeInTheDocument()
     expect(screen.getByText(/Gerar Mandala Aleatória/i)).toBeInTheDocument()
   })
 
   it('toggles Fibonacci mode', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Modo Fibonacci/i)
+    const toggle = screen.getByLabelText(/Modo Fibonacci \(Pétalas\)/i)
     expect(toggle).toBeInTheDocument()
     expect(toggle).not.toBeChecked()
 
@@ -53,7 +53,7 @@ describe('MandalaGenerator', () => {
 
   it('snaps petal count to Fibonacci numbers when mode is enabled', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Modo Fibonacci/i)
+    const toggle = screen.getByLabelText(/Modo Fibonacci \(Pétalas\)/i)
     const petalInput = screen.getByLabelText(/Pétalas:/i)
 
     // Set petals to 10 (not Fibonacci)
