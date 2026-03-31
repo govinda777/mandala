@@ -31,6 +31,7 @@ O projeto está passando por uma reestruturação para adotar boas práticas de 
 
 - ✅ Geração procedural de mandalas.
 - ✅ Customização de pétalas, camadas, cores e complexidade.
+- ✅ **[Geometria Sagrada - Proporção Áurea](docs/features/golden-spiral.md)**.
 - 🔜 **Modo Fibonacci** (Em breve).
 - 🔜 **Exportação para NFT** (Planejado).
 - 🔜 **Temas Astrológicos** (Planejado).
