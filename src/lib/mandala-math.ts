@@ -20,6 +20,16 @@ export const getNearestFibonacci = (n: number): number => {
  * @param layerIndex The layer index (1-based) to use for calculating the Fibonacci multiplier.
  * @returns The new radius.
  */
+/**
+ * Calculates a mirrored angle relative to an axis of symmetry.
+ * @param angle The original angle in radians.
+ * @param axisAngle The angle of the axis of symmetry in radians.
+ * @returns The mirrored angle in radians.
+ */
+export const calculateMirroredAngle = (angle: number, axisAngle: number): number => {
+  return 2 * axisAngle - angle;
+};
+
 export const calculateFibonacciRadius = (baseRadius: number, layerIndex: number): number => {
   if (layerIndex <= 0) return baseRadius;
 

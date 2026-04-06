@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from './mandala-math';
 
 import { getMoonIllumination } from './mandala-math';
 
@@ -18,6 +18,8 @@ export interface MandalaConfig {
   tessellation?: boolean;
   moonPhaseAge?: number;
   fibonacciAdvancedMode?: boolean;
+  simetriaPersonalizada?: boolean;
+  eixosSimetria?: number;
 }
 
 export const drawMandala = (
@@ -39,6 +41,8 @@ export const drawMandala = (
     tessellation,
     moonPhaseAge,
     fibonacciAdvancedMode,
+    simetriaPersonalizada,
+    eixosSimetria = 2,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -99,7 +103,9 @@ export const drawMandala = (
       corInterna,
       corExterna,
       complexidade,
-      config.formaBase
+      config.formaBase,
+      simetriaPersonalizada,
+      eixosSimetria
     );
 
     // Desenhar círculo interno desta camada (adaptado para forma base)
@@ -243,13 +249,23 @@ const drawPetals = (
   corInterna: string,
   corExterna: string,
   complexidade: number,
-  formaBase?: number
+  formaBase?: number,
+  simetriaPersonalizada?: boolean,
+  eixosSimetria?: number
 ) => {
   const anguloIncremento = (Math.PI * 2) / numPetalas;
 
-  for (let i = 0; i < numPetalas; i++) {
-    const angulo = i * anguloIncremento;
+  // Determine axes of symmetry
+  const axes = [];
+  if (simetriaPersonalizada && eixosSimetria && eixosSimetria > 0) {
+    const axisAngleIncrement = Math.PI / eixosSimetria;
+    for (let i = 0; i < eixosSimetria; i++) {
+      axes.push(i * axisAngleIncrement);
+    }
+  }
 
+  // Draw a single petal curve
+  const drawPetalAtAngle = (angulo: number) => {
     // Calcular multiplicadores da forma base
     const multCentro = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo, formaBase) : 1;
     const mult1 = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo - anguloIncremento / 4, formaBase) : 1;
@@ -338,6 +354,27 @@ const drawPetals = (
           }
         }
       }
+    }
+  };
+
+  for (let i = 0; i < numPetalas; i++) {
+    const angulo = i * anguloIncremento;
+
+    drawPetalAtAngle(angulo);
+
+    if (simetriaPersonalizada && axes.length > 0) {
+      // Set to keep track of drawn angles to avoid overlapping
+      const drawnAngles = new Set<string>();
+      drawnAngles.add(angulo.toFixed(5));
+
+      axes.forEach(axis => {
+        const mirrored = calculateMirroredAngle(angulo, axis);
+        const mirroredKey = mirrored.toFixed(5);
+        if (!drawnAngles.has(mirroredKey)) {
+          drawPetalAtAngle(mirrored);
+          drawnAngles.add(mirroredKey);
+        }
+      });
     }
   }
 };

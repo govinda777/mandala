@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -130,6 +130,35 @@ describe('Mandala Math', () => {
       // Total: 21
       const circles = calculateFractalCircles(0, 0, 100, 2, branches);
       expect(circles).toHaveLength(1 + 4 + 16);
+    });
+  });
+
+  describe('calculateMirroredAngle', () => {
+    it('should mirror angle around the x-axis (0 rad)', () => {
+      // theta = 30 deg (PI/6), axis = 0
+      // expected = 2*0 - PI/6 = -PI/6
+      expect(calculateMirroredAngle(Math.PI / 6, 0)).toBeCloseTo(-Math.PI / 6);
+      expect(calculateMirroredAngle(Math.PI / 4, 0)).toBeCloseTo(-Math.PI / 4);
+    });
+
+    it('should mirror angle around the y-axis (PI/2 rad)', () => {
+      // theta = 30 deg (PI/6), axis = 90 deg (PI/2)
+      // expected = 2*(PI/2) - PI/6 = PI - PI/6 = 5PI/6
+      expect(calculateMirroredAngle(Math.PI / 6, Math.PI / 2)).toBeCloseTo((5 * Math.PI) / 6);
+    });
+
+    it('should handle negative angles correctly', () => {
+      // theta = -30 deg (-PI/6), axis = 45 deg (PI/4)
+      // expected = 2*(PI/4) - (-PI/6) = PI/2 + PI/6 = 4PI/6 = 2PI/3
+      expect(calculateMirroredAngle(-Math.PI / 6, Math.PI / 4)).toBeCloseTo((2 * Math.PI) / 3);
+    });
+
+    it('should handle angles greater than 2*PI', () => {
+      // theta = 390 deg (2*PI + PI/6), axis = 0
+      // expected = 2*0 - (2*PI + PI/6) = -2*PI - PI/6
+      // We can check if it resolves to -PI/6 (modulo 2PI) or exact.
+      // The formula 2*axis - angle will give exactly -2*PI - PI/6.
+      expect(calculateMirroredAngle(2 * Math.PI + Math.PI / 6, 0)).toBeCloseTo(-2 * Math.PI - Math.PI / 6);
     });
   });
 
