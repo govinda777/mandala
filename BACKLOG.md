@@ -64,6 +64,7 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Adicionar testes unitários.
   - [x] Implementar renderização no Canvas (ajuste de escala).
   - [x] Adicionar controle na UI (checkbox e slider de frequência).
+- [x] **Simetria Personalizada**: Adicionar suporte a simetria de espelhamento (caleidoscópio).
 
 ## 📋 Próximos Passos (Curto Prazo)
 

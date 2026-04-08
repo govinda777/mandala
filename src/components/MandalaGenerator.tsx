@@ -22,6 +22,8 @@ export default function MandalaGenerator() {
   const [useMoonPhase, setUseMoonPhase] = useState(false);
   const [moonPhaseAge, setMoonPhaseAge] = useState(14.76); // Full moon by default
   const [formaBase, setFormaBase] = useState(0); // 0 = Circle
+  const [simetriaPersonalizada, setSimetriaPersonalizada] = useState(false);
+  const [eixosSimetria, setEixosSimetria] = useState(2);
 
   // Animation Loop
   useEffect(() => {
@@ -88,7 +90,9 @@ export default function MandalaGenerator() {
       tessellation,
       pulseScale: currentPulseScale,
       moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
-      fibonacciAdvancedMode: modoFibonacciAvancado
+      fibonacciAdvancedMode: modoFibonacciAvancado,
+      simetriaPersonalizada,
+      eixosSimetria
     };
 
     const width = 2048;
@@ -133,14 +137,16 @@ export default function MandalaGenerator() {
       tessellation,
       pulseScale: currentPulseScale,
       moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
-      fibonacciAdvancedMode: modoFibonacciAvancado
+      fibonacciAdvancedMode: modoFibonacciAvancado,
+      simetriaPersonalizada,
+      eixosSimetria
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -187,6 +193,34 @@ export default function MandalaGenerator() {
             ))}
           </select>
         </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="simetria-personalizada"
+            checked={simetriaPersonalizada}
+            onChange={(e) => setSimetriaPersonalizada(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="simetria-personalizada" className="text-white">Simetria Personalizada (Caleidoscópio)</label>
+        </div>
+
+        {simetriaPersonalizada && (
+          <div>
+            <label className="block text-white mb-2">
+              Eixos de Simetria: {eixosSimetria}
+            </label>
+            <input
+              type="range"
+              min="1"
+              max="12"
+              step="1"
+              value={eixosSimetria}
+              onChange={(e) => setEixosSimetria(parseInt(e.target.value))}
+              className="w-full"
+            />
+          </div>
+        )}
 
         <div className="flex items-center space-x-2">
           <input
