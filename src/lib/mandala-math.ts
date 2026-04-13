@@ -145,6 +145,22 @@ export const calculatePulseScale = (
 };
 
 /**
+ * Calculates the current rotation angle in degrees based on elapsed time and speed.
+ * @param time Time in milliseconds.
+ * @param speedRPM Speed of rotation in Revolutions Per Minute.
+ * @returns The current rotation angle in degrees.
+ */
+export const calculateAutoRotation = (
+  time: number,
+  speedRPM: number
+): number => {
+  // 1 RPM = 360 degrees per 60000 milliseconds
+  // degrees_per_ms = (360 * speedRPM) / 60000 = (6 * speedRPM) / 1000
+  const degreesPerMs = (6 * speedRPM) / 1000;
+  return time * degreesPerMs;
+};
+
+/**
  * Calculates circles for a recursive fractal pattern.
  * @param centerX Center X coordinate
  * @param centerY Center Y coordinate

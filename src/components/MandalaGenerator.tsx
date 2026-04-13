@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci, calculatePulseScale, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale, calculateAutoRotation, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 import { generateHighResDataURL, triggerDownload } from '../lib/mandala-export';
 
@@ -19,6 +19,9 @@ export default function MandalaGenerator() {
   const [pulsing, setPulsing] = useState(false);
   const [pulseFrequency, setPulseFrequency] = useState(0.2); // Hz
   const [currentPulseScale, setCurrentPulseScale] = useState(1);
+  const [rotating, setRotating] = useState(false);
+  const [rotationSpeedRPM, setRotationSpeedRPM] = useState(1); // RPM
+  const [currentAutoRotation, setCurrentAutoRotation] = useState(0);
   const [useMoonPhase, setUseMoonPhase] = useState(false);
   const [moonPhaseAge, setMoonPhaseAge] = useState(14.76); // Full moon by default
   const [formaBase, setFormaBase] = useState(0); // 0 = Circle
@@ -28,25 +31,42 @@ export default function MandalaGenerator() {
   // Animation Loop
   useEffect(() => {
     let animationId: number;
+    let startTime: number | null = null;
+    let initialRotation = currentAutoRotation; // Keep track of the rotation when we paused/resumed
 
     const animate = (time: number) => {
+      let requiresNextFrame = false;
+
       if (pulsing) {
         const scale = calculatePulseScale(time, pulseFrequency);
         setCurrentPulseScale(scale);
+        requiresNextFrame = true;
+      }
+
+      if (rotating) {
+        if (startTime === null) startTime = time;
+        const elapsed = time - startTime;
+        const additionalRotation = calculateAutoRotation(elapsed, rotationSpeedRPM);
+        setCurrentAutoRotation((initialRotation + additionalRotation) % 360);
+        requiresNextFrame = true;
+      }
+
+      if (requiresNextFrame) {
         animationId = requestAnimationFrame(animate);
       }
     };
 
-    if (pulsing) {
+    if (pulsing || rotating) {
       animationId = requestAnimationFrame(animate);
     } else {
-      setCurrentPulseScale(1);
+      if (!pulsing) setCurrentPulseScale(1);
+      // We don't reset currentAutoRotation so it stops where it is
     }
 
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
     };
-  }, [pulsing, pulseFrequency]);
+  }, [pulsing, pulseFrequency, rotating, rotationSpeedRPM]); // Removed initialRotation and currentAutoRotation to avoid reset loops
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -127,7 +147,7 @@ export default function MandalaGenerator() {
       numCamadas,
       corBase,
       complexidade,
-      rotacao,
+      rotacao: rotacao + currentAutoRotation,
       width: canvas.width,
       height: canvas.height,
       formaBase: formaBase > 0 ? formaBase : undefined,
@@ -146,7 +166,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -217,6 +237,34 @@ export default function MandalaGenerator() {
               step="1"
               value={eixosSimetria}
               onChange={(e) => setEixosSimetria(parseInt(e.target.value))}
+              className="w-full"
+            />
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 mb-4">
+          <input
+            type="checkbox"
+            id="rotating-mode"
+            checked={rotating}
+            onChange={(e) => setRotating(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="rotating-mode" className="text-white">Animação de Rotação (Girar)</label>
+        </div>
+
+        {rotating && (
+          <div>
+            <label className="block text-white mb-2">
+              Velocidade de Rotação: {rotationSpeedRPM} RPM
+            </label>
+            <input
+              type="range"
+              min="-10"
+              max="10"
+              step="0.5"
+              value={rotationSpeedRPM}
+              onChange={(e) => setRotationSpeedRPM(parseFloat(e.target.value))}
               className="w-full"
             />
           </div>
