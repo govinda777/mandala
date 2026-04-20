@@ -20,6 +20,9 @@ export interface MandalaConfig {
   fibonacciAdvancedMode?: boolean;
   simetriaPersonalizada?: boolean;
   eixosSimetria?: number;
+  cymaticsMode?: boolean;
+  cymaticsN?: number;
+  cymaticsM?: number;
 }
 
 export const drawMandala = (
@@ -43,6 +46,9 @@ export const drawMandala = (
     fibonacciAdvancedMode,
     simetriaPersonalizada,
     eixosSimetria = 2,
+    cymaticsMode = false,
+    cymaticsN = 1,
+    cymaticsM = 2,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -186,6 +192,19 @@ const drawHexagonGrid = (
   points.forEach(point => {
     drawHexagon(ctx, point.x, point.y, radius);
   });
+
+
+  if (cymaticsMode) {
+    const maxDim = Math.min(width, height);
+    const chladniPoints = calculateChladniPattern(cymaticsN, cymaticsM, maxDim);
+    const chladniColor = `hsla(${(corBase + 180) % 360}, 80%, 70%, 0.8)`;
+
+    // Pattern uses 0,0 center, we need to translate relative to it
+    ctx.save();
+    // Context is already translated to width/2, height/2 in the beginning of drawMandala
+    drawChladniPattern(ctx, chladniPoints, chladniColor);
+    ctx.restore();
+  }
 
   ctx.restore();
 };
@@ -548,5 +567,31 @@ export function drawGoldenSpiral(
     else ctx.lineTo(point.x, point.y);
   });
   ctx.stroke();
+  ctx.restore();
+}
+
+/**
+ * Draws the Chladni (cymatics) pattern points onto the canvas.
+ * @param ctx The Canvas Rendering Context
+ * @param points The points to draw
+ * @param color The color of the points
+ */
+export function drawChladniPattern(
+  ctx: CanvasRenderingContext2D,
+  points: {x: number, y: number}[],
+  color: string
+): void {
+  ctx.save();
+  ctx.fillStyle = color;
+  // Use a slight shadow for a glowing "sand" effect
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 5;
+
+  points.forEach(point => {
+    // Draw each point as a small grain of "sand"
+    // Using a 1x1 or 2x2 rect is typically faster than drawing arcs for thousands of points
+    ctx.fillRect(point.x, point.y, 1.5, 1.5);
+  });
+
   ctx.restore();
 }

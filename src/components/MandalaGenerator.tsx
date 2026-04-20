@@ -14,6 +14,9 @@ export default function MandalaGenerator() {
   const [modoFibonacciAvancado, setModoFibonacciAvancado] = useState(false);
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
+  const [cymaticsMode, setCymaticsMode] = useState(false);
+  const [cymaticsN, setCymaticsN] = useState(1);
+  const [cymaticsM, setCymaticsM] = useState(2);
   const [fractalMode, setFractalMode] = useState(false);
   const [tessellation, setTessellation] = useState(false);
   const [pulsing, setPulsing] = useState(false);
@@ -86,6 +89,9 @@ export default function MandalaGenerator() {
       formaBase: formaBase > 0 ? formaBase : undefined,
       flowerOfLife,
       goldenSpiral,
+      cymaticsMode,
+      cymaticsN,
+      cymaticsM,
       fractalMode,
       tessellation,
       pulseScale: currentPulseScale,
@@ -146,7 +152,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, formaBase, flowerOfLife, goldenSpiral, cymaticsMode, cymaticsN, cymaticsM, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -277,6 +283,51 @@ export default function MandalaGenerator() {
             <span className="text-white">Exibir Espiral Áurea</span>
           </label>
         </div>
+
+        <div className="flex items-center space-x-2">
+          <label>
+            <input
+              type="checkbox"
+              checked={cymaticsMode}
+              onChange={(e) => setCymaticsMode(e.target.checked)}
+              className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 mr-2"
+            />
+            <span className="text-white">Cimática (Padrões de Chladni)</span>
+          </label>
+        </div>
+
+        {cymaticsMode && (
+          <div className="bg-gray-700 p-3 rounded-lg border border-gray-600 space-y-3">
+            <div>
+              <label className="block text-white mb-1 text-sm">
+                Frequência N: {cymaticsN}
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                step="1"
+                value={cymaticsN}
+                onChange={(e) => setCymaticsN(parseInt(e.target.value))}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-white mb-1 text-sm">
+                Frequência M: {cymaticsM}
+              </label>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                step="1"
+                value={cymaticsM}
+                onChange={(e) => setCymaticsM(parseInt(e.target.value))}
+                className="w-full"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center space-x-2">
           <input

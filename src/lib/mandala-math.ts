@@ -389,3 +389,40 @@ export const getMoonIllumination = (age: number): number => {
   const phaseAngle = (age / lunarCycle) * 2 * Math.PI;
   return 0.5 * (1 - Math.cos(phaseAngle));
 };
+
+/**
+ * Calculates Chladni patterns (cymatics) points for a given square plate size.
+ * Chladni equation for a square plate fixed at the center:
+ * cos(n * pi * x / L) * cos(m * pi * y / L) - cos(m * pi * x / L) * cos(n * pi * y / L) = 0
+ * @param n Frequency parameter n
+ * @param m Frequency parameter m
+ * @param size The size (width/height) of the area to calculate
+ * @returns Array of {x, y} points representing the nodal lines
+ */
+export const calculateChladniPattern = (
+  n: number,
+  m: number,
+  size: number
+): Point[] => {
+  const points: Point[] = [];
+  const L = size / 2;
+  const resolution = size > 200 ? 4 : 2; // Performance optimization for large areas
+  const tolerance = 0.1;
+
+  for (let x = -L; x <= L; x += resolution) {
+    for (let y = -L; y <= L; y += resolution) {
+      const nx = x / L;
+      const ny = y / L;
+
+      const val =
+        Math.cos(n * Math.PI * nx) * Math.cos(m * Math.PI * ny) -
+        Math.cos(m * Math.PI * nx) * Math.cos(n * Math.PI * ny);
+
+      if (Math.abs(val) < tolerance) {
+        points.push({ x, y });
+      }
+    }
+  }
+
+  return points;
+};

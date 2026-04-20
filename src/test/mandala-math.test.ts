@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('fibonacciNumbers', () => {
@@ -187,4 +187,25 @@ describe('Mandala Math', () => {
       expect(calculateFibonacciRadius(10, -1)).toBe(10);
     });
   });
+
+  describe('calculateChladniPattern', () => {
+    it('should calculate nodal lines points for Chladni pattern (1, 2)', () => {
+      const points = calculateChladniPattern(1, 2, 400);
+      expect(points.length).toBeGreaterThan(100);
+      // Nodal points should have valid x and y
+      expect(typeof points[0].x).toBe('number');
+      expect(typeof points[0].y).toBe('number');
+    });
+
+    it('should calculate nodal lines points for Chladni pattern (3, 4)', () => {
+      const points = calculateChladniPattern(3, 4, 400);
+      expect(points.length).toBeGreaterThan(100);
+    });
+
+    it('should handle small sizes correctly', () => {
+      const points = calculateChladniPattern(1, 2, 100);
+      expect(points.length).toBeGreaterThan(10);
+    });
+  });
+
 });

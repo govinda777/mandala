@@ -6,6 +6,12 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Cimática (Padrões de Chladni)**: Simulação visual de vibrações acústicas baseadas em frequências matemáticas.
+  - [x] Implementar matemática das linhas nodais de Chladni.
+  - [x] Adicionar testes unitários.
+  - [x] Implementar renderização no Canvas.
+  - [x] Adicionar controles de UI para N e M.
+
 - [x] **Modo Fibonacci Avançado**
   - [x] Testes unitários criados e passando
   - [x] Função matemática implementada em `mandala-math.ts` (`calculateFibonacciRadius`)
@@ -76,7 +82,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
 
 ### 🔬 Ciência e Natureza
-- **Cimática**: Simular padrões de Chladni (areia em prato vibratório) baseados em input de som ou frequência.
 - **Bioluminescência**: Paletas de cores inspiradas em organismos bioluminescentes.
 
 ### 💎 Web3 e NFT
