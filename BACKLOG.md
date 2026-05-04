@@ -65,6 +65,7 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Implementar renderização no Canvas (ajuste de escala).
   - [x] Adicionar controle na UI (checkbox e slider de frequência).
 - [x] **Simetria Personalizada**: Adicionar suporte a simetria de espelhamento (caleidoscópio).
+- [x] **Cimática**: Simular padrões de Chladni (areia em prato vibratório) baseados em frequências N e M.
 
 ## 📋 Próximos Passos (Curto Prazo)
 
@@ -76,7 +77,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
 
 ### 🔬 Ciência e Natureza
-- **Cimática**: Simular padrões de Chladni (areia em prato vibratório) baseados em input de som ou frequência.
 - **Bioluminescência**: Paletas de cores inspiradas em organismos bioluminescentes.
 
 ### 💎 Web3 e NFT

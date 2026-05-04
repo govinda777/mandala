@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniNodes } from './mandala-math';
 
 import { getMoonIllumination } from './mandala-math';
 
@@ -20,7 +20,29 @@ export interface MandalaConfig {
   fibonacciAdvancedMode?: boolean;
   simetriaPersonalizada?: boolean;
   eixosSimetria?: number;
+  cymaticsMode?: boolean;
+  cymaticsN?: number;
+  cymaticsM?: number;
 }
+
+/**
+ * Draws the Chladni node pattern.
+ * @param ctx The canvas context
+ * @param nodes Array of points representing the nodes
+ * @param color The color of the nodes
+ */
+export const drawChladniPattern = (
+  ctx: CanvasRenderingContext2D,
+  nodes: { x: number; y: number }[],
+  color: string
+) => {
+  ctx.fillStyle = color;
+  nodes.forEach(node => {
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+};
 
 export const drawMandala = (
   ctx: CanvasRenderingContext2D,
@@ -43,6 +65,9 @@ export const drawMandala = (
     fibonacciAdvancedMode,
     simetriaPersonalizada,
     eixosSimetria = 2,
+    cymaticsMode = false,
+    cymaticsN = 3,
+    cymaticsM = 5,
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -65,6 +90,12 @@ export const drawMandala = (
 
   // Limpar o canvas
   ctx.clearRect(0, 0, width, height);
+
+  // Background - Chladni Pattern
+  if (cymaticsMode) {
+    const nodes = calculateChladniNodes(width, height, cymaticsN, cymaticsM, 150);
+    drawChladniPattern(ctx, nodes, `hsla(${corBase}, 70%, 50%, 0.3)`);
+  }
 
   // Mover para o centro do canvas
   ctx.save();

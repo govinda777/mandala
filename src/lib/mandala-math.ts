@@ -389,3 +389,43 @@ export const getMoonIllumination = (age: number): number => {
   const phaseAngle = (age / lunarCycle) * 2 * Math.PI;
   return 0.5 * (1 - Math.cos(phaseAngle));
 };
+
+/**
+ * Calculates points (nodes) for Chladni figures based on frequencies n and m.
+ * @param width Canvas width
+ * @param height Canvas height
+ * @param n Frequency mode n
+ * @param m Frequency mode m
+ * @param resolution The resolution of the grid to check for nodes
+ * @returns Array of node points where amplitude is close to zero
+ */
+export const calculateChladniNodes = (
+  width: number,
+  height: number,
+  n: number,
+  m: number,
+  resolution: number = 100
+): Point[] => {
+  const nodes: Point[] = [];
+  const tolerance = 0.1;
+
+  for (let i = 0; i <= resolution; i++) {
+    for (let j = 0; j <= resolution; j++) {
+      // Map to [-1, 1]
+      const x = -1 + (2 * i) / resolution;
+      const y = -1 + (2 * j) / resolution;
+
+      // Chladni equation for square plate: u(x, y) = cos(n*pi*x)*cos(m*pi*y) - cos(m*pi*x)*cos(n*pi*y)
+      const val = Math.cos(n * Math.PI * x) * Math.cos(m * Math.PI * y) - Math.cos(m * Math.PI * x) * Math.cos(n * Math.PI * y);
+
+      if (Math.abs(val) < tolerance) {
+        // Map back to canvas coordinates [0, width] and [0, height]
+        const canvasX = ((x + 1) / 2) * width;
+        const canvasY = ((y + 1) / 2) * height;
+        nodes.push({ x: canvasX, y: canvasY });
+      }
+    }
+  }
+
+  return nodes;
+};
