@@ -64,6 +64,11 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Adicionar testes unitários.
   - [x] Implementar renderização no Canvas (ajuste de escala).
   - [x] Adicionar controle na UI (checkbox e slider de frequência).
+- [x] **Animação Rotacional**: Fazer a mandala girar contínuamente.
+  - [x] Implementar lógica matemática (`calculateAutoRotation`).
+  - [x] Adicionar testes unitários.
+  - [x] Implementar loop de animação no React (ajuste do ângulo com RequestAnimationFrame).
+  - [x] Adicionar controle na UI (checkbox e slider de RPM).
 - [x] **Simetria Personalizada**: Adicionar suporte a simetria de espelhamento (caleidoscópio).
 
 ## 📋 Próximos Passos (Curto Prazo)
@@ -85,5 +90,4 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ### 🛠️ Melhorias Técnicas
 - **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Animação**: Fazer a mandala girar ou "respirar" (pulsar camadas).
 - **Compartilhamento**: Gerar link único com os parâmetros da mandala.
