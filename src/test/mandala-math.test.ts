@@ -1,7 +1,29 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
+  describe('Cymatics / Chladni Pattern', () => {
+    it('should generate an array of points', () => {
+      // Testing with a low resolution and simple parameters
+      const points = calculateChladniPattern(1, 1, 1, 1, 0.1);
+      expect(Array.isArray(points)).toBe(true);
+    });
+
+    it('should calculate specific points correctly for n=3, m=5', () => {
+      // With low random tests, we should expect some points back
+      // Using deterministic or pseudo-dense point checking.
+      const points = calculateChladniPattern(3, 5, 1, 1000, 0.1);
+      expect(points.length).toBeGreaterThan(0);
+
+      // Select a point from the result and verify it roughly matches the Chladni equation
+      const p = points[0];
+      const z = Math.cos(3 * Math.PI * p.x) * Math.cos(5 * Math.PI * p.y) -
+                Math.cos(5 * Math.PI * p.x) * Math.cos(3 * Math.PI * p.y);
+
+      expect(Math.abs(z)).toBeLessThanOrEqual(0.1);
+    });
+  });
+
   describe('fibonacciNumbers', () => {
     it('should be an array of numbers', () => {
       expect(Array.isArray(fibonacciNumbers)).toBe(true);

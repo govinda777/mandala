@@ -3,6 +3,12 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
+- [x] **Cimática (Padrões de Chladni)**: Simular padrões de interferência e frequências ressonantes em modos de vibração 2D.
+  - [x] Atualizar documentação e backlog.
+  - [x] Implementar testes unitários para a geração do padrão Chladni.
+  - [x] Implementar a lógica matemática.
+  - [x] Implementar o renderizador Canvas para a visualização dos pontos nodais de Chladni.
+  - [x] Adicionar controles UI para ativar o modo cimática e controlar as frequências `n` e `m`.
 
 ## ✅ Concluído
 
@@ -81,7 +87,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
 
 ### 🔬 Ciência e Natureza
-- **Cimática**: Simular padrões de Chladni (areia em prato vibratório) baseados em input de som ou frequência.
 - **Bioluminescência**: Paletas de cores inspiradas em organismos bioluminescentes.
 
 ### 💎 Web3 e NFT

@@ -405,3 +405,56 @@ export const getMoonIllumination = (age: number): number => {
   const phaseAngle = (age / lunarCycle) * 2 * Math.PI;
   return 0.5 * (1 - Math.cos(phaseAngle));
 };
+
+/**
+ * Calcula pontos que compõem o padrão de Chladni (Cimática) numa placa 2D (círculo).
+ * Encontra os pontos nodais onde a interferência de onda é destrutiva.
+ * @param n Frequência de onda n
+ * @param m Frequência de onda m
+ * @param radius Raio máximo para a geração dos pontos
+ * @param resolution O número de pontos a avaliar ou "densidade"
+ * @param threshold O limiar abaixo do qual consideramos que a amplitude é zero (nó)
+ */
+export const calculateChladniPattern = (
+  n: number,
+  m: number,
+  radius: number,
+  resolution: number = 100, // Reduced resolution for testing, though normally a dense grid
+  threshold: number = 0.1
+): Point[] => {
+  const points: Point[] = [];
+
+  // Create a grid of points to check
+  // Using a grid instead of random points creates a more stable structure that doesn't flicker on re-render.
+  // We'll iterate over coordinates x,y from -radius to +radius
+
+  const step = (radius * 2) / resolution;
+
+  for (let x = -radius; x <= radius; x += step) {
+    for (let y = -radius; y <= radius; y += step) {
+      // Only keep points inside the circle
+      if (x * x + y * y <= radius * radius) {
+
+        const nx = x / radius;
+        const ny = y / radius;
+
+        const z = Math.cos(n * Math.PI * nx) * Math.cos(m * Math.PI * ny) -
+                  Math.cos(m * Math.PI * nx) * Math.cos(n * Math.PI * ny);
+
+        if (Math.abs(z) < threshold) {
+          // Add some local random jitter to make it look like sand, using coordinates as seed so it's stable
+          const seed = x * 12.9898 + y * 78.233;
+          const random1 = (Math.sin(seed) * 43758.5453) % 1;
+          const random2 = (Math.sin(seed + 1.23) * 43758.5453) % 1;
+
+          points.push({
+            x: x + (random1 - 0.5) * step * 1.5,
+            y: y + (random2 - 0.5) * step * 1.5
+          });
+        }
+      }
+    }
+  }
+
+  return points;
+};

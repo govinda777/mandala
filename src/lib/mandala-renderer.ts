@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from './mandala-math';
 
 import { getMoonIllumination } from './mandala-math';
 
@@ -20,6 +20,9 @@ export interface MandalaConfig {
   fibonacciAdvancedMode?: boolean;
   simetriaPersonalizada?: boolean;
   eixosSimetria?: number;
+  cymaticsMode?: boolean;
+  cymaticsN?: number;
+  cymaticsM?: number;
 }
 
 export const drawMandala = (
@@ -42,7 +45,10 @@ export const drawMandala = (
     moonPhaseAge,
     fibonacciAdvancedMode,
     simetriaPersonalizada,
-    eixosSimetria = 2,
+    eixosSimetria,
+    cymaticsMode,
+    cymaticsN,
+    cymaticsM
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -159,6 +165,14 @@ export const drawMandala = (
   // Draw tessellation overlay in screen coordinates
   if (tessellation) {
     drawHexagonGrid(ctx, width, height, complexidade, corBase);
+  }
+
+  if (cymaticsMode && cymaticsN !== undefined && cymaticsM !== undefined) {
+    // Chladni is centered on the mandala, but ctx was restored, so we translate back
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawChladniOverlay(ctx, cymaticsN, cymaticsM, tamanho, corBase);
+    ctx.restore();
   }
 };
 
@@ -527,6 +541,35 @@ const drawFlowerOfLifeOverlay = (
     ctx.beginPath();
     ctx.arc(center.x, center.y, circleRadius, 0, Math.PI * 2);
     ctx.stroke();
+  });
+
+  ctx.restore();
+};
+
+const drawChladniOverlay = (
+  ctx: CanvasRenderingContext2D,
+  n: number,
+  m: number,
+  radius: number,
+  corBase: number
+) => {
+  // Get the nodal points, lower resolution for performance
+  const points = calculateChladniPattern(n, m, radius, 250, 0.05);
+
+  ctx.save();
+
+  // No need to translate because the origin of ctx at this point is already set to width/2, height/2
+  // by drawMandala. We just draw the points which are centered at 0,0 from calculateChladniPattern.
+  // Although we have translation in drawMandala, wait, let's look at drawMandala again.
+
+  // Draw the points like sand
+  ctx.fillStyle = `hsla(${corBase}, 70%, 80%, 0.8)`; // Sand-like color matching mandala hue
+
+  points.forEach(p => {
+    ctx.beginPath();
+    // Smaller points to match reduced density
+    ctx.arc(p.x, p.y, 2.0, 0, Math.PI * 2);
+    ctx.fill();
   });
 
   ctx.restore();
