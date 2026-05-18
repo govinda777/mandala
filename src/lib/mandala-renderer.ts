@@ -1,6 +1,6 @@
 import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from './mandala-math';
 
-import { getMoonIllumination } from './mandala-math';
+import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
 export interface MandalaConfig {
   numPetalas: number;
@@ -23,6 +23,7 @@ export interface MandalaConfig {
   cymaticsMode?: boolean;
   cymaticsN?: number;
   cymaticsM?: number;
+  bioluminescenceMode?: boolean;
 }
 
 export const drawMandala = (
@@ -48,7 +49,8 @@ export const drawMandala = (
     eixosSimetria,
     cymaticsMode,
     cymaticsN,
-    cymaticsM
+    cymaticsM,
+    bioluminescenceMode
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -72,6 +74,12 @@ export const drawMandala = (
   // Limpar o canvas
   ctx.clearRect(0, 0, width, height);
 
+  if (bioluminescenceMode) {
+    // Fundo escuro marinho para o modo bioluminescente
+    ctx.fillStyle = "#010A15";
+    ctx.fillRect(0, 0, width, height);
+  }
+
   // Mover para o centro do canvas
   ctx.save();
   ctx.translate(width / 2, height / 2);
@@ -92,8 +100,21 @@ export const drawMandala = (
 
     // Definir cores para esta camada
     const matiz = (corBase + (camada * 360) / numCamadas) % 360;
-    const corInterna = `hsl(${matiz}, 70%, ${luminosityInner}%)`;
-    const corExterna = `hsl(${(matiz + 30) % 360}, 70%, ${luminosityOuter}%)`;
+    let corInterna = `hsl(${matiz}, 70%, ${luminosityInner}%)`;
+    let corExterna = `hsl(${(matiz + 30) % 360}, 70%, ${luminosityOuter}%)`;
+
+    if (bioluminescenceMode) {
+      // Glow and colors based on bioluminescence properties
+      const intensity = calculateBioluminescenceIntensity(raio, tamanho);
+      corInterna = getBioluminescenceColor(intensity, corBase);
+      const intensityOuter = calculateBioluminescenceIntensity(raio * petalOpeningRatio, tamanho);
+      corExterna = getBioluminescenceColor(intensityOuter, corBase + 20);
+
+      ctx.shadowBlur = 10 + (intensity * 15);
+      ctx.shadowColor = corInterna;
+    } else {
+      ctx.shadowBlur = 0;
+    }
 
     // Aumentar num de pétalas com base na complexidade para camadas mais internas
     const petalasCamada = Math.floor(
@@ -131,7 +152,12 @@ export const drawMandala = (
       ctx.arc(0, 0, rInt, 0, Math.PI * 2);
     }
 
-    ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, ${luminosityInner}%, 0.5)`;
+    if (bioluminescenceMode) {
+      const intInt = calculateBioluminescenceIntensity(rInt, tamanho);
+      ctx.fillStyle = getBioluminescenceColor(intInt, matiz + 60);
+    } else {
+      ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, ${luminosityInner}%, 0.5)`;
+    }
     ctx.fill();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 2;

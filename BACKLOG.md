@@ -3,6 +3,13 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
+- [ ] **Bioluminescência**: Paletas de cores e brilhos inspirados em organismos bioluminescentes.
+  - [ ] Atualizar documentação e backlog.
+  - [ ] Implementar testes unitários para cálculo de intensidade luminosa.
+  - [ ] Implementar a lógica matemática de decaimento de luz ($1/r^2$).
+  - [ ] Implementar a renderização com glow effect no Canvas.
+  - [ ] Adicionar controle UI para o modo Bioluminescência.
+
 - [x] **Cimática (Padrões de Chladni)**: Simular padrões de interferência e frequências ressonantes em modos de vibração 2D.
   - [x] Atualizar documentação e backlog.
   - [x] Implementar testes unitários para a geração do padrão Chladni.
@@ -87,7 +94,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 - **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
 
 ### 🔬 Ciência e Natureza
-- **Bioluminescência**: Paletas de cores inspiradas em organismos bioluminescentes.
 
 ### 💎 Web3 e NFT
 - **Exportação de Metadados**: Gerar JSON com os atributos da mandala (raridade baseada na complexidade, cores, etc).
