@@ -458,3 +458,52 @@ export const calculateChladniPattern = (
 
   return points;
 };
+
+/**
+ * Calcula a intensidade da luz bioluminescente num determinado raio
+ * baseando-se na lei do inverso do quadrado, atenuada para renderização.
+ * @param radius Distância do centro
+ * @param maxRadius Raio máximo para normalização
+ * @returns Intensidade da emissão de luz (0 a 2.0)
+ */
+export const calculateBioluminescenceIntensity = (
+  radius: number,
+  maxRadius: number
+): number => {
+  // Para evitar divisão por zero ou intensidades infinitas perto do centro
+  // adicionamos um offset baseado no tamanho.
+  const offset = maxRadius * 0.1;
+  const distance = radius + offset;
+
+  // Intensidade base no centro "imaginário"
+  const I0 = maxRadius * maxRadius * 0.05;
+
+  const intensity = I0 / (distance * distance);
+
+  // Limitar a intensidade máxima para 2.0 (super-brilho) para não estourar
+  return Math.min(Math.max(intensity, 0), 2.0);
+};
+
+/**
+ * Retorna uma cor hsla apropriada para o espectro bioluminescente,
+ * variando brilho (lightness) e opacidade (alpha) dependendo da intensidade.
+ * @param intensity Intensidade calculada
+ * @param baseHue Matiz de base
+ * @returns String de cor hsl()
+ */
+export const getBioluminescenceColor = (
+  intensity: number,
+  baseHue: number
+): string => {
+  // Limitar espectro bioluminescente entre 160 (verde) e 240 (azul escuro)
+  let hue = baseHue % 360;
+  if (hue < 160) hue = 160 + (hue % 80);
+  if (hue > 240) hue = 240 - ((hue - 240) % 80);
+
+  // Intensidade altera a claridade (lightness) e alpha
+  // intensity vai de ~0 a 2.0
+  const lightness = Math.min(30 + intensity * 25, 90); // 30% a 90%
+  const alpha = Math.min(0.2 + intensity * 0.6, 1.0); // 0.2 a 1.0
+
+  return `hsla(${Math.floor(hue)}, 100%, ${Math.floor(lightness)}%, ${alpha.toFixed(3)})`;
+};

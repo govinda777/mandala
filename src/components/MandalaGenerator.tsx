@@ -30,6 +30,7 @@ export default function MandalaGenerator() {
   const [cymaticsMode, setCymaticsMode] = useState(false);
   const [cymaticsN, setCymaticsN] = useState(3);
   const [cymaticsM, setCymaticsM] = useState(5);
+  const [bioluminescenceMode, setBioluminescenceMode] = useState(false);
 
   // Animation Loop
   useEffect(() => {
@@ -118,7 +119,8 @@ export default function MandalaGenerator() {
       eixosSimetria,
       cymaticsMode,
       cymaticsN,
-      cymaticsM
+      cymaticsM,
+      bioluminescenceMode
     };
 
     const width = 2048;
@@ -168,14 +170,15 @@ export default function MandalaGenerator() {
       eixosSimetria,
       cymaticsMode,
       cymaticsN,
-      cymaticsM
+      cymaticsM,
+      bioluminescenceMode
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -221,6 +224,17 @@ export default function MandalaGenerator() {
               <option key={planet} value={planet}>{planet}</option>
             ))}
           </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="bioluminescence-mode"
+            checked={bioluminescenceMode}
+            onChange={(e) => setBioluminescenceMode(e.target.checked)}
+            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+          />
+          <label htmlFor="bioluminescence-mode" className="text-white">Bioluminescência (Neon Glow)</label>
         </div>
 
         <div className="flex items-center space-x-2">
