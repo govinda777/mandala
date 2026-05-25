@@ -1,7 +1,28 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern, calculateBioluminescenceIntensity, getBioluminescenceColor } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
+  describe('Bioluminescence', () => {
+    it('should calculate intensity that decays with distance', () => {
+      const maxRadius = 100;
+      const intensityCenter = calculateBioluminescenceIntensity(0, maxRadius);
+      const intensityMid = calculateBioluminescenceIntensity(50, maxRadius);
+      const intensityEdge = calculateBioluminescenceIntensity(100, maxRadius);
+
+      expect(intensityCenter).toBeGreaterThan(intensityMid);
+      expect(intensityMid).toBeGreaterThan(intensityEdge);
+      expect(intensityEdge).toBeGreaterThan(0);
+    });
+
+    it('should calculate bioluminescence color mapped from intensity', () => {
+      const colorHigh = getBioluminescenceColor(1.5, 100);
+      const colorLow = getBioluminescenceColor(0.1, 260);
+
+      expect(colorHigh).toBe('hsla(180, 100%, 67%, 1.000)');
+      expect(colorLow).toBe('hsla(220, 100%, 32%, 0.260)');
+    });
+  });
+
   describe('Cymatics / Chladni Pattern', () => {
     it('should generate an array of points', () => {
       // Testing with a low resolution and simple parameters
