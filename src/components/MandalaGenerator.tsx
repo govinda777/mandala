@@ -31,9 +31,6 @@ export default function MandalaGenerator() {
   const [cymaticsN, setCymaticsN] = useState(3);
   const [cymaticsM, setCymaticsM] = useState(5);
   const [bioluminescenceMode, setBioluminescenceMode] = useState(false);
-  const [generativeMode, setGenerativeMode] = useState(false);
-  const [generativeLayers, setGenerativeLayers] = useState(20);
-  const [generativePetals, setGenerativePetals] = useState(30);
   const [activeAccordion, setActiveAccordion] = useState<string>('estrutura');
 
   // Animation Loop
@@ -124,10 +121,7 @@ export default function MandalaGenerator() {
       cymaticsMode,
       cymaticsN,
       cymaticsM,
-      bioluminescenceMode,
-      generativeMode,
-      generativeLayers,
-      generativePetals
+      bioluminescenceMode
     };
 
     const width = 2048;
@@ -178,17 +172,14 @@ export default function MandalaGenerator() {
       cymaticsMode,
       cymaticsN,
       cymaticsM,
-      bioluminescenceMode,
-      generativeMode,
-      generativeLayers,
-      generativePetals
+      bioluminescenceMode
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, generativeMode, generativeLayers, generativePetals]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -341,27 +332,6 @@ export default function MandalaGenerator() {
                   <input type="checkbox" checked={modoFibonacciAvancado} onChange={(e) => setModoFibonacciAvancado(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
                   <span className="text-slate-300">Raio em Fibonacci</span>
                 </label>
-
-                <div className="pt-2 border-t border-slate-700">
-                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
-                    <input type="checkbox" checked={generativeMode} onChange={(e) => setGenerativeMode(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
-                    <span className="text-slate-300">Modo Generativo</span>
-                  </label>
-                  {generativeMode && (
-                    <div className="space-y-2 pl-6">
-                      <div className="flex justify-between">
-                        <label className="text-xs text-slate-400">Camadas Generativas</label>
-                        <span className="text-xs text-slate-400">{generativeLayers}</span>
-                      </div>
-                      <input type="range" min="1" max="50" step="1" value={generativeLayers} onChange={(e) => setGenerativeLayers(parseInt(e.target.value))} className="w-full accent-purple-500" />
-                      <div className="flex justify-between">
-                        <label className="text-xs text-slate-400">Pétalas Generativas</label>
-                        <span className="text-xs text-slate-400">{generativePetals}</span>
-                      </div>
-                      <input type="range" min="1" max="100" step="1" value={generativePetals} onChange={(e) => setGenerativePetals(parseInt(e.target.value))} className="w-full accent-purple-500" />
-                    </div>
-                  )}
-                </div>
               </div>
             )}
           </div>

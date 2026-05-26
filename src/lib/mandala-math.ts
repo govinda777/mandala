@@ -548,47 +548,75 @@ export interface GenerativeLayer {
 
 /**
  * Generates deterministic generative layers scaling from outside in.
- * @param totalLayers Number of total layers to generate
- * @param petalsPerLayer Number of petals per layer (used to calculate tangent constraint)
+ * @param numCamadas Number of total layers to generate
+ * @param numPetalas Number of petals per layer (used to calculate tangent constraint)
  * @param baseRadius The maximum radius of the mandala
+ * @param complexidade Modulation parameter to adjust the noise/perturbation levels
+ * @param corBase Base hue color
  * @param seed Seed for deterministic randomness
  */
 export const generateGenerativeLayers = (
-  totalLayers: number,
-  petalsPerLayer: number,
+  numCamadas: number,
+  numPetalas: number,
   baseRadius: number,
+  complexidade: number,
+  corBase: number,
+  fibonacciAdvancedMode?: boolean,
   seed: number = 12345
 ): GenerativeLayer[] => {
   const layers: GenerativeLayer[] = [];
   const rng = new SeededRandom(seed);
 
-  // Angle of each petal based on total petals per layer
-  const angleRad = (Math.PI * 2) / petalsPerLayer;
+  // Angle of each petal based on total petals
+  const angleRad = (Math.PI * 2) / numPetalas;
 
-  // Constraint function: Y_max = X * tan(angle) * 0.9
-  // We use angleRad / 2 because the petal is symmetric across the X-axis (from 0 to half-width)
-  const calcMaxY = (x: number) => x * Math.tan(angleRad / 2) * 0.9;
+  // Base curvature based on complexity: 1.0 is default, higher complexity adds more elasticity
+  const curvatura = 1.0 + (complexidade - 1) * 0.2;
+
+  // Constraint function: Y_max = X * tan(angle/2) * curvatura
+  // Limit curvature strictly so petals don't heavily overlap
+  const limitCurvature = Math.min(curvatura, 1.5);
+  const calcMaxY = (x: number) => Math.max(2, x * Math.tan(angleRad / 2) * limitCurvature);
 
   // Generate layers from outside (scale=1.0) to inside
-  for (let layer = totalLayers; layer > 0; layer--) {
-    const scale = layer / totalLayers;
+  for (let layer = numCamadas; layer > 0; layer--) {
+    const scale = fibonacciAdvancedMode ? calculateFibonacciRadius(layer, numCamadas) : layer / numCamadas;
+
+    // Perturbation factor based on complexity
+    const pFact = (complexidade - 1) * 0.1;
 
     // Generate anchor points relative to the base radius and current scale
     const x4 = baseRadius * scale; // Tip of the petal
-    const x1 = rng.nextRange(baseRadius * 0.6, baseRadius * 0.9) * scale; // Base of the petal (closest to center)
 
-    const x2 = rng.nextRange(baseRadius * 0.1, baseRadius * 0.8) * scale;
-    const y2 = rng.nextRange(5, calcMaxY(x2)); // Constrained Y
+    const x1Min = Math.max(0, baseRadius * (0.6 - pFact));
+    const x1Max = Math.min(baseRadius * 0.9, baseRadius * (0.9 + pFact));
+    const x1 = rng.nextRange(x1Min, x1Max) * scale; // Base of the petal (closest to center)
 
-    const x3 = rng.nextRange(baseRadius * 0.2, x4) * scale;
-    const y3 = rng.nextRange(5, calcMaxY(x3)); // Constrained Y
+    const x2Min = Math.max(0, baseRadius * (0.1 - pFact));
+    const x2Max = Math.min(baseRadius * 0.8, baseRadius * (0.8 + pFact));
+    const x2 = rng.nextRange(x2Min, x2Max) * scale;
 
-    // Random Hue for this layer
-    const hue = Math.floor(rng.nextRange(0, 360));
+    // Ensure bounds are valid for RNG (min < max)
+    const y2Max = calcMaxY(x2);
+    const y2Min = 2; // minimum safe Y
+    const y2 = y2Max > y2Min ? rng.nextRange(y2Min, y2Max) : y2Min;
+
+    const x3Min = Math.max(0, baseRadius * (0.2 - pFact));
+    const x3Max = x4; // Tip is max
+    const x3 = x3Min < x3Max ? rng.nextRange(x3Min, x3Max) * scale : x3Max * scale;
+
+    const y3Max = calcMaxY(x3);
+    const y3Min = 2;
+    const y3 = y3Max > y3Min ? rng.nextRange(y3Min, y3Max) : y3Min;
+
+    // Generate Hue based on base color with slight perturbations per layer for the watercolor effect
+    // Shift the hue slightly outwards using complexity and layer scale
+    const hueShift = rng.nextRange(-20 * complexidade, 20 * complexidade);
+    const layerHue = (corBase + hueShift + 360) % 360;
 
     layers.push({
       scale,
-      hue,
+      hue: Math.floor(layerHue),
       petals: { x1, x2, y2, x3, y3, x4 }
     });
   }

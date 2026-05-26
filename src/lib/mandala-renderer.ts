@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -24,9 +24,6 @@ export interface MandalaConfig {
   cymaticsN?: number;
   cymaticsM?: number;
   bioluminescenceMode?: boolean;
-  generativeMode?: boolean;
-  generativeLayers?: number;
-  generativePetals?: number;
 }
 
 export const drawMandala = (
@@ -41,6 +38,7 @@ export const drawMandala = (
     rotacao,
     width,
     height,
+    formaBase,
     flowerOfLife,
     goldenSpiral,
     fractalMode,
@@ -53,292 +51,34 @@ export const drawMandala = (
     cymaticsMode,
     cymaticsN,
     cymaticsM,
-    bioluminescenceMode,
-    generativeMode,
-    generativeLayers = 20,
-    generativePetals = 30
+    bioluminescenceMode
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
 
   // Calculate luminosity adjustment based on moon phase (if provided)
-  // Default luminosity is around 50%. Moon phase modulates this from 20% to 80%.
   let luminosityInner = 50;
-  let luminosityOuter = 50;
-  let petalOpeningRatio = 0.8; // Default inner/outer radius ratio
+  let luminosityOuter = 30;
+  let alphaBase = 0.7;
 
   if (moonPhaseAge !== undefined) {
-    const illumination = getMoonIllumination(moonPhaseAge); // 0.0 to 1.0
-    // Adjust luminosity: New Moon (0) -> 20%, Full Moon (1) -> 80%
-    luminosityInner = 20 + (illumination * 60);
-    luminosityOuter = 20 + (illumination * 60);
-
-    // Adjust petal opening: New Moon (0) -> tight (0.9), Full Moon (1) -> open (0.6)
-    petalOpeningRatio = 0.9 - (illumination * 0.3);
+    const illumination = getMoonIllumination(moonPhaseAge);
+    luminosityInner = 20 + illumination * 60;
+    luminosityOuter = 10 + illumination * 40;
+    alphaBase = 0.4 + illumination * 0.4;
   }
 
-  // Limpar o canvas
+  // Clear canvas
   ctx.clearRect(0, 0, width, height);
 
-  if (bioluminescenceMode) {
-    // Fundo escuro marinho para o modo bioluminescente
-    ctx.fillStyle = "#010A15";
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  // Mover para o centro do canvas
   ctx.save();
   ctx.translate(width / 2, height / 2);
 
-  // GENERATIVE MODE OVERRIDE
-  if (generativeMode) {
-    const anglePerPetal = 360 / generativePetals;
-    const anglePerPetalRad = (anglePerPetal * Math.PI) / 180;
-
-    ctx.globalCompositeOperation = 'source-over';
-
-    // Generate deterministic layers based on petals and layers
-    // Seed based on number of petals and layers so it stays consistent during rotation but changes when parameters change
-    const seed = generativeLayers * 1000 + generativePetals;
-
-    const layers = generateGenerativeLayers(generativeLayers, generativePetals, tamanho, seed);
-
-    // Rotate the entire context by the continuous rotation angle
-    ctx.rotate((rotacao * Math.PI) / 180);
-
-    layers.forEach(layer => {
-      ctx.fillStyle = `hsla(${layer.hue}, 80%, 50%, 0.4)`;
-      const p = layer.petals;
-
-      for (let i = 0; i < generativePetals; i++) {
-        ctx.rotate(anglePerPetalRad);
-
-        ctx.beginPath();
-        ctx.moveTo(p.x1, 0);
-        ctx.bezierCurveTo(p.x2, p.y2, p.x3, p.y3, p.x4, 0);
-        ctx.bezierCurveTo(p.x3, -p.y3, p.x2, -p.y2, p.x1, 0);
-        ctx.fill();
-      }
-    });
-
-    ctx.restore();
-    return; // Stop rendering standard mandala
-  }
-
+  // Apply continuous rotation
   ctx.rotate((rotacao * Math.PI) / 180);
 
-  // Desenhar camadas da mandala
-  for (let camada = 1; camada <= numCamadas; camada++) {
-    // Calcular raio da camada atual
-    let raio = (tamanho / numCamadas) * camada;
-
-    if (fibonacciAdvancedMode) {
-      // Calculate a base unit so that the last layer doesn't exceed the canvas
-      // The max Fibonacci multiplier will be fib(numCamadas)
-      const maxFib = calculateFibonacciRadius(1, numCamadas);
-      const baseUnit = tamanho / maxFib;
-      raio = calculateFibonacciRadius(baseUnit, camada);
-    }
-
-    // Definir cores para esta camada
-    const matiz = (corBase + (camada * 360) / numCamadas) % 360;
-    let corInterna = `hsl(${matiz}, 70%, ${luminosityInner}%)`;
-    let corExterna = `hsl(${(matiz + 30) % 360}, 70%, ${luminosityOuter}%)`;
-
-    if (bioluminescenceMode) {
-      // Glow and colors based on bioluminescence properties
-      const intensity = calculateBioluminescenceIntensity(raio, tamanho);
-      corInterna = getBioluminescenceColor(intensity, corBase);
-      const intensityOuter = calculateBioluminescenceIntensity(raio * petalOpeningRatio, tamanho);
-      corExterna = getBioluminescenceColor(intensityOuter, corBase + 20);
-
-      ctx.shadowBlur = 10 + (intensity * 15);
-      ctx.shadowColor = corInterna;
-    } else {
-      ctx.shadowBlur = 0;
-    }
-
-    // Aumentar num de pétalas com base na complexidade para camadas mais internas
-    const petalasCamada = Math.floor(
-      numPetalas * (1 + (complexidade - 1) * (1 - camada / numCamadas) * 0.5)
-    );
-
-    // Desenhar pétalas para esta camada
-    drawPetals(
-      ctx,
-      petalasCamada,
-      raio,
-      raio * petalOpeningRatio,
-      corInterna,
-      corExterna,
-      complexidade,
-      config.formaBase,
-      simetriaPersonalizada,
-      eixosSimetria
-    );
-
-    // Desenhar círculo interno desta camada (adaptado para forma base)
-    ctx.beginPath();
-    const rInt = raio * 0.4;
-    if (config.formaBase && config.formaBase >= 3) {
-      for (let i = 0; i <= 360; i += 5) {
-        const ang = (i * Math.PI) / 180;
-        const mult = calculatePolygonRadiusMultiplier(ang, config.formaBase);
-        const ptX = Math.cos(ang) * rInt * mult;
-        const ptY = Math.sin(ang) * rInt * mult;
-        if (i === 0) ctx.moveTo(ptX, ptY);
-        else ctx.lineTo(ptX, ptY);
-      }
-      ctx.closePath();
-    } else {
-      ctx.arc(0, 0, rInt, 0, Math.PI * 2);
-    }
-
-    if (bioluminescenceMode) {
-      const intInt = calculateBioluminescenceIntensity(rInt, tamanho);
-      ctx.fillStyle = getBioluminescenceColor(intInt, matiz + 60);
-    } else {
-      ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, ${luminosityInner}%, 0.5)`;
-    }
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Adicionar detalhes extras baseados em complexidade
-    if (complexidade > 1.5 && camada % 2 === 0) {
-      drawDetailPattern(ctx, petalasCamada * 2, raio * 0.6, matiz, config.formaBase);
-    }
-  }
-
-  // Desenhar círculos concêntricos decorativos
-  drawCentralCircles(ctx, numCamadas, tamanho, complexidade, corBase, numPetalas, config.formaBase);
-
-  if (flowerOfLife) {
-    drawFlowerOfLifeOverlay(ctx, tamanho, complexidade);
-  }
-
-  if (goldenSpiral) {
-    const spiralPoints = calculateGoldenSpiral(0, 0, tamanho, 4);
-    drawGoldenSpiral(ctx, spiralPoints, "rgba(255, 215, 0, 0.8)");
-  }
-
-  if (fractalMode) {
-    drawFractalOverlay(ctx, tamanho, complexidade);
-  }
-
-  // Restaurar a transformação
-  ctx.restore();
-
-  // Draw tessellation overlay in screen coordinates
-  if (tessellation) {
-    drawHexagonGrid(ctx, width, height, complexidade, corBase);
-  }
-
-  if (cymaticsMode && cymaticsN !== undefined && cymaticsM !== undefined) {
-    // Chladni is centered on the mandala, but ctx was restored, so we translate back
-    ctx.save();
-    ctx.translate(width / 2, height / 2);
-    drawChladniOverlay(ctx, cymaticsN, cymaticsM, tamanho, corBase);
-    ctx.restore();
-  }
-};
-
-const drawHexagonGrid = (
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  _complexidade: number,
-  corBase: number
-) => {
-  // Determine hexagon radius based on complexity or fixed size
-  // Use a scale relative to canvas size or fixed pixels?
-  // Let's use fixed range adjusted by complexity
-  const minRadius = 30;
-  const maxRadius = 80;
-  // Higher complexity -> smaller hexagons (more detailed)
-  const radius = maxRadius - (_complexidade - 1) * (maxRadius - minRadius) / 2;
-
-  const points = calculateHexagonGrid(width, height, radius);
-
-  ctx.save();
-  ctx.strokeStyle = `hsla(${corBase}, 70%, 70%, 0.3)`;
-  ctx.lineWidth = 1;
-
-  points.forEach(point => {
-    drawHexagon(ctx, point.x, point.y, radius);
-  });
-
-  ctx.restore();
-};
-
-const drawHexagon = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  radius: number
-) => {
-  ctx.beginPath();
-  for (let i = 0; i < 6; i++) {
-    // Pointy topped hexagons: angles at 30, 90, 150... (PI/6, PI/2...)
-    const angle = Math.PI / 6 + i * Math.PI / 3;
-    const hx = x + radius * Math.cos(angle);
-    const hy = y + radius * Math.sin(angle);
-    if (i === 0) ctx.moveTo(hx, hy);
-    else ctx.lineTo(hx, hy);
-  }
-  ctx.closePath();
-  ctx.stroke();
-};
-
-const drawFractalOverlay = (
-  ctx: CanvasRenderingContext2D,
-  radius: number,
-  complexidade: number
-) => {
-  // Adjust depth based on complexity?
-  // Complexity is 1.0 to 3.0.
-  // Depth 2 is good default. 3 might be slow/too detailed.
-  const depth = complexidade > 2 ? 3 : 2;
-  const branches = 6;
-
-  // Initial radius for the central fractal circle
-  // Making it relative to the mandala radius
-  const startRadius = radius * 0.25;
-
-  const circles = calculateFractalCircles(0, 0, startRadius, depth, branches);
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(100, 200, 255, 0.7)"; // Cyan/Blueish for fractal
-  ctx.lineWidth = 1.5;
-
-  circles.forEach(circle => {
-    ctx.beginPath();
-    ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.fillStyle = "rgba(100, 200, 255, 0.1)";
-    ctx.fill();
-  });
-
-  ctx.restore();
-};
-
-const drawPetals = (
-  ctx: CanvasRenderingContext2D,
-  numPetalas: number,
-  raioExterno: number,
-  raioInterno: number,
-  corInterna: string,
-  corExterna: string,
-  complexidade: number,
-  formaBase?: number,
-  simetriaPersonalizada?: boolean,
-  eixosSimetria?: number
-) => {
-  const anguloIncremento = (Math.PI * 2) / numPetalas;
-
   // Determine axes of symmetry
-  const axes = [];
+  const axes: number[] = [];
   if (simetriaPersonalizada && eixosSimetria && eixosSimetria > 0) {
     const axisAngleIncrement = Math.PI / eixosSimetria;
     for (let i = 0; i < eixosSimetria; i++) {
@@ -346,237 +86,129 @@ const drawPetals = (
     }
   }
 
-  // Draw a single petal curve
-  const drawPetalAtAngle = (angulo: number) => {
-    // Calcular multiplicadores da forma base
-    const multCentro = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo, formaBase) : 1;
-    const mult1 = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo - anguloIncremento / 4, formaBase) : 1;
-    const mult2 = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo + anguloIncremento / 4, formaBase) : 1;
+  // Generate deterministic layers based on outside-in logic
+  // Use numCamadas * 1000 + numPetalas as a stable seed to prevent flickering
+  const seed = numCamadas * 1000 + numPetalas;
+  const layers = generateGenerativeLayers(numCamadas, numPetalas, tamanho, complexidade, corBase, fibonacciAdvancedMode, seed);
 
-    const rE = raioExterno * multCentro;
-    const rI = raioInterno * multCentro;
+  const anglePerPetal = 360 / numPetalas;
 
-    // Criar um gradiente para cada pétala
-    const gradiente = ctx.createRadialGradient(
-      0,
-      0,
-      rI * 0.2,
-      0,
-      0,
-      rE
-    );
-    gradiente.addColorStop(0, corInterna);
-    gradiente.addColorStop(1, corExterna);
+  // Set composite operation for watercolor blending effect
+  ctx.globalCompositeOperation = bioluminescenceMode ? 'screen' : 'source-over';
 
-    // Desenhar uma pétala
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
+  // Draw generative layers from outside in
+  layers.forEach((layer) => {
+    // Generate HSL color for the layer
+    // Adjust luminosity based on moon phase settings
+    const lum = Math.min(100, luminosityOuter + layer.scale * (luminosityInner - luminosityOuter));
+    const alpha = alphaBase * 0.6; // slightly transparent for overlaying
 
-    // Ajustar forma das pétalas baseado em complexidade
-    const ajusteForma = 1 + (complexidade - 1) * 0.4;
+    let fillStyle = `hsla(${layer.hue}, 80%, ${lum}%, ${alpha})`;
 
-    // Calcular pontos de controle para a curva de Bézier (com multiplicadores)
-    const rE1 = raioExterno * mult1;
-    const rE2 = raioExterno * mult2;
+    // Bioluminescence Override
+    if (bioluminescenceMode) {
+      // Calculate inverse square intensity based on distance from center (using layer.scale)
+      const distFromCenter = layer.scale * tamanho;
+      const intensity = calculateBioluminescenceIntensity(distFromCenter, tamanho);
+      fillStyle = getBioluminescenceColor(intensity, corBase);
+    }
 
-    const x1 = Math.cos(angulo - anguloIncremento / 4) * rE1;
-    const y1 = Math.sin(angulo - anguloIncremento / 4) * rE1;
-    const x2 = Math.cos(angulo + anguloIncremento / 4) * rE2;
-    const y2 = Math.sin(angulo + anguloIncremento / 4) * rE2;
-    const xm = Math.cos(angulo) * rE * ajusteForma;
-    const ym = Math.sin(angulo) * rE * ajusteForma;
+    ctx.fillStyle = fillStyle;
 
-    // Desenhar a curva
-    ctx.quadraticCurveTo(xm, ym, x1, y1);
-    ctx.lineTo(0, 0);
-    ctx.quadraticCurveTo(xm, ym, x2, y2);
-    ctx.lineTo(0, 0);
+    const { x1, x2, y2, x3, y3, x4 } = layer.petals;
 
-    // Preencher e contornar a pétala
-    ctx.fillStyle = gradiente;
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
+    // Draw all petals for this layer
+    for (let i = 0; i < numPetalas; i++) {
+      const currentAngleRad = (anglePerPetal * i * Math.PI) / 180;
 
-    // Desenhar detalhes adicionais
-    if (rE > 50) {
-      // Adicionar pontos decorativos
-      ctx.beginPath();
-      ctx.arc(
-        Math.cos(angulo) * rE * 0.7,
-        Math.sin(angulo) * rE * 0.7,
-        rE * 0.05,
-        0,
-        Math.PI * 2
-      );
-      ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-      ctx.fill();
+      const drawSymmetricPetal = (angle: number) => {
+        ctx.save();
+        ctx.rotate(angle);
 
-      // Adicionar linhas decorativas baseadas na complexidade
-      if (complexidade > 1.2) {
-        const numLinhas = Math.floor(complexidade);
-        for (let j = 1; j <= numLinhas; j++) {
-          const raioLinha = raioExterno * (0.3 + j * 0.2) * multCentro;
-          if (raioLinha < rE) {
-            ctx.beginPath();
-            ctx.moveTo(
-              Math.cos(angulo) * raioLinha * 0.7,
-              Math.sin(angulo) * raioLinha * 0.7
-            );
-            ctx.lineTo(
-              Math.cos(angulo + anguloIncremento * 0.3) * raioLinha * 0.8,
-              Math.sin(angulo + anguloIncremento * 0.3) * raioLinha * 0.8
-            );
-            ctx.strokeStyle = `hsla(${
-              parseInt(corInterna.slice(4)) + 30
-            }, 80%, 60%, 0.4)`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
+        // Multiplicador Poligonal Base
+        const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angle, formaBase) : 1;
+
+        ctx.beginPath();
+        ctx.moveTo(x1 * mult, 0);
+
+        // Upper half of the petal (Bezier Curve)
+        ctx.bezierCurveTo(x2 * mult, y2 * mult, x3 * mult, y3 * mult, x4 * mult, 0);
+
+        // Lower half of the petal (Mirrored -Y Bezier Curve)
+        ctx.bezierCurveTo(x3 * mult, -y3 * mult, x2 * mult, -y2 * mult, x1 * mult, 0);
+
+        ctx.fill();
+
+        // Option to draw strokes based on fractalMode
+        if (fractalMode) {
+          ctx.strokeStyle = `hsla(${layer.hue}, 80%, 80%, 0.3)`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
         }
+        ctx.restore();
+      };
+
+      drawSymmetricPetal(currentAngleRad);
+
+      // Apply mirrored kaleidoscope symmetry if enabled
+      if (simetriaPersonalizada && axes.length > 0) {
+        axes.forEach(axis => {
+          const mirroredAngle = calculateMirroredAngle(currentAngleRad, axis);
+          drawSymmetricPetal(mirroredAngle);
+        });
       }
     }
-  };
+  });
 
-  for (let i = 0; i < numPetalas; i++) {
-    const angulo = i * anguloIncremento;
+  // Restore context from rotation and translation before drawing overlays
+  ctx.restore();
 
-    drawPetalAtAngle(angulo);
+  // OVERLAYS (Drawn over the generative base)
 
-    if (simetriaPersonalizada && axes.length > 0) {
-      // Set to keep track of drawn angles to avoid overlapping
-      const drawnAngles = new Set<string>();
-      drawnAngles.add(angulo.toFixed(5));
-
-      axes.forEach(axis => {
-        const mirrored = calculateMirroredAngle(angulo, axis);
-        const mirroredKey = mirrored.toFixed(5);
-        if (!drawnAngles.has(mirroredKey)) {
-          drawPetalAtAngle(mirrored);
-          drawnAngles.add(mirroredKey);
-        }
-      });
-    }
-  }
-};
-
-const drawDetailPattern = (
-  ctx: CanvasRenderingContext2D,
-  numElementos: number,
-  raio: number,
-  matiz: number,
-  formaBase?: number
-) => {
-  const anguloIncremento = (Math.PI * 2) / numElementos;
-
-  for (let i = 0; i < numElementos; i++) {
-    const angulo = i * anguloIncremento;
-    const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angulo, formaBase) : 1;
-    const r = raio * mult;
-    const x = Math.cos(angulo) * r;
-    const y = Math.sin(angulo) * r;
-
-    // Desenhar pequenos círculos ou outras formas
-    ctx.beginPath();
-
-    // Alternar entre diferentes formas decorativas
-    if (i % 3 === 0) {
-      // Pequeno círculo
-      ctx.arc(x, y, raio * 0.05, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${(matiz + 120) % 360}, 70%, 60%, 0.6)`;
-      ctx.fill();
-    } else if (i % 3 === 1) {
-      // Pequeno losango
-      ctx.moveTo(x, y - raio * 0.06);
-      ctx.lineTo(x + raio * 0.06, y);
-      ctx.lineTo(x, y + raio * 0.06);
-      ctx.lineTo(x - raio * 0.06, y);
-      ctx.closePath();
-      ctx.fillStyle = `hsla(${(matiz + 60) % 360}, 70%, 60%, 0.6)`;
-      ctx.fill();
-    } else {
-      // Linha radiante
-      ctx.moveTo(x * 0.8, y * 0.8);
-      ctx.lineTo(x * 1.1, y * 1.1);
-      ctx.strokeStyle = `hsla(${(matiz + 180) % 360}, 70%, 60%, 0.6)`;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-  }
-};
-
-const drawCentralCircles = (
-  ctx: CanvasRenderingContext2D,
-  numCamadas: number,
-  tamanho: number,
-  complexidade: number,
-  corBase: number,
-  numPetalas: number,
-  formaBase?: number
-) => {
-  // Número de círculos/formas concêntricas no centro baseado na complexidade
-  const numCirculos = Math.floor(numCamadas * complexidade);
-
-  // Desenhar formas concêntricas no centro
-  for (let i = 0; i < numCirculos; i++) {
-    const raio = tamanho * (0.1 - (i * 0.015) / Math.sqrt(complexidade));
-    if (raio <= 0) break;
-
-    ctx.beginPath();
-    if (formaBase && formaBase >= 3) {
-      for (let j = 0; j <= 360; j += 5) {
-        const ang = (j * Math.PI) / 180;
-        const mult = calculatePolygonRadiusMultiplier(ang, formaBase);
-        const ptX = Math.cos(ang) * raio * mult;
-        const ptY = Math.sin(ang) * raio * mult;
-        if (j === 0) ctx.moveTo(ptX, ptY);
-        else ctx.lineTo(ptX, ptY);
+  if (tessellation) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    // Draw hex grid
+    const hexPoints = calculateHexagonGrid(width, height, tamanho * 0.1);
+    ctx.strokeStyle = `hsla(${corBase}, 50%, 50%, 0.2)`;
+    ctx.lineWidth = 1;
+    hexPoints.forEach(p => {
+      ctx.beginPath();
+      // Draw a small hexagon at p
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const hx = p.x + Math.cos(angle) * (tamanho * 0.1);
+        const hy = p.y + Math.sin(angle) * (tamanho * 0.1);
+        if (i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
       }
       ctx.closePath();
-    } else {
-      ctx.arc(0, 0, raio, 0, Math.PI * 2);
-    }
-
-    // Cores mais variadas baseadas na complexidade
-    if (complexidade > 2 && i % 3 === 0) {
-      ctx.fillStyle = `hsla(${(corBase + i * 30) % 360}, 70%, 50%, 0.4)`;
-    } else if (i % 2 === 0) {
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-    } else {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-    }
-
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
+      ctx.stroke();
+    });
+    ctx.restore();
   }
 
-  // Adicionar um ponto central
-  ctx.beginPath();
-  ctx.arc(0, 0, 5, 0, Math.PI * 2);
-  ctx.fillStyle = "white";
-  ctx.fill();
+  if (flowerOfLife) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawFlowerOfLifeOverlay(ctx, tamanho, complexidade);
+    ctx.restore();
+  }
 
-  // Adicionar padrão radiante no centro quando complexidade alta
-  if (complexidade > 1.7) {
-    const numRaios = Math.floor(numPetalas * 1.5);
-    const anguloRaio = (Math.PI * 2) / numRaios;
-    const raioInt = tamanho * 0.15;
+  if (cymaticsMode && cymaticsN && cymaticsM) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawChladniOverlay(ctx, cymaticsN, cymaticsM, tamanho, corBase);
+    ctx.restore();
+  }
 
-    for (let i = 0; i < numRaios; i++) {
-      const angulo = i * anguloRaio;
-      ctx.beginPath();
-      ctx.moveTo(
-        Math.cos(angulo) * raioInt * 0.5,
-        Math.sin(angulo) * raioInt * 0.5
-      );
-      ctx.lineTo(Math.cos(angulo) * raioInt, Math.sin(angulo) * raioInt);
-      ctx.strokeStyle = `hsla(${(corBase + i * 10) % 360}, 80%, 60%, 0.6)`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
+  if (goldenSpiral) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    // Draw Golden Spiral
+    const spiralPoints = calculateGoldenSpiral(0, 0, tamanho, 3);
+    drawGoldenSpiral(ctx, spiralPoints, `hsla(${(corBase + 180) % 360}, 80%, 60%, 0.8)`);
+    ctx.restore();
   }
 };
 
@@ -585,24 +217,13 @@ const drawFlowerOfLifeOverlay = (
   radius: number,
   _complexidade: number
 ) => {
-  // Determine circle radius and layers based on complexity or fixed?
-  // Let's use a fixed relative size for now.
-  // The "radius" parameter here is the mandala radius (half screen approx).
-
-  // In Flower of Life, the circles have radius r.
-  // If we want to cover the area, we need to choose r.
-  // Let's say we want 3 layers.
   const layers = 3;
-  // The extent is approximately 2 * layers * r.
-  // So if extent = radius (mandala size), then r = radius / (2 * layers).
-  const circleRadius = radius / (2 * 1.5); // A bit larger
-
+  const circleRadius = radius / (2 * 1.5);
   const centers = calculateFlowerOfLifeCenters(circleRadius, layers);
 
   ctx.save();
-  // Use a blending mode or thin lines
-  ctx.globalCompositeOperation = "source-over"; // Normal blending, but transparency helps
-  ctx.strokeStyle = "rgba(255, 215, 0, 0.5)"; // Goldish
+  ctx.globalCompositeOperation = "source-over";
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.5)";
   ctx.lineWidth = 2;
 
   centers.forEach((center) => {
@@ -621,21 +242,13 @@ const drawChladniOverlay = (
   radius: number,
   corBase: number
 ) => {
-  // Get the nodal points, lower resolution for performance
   const points = calculateChladniPattern(n, m, radius, 250, 0.05);
 
   ctx.save();
-
-  // No need to translate because the origin of ctx at this point is already set to width/2, height/2
-  // by drawMandala. We just draw the points which are centered at 0,0 from calculateChladniPattern.
-  // Although we have translation in drawMandala, wait, let's look at drawMandala again.
-
-  // Draw the points like sand
-  ctx.fillStyle = `hsla(${corBase}, 70%, 80%, 0.8)`; // Sand-like color matching mandala hue
+  ctx.fillStyle = `hsla(${corBase}, 70%, 80%, 0.8)`;
 
   points.forEach(p => {
     ctx.beginPath();
-    // Smaller points to match reduced density
     ctx.arc(p.x, p.y, 2.0, 0, Math.PI * 2);
     ctx.fill();
   });
