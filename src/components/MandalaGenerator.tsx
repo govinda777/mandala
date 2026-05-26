@@ -31,6 +31,7 @@ export default function MandalaGenerator() {
   const [cymaticsN, setCymaticsN] = useState(3);
   const [cymaticsM, setCymaticsM] = useState(5);
   const [bioluminescenceMode, setBioluminescenceMode] = useState(false);
+  const [activeAccordion, setActiveAccordion] = useState<string>('estrutura');
 
   // Animation Loop
   useEffect(() => {
@@ -186,373 +187,315 @@ export default function MandalaGenerator() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center bg-gray-800 p-6 rounded-lg">
-      <canvas 
-        ref={canvasRef} 
-        width={400} 
-        height={400} 
-        className="border border-gray-600 bg-gray-900 shadow-lg rounded-lg"
-      />
-      
-      <div className="mt-4 space-y-4 w-full max-w-md">
-        <div className="flex flex-col space-y-2">
-          <label className="text-white">Forma Base (Simetria Poligonal)</label>
-          <select
-            value={formaBase}
-            onChange={(e) => setFormaBase(parseInt(e.target.value))}
-            className="bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
+    <div className="grid grid-cols-1 md:grid-cols-12 h-full w-full">
+      {/* Coluna Esquerda - Controles */}
+      <div className="md:col-span-4 h-full overflow-y-auto bg-slate-900/50 backdrop-blur-md border-r border-slate-800 p-6 custom-scrollbar">
+        <h2 className="text-xl font-bold mb-6 text-white text-center tracking-wider">MANDALA GENERATOR</h2>
+
+        <div className="space-y-3 w-full">
+
+          {/* Accordion: Estrutura & Geometria */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 flex justify-between items-center bg-slate-800 hover:bg-slate-700 transition-colors"
+              onClick={() => setActiveAccordion(activeAccordion === 'estrutura' ? '' : 'estrutura')}
+            >
+              <span className="font-semibold text-sm">🛠️ Estrutura Geral</span>
+              <span>{activeAccordion === 'estrutura' ? '▼' : '▶'}</span>
+            </button>
+
+            {activeAccordion === 'estrutura' && (
+              <div className="p-4 space-y-4 text-sm bg-slate-900/30">
+                <div className="flex flex-col space-y-1">
+                  <label className="text-slate-300">Forma Base (Simetria)</label>
+                  <select
+                    value={formaBase}
+                    onChange={(e) => setFormaBase(parseInt(e.target.value))}
+                    className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                  >
+                    <option value={0}>Círculo</option>
+                    <option value={3}>Triângulo</option>
+                    <option value={4}>Quadrado</option>
+                    <option value={5}>Pentágono</option>
+                    <option value={6}>Hexágono</option>
+                    <option value={8}>Octógono</option>
+                    <option value={12}>Dodecágono</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label htmlFor="petals-input" className="text-slate-300">Pétalas</label>
+                    <span className="text-slate-400">{numPetalas}</span>
+                  </div>
+                  <input
+                    id="petals-input"
+                    type="range" min="3" max="24"
+                    value={numPetalas}
+                    onChange={(e) => handlePetalasChange(parseInt(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="text-slate-300">Camadas</label>
+                    <span className="text-slate-400">{numCamadas}</span>
+                  </div>
+                  <input
+                    type="range" min="1" max="10"
+                    value={numCamadas}
+                    onChange={(e) => setNumCamadas(parseInt(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="text-slate-300">Complexidade</label>
+                    <span className="text-slate-400">{complexidade.toFixed(1)}</span>
+                  </div>
+                  <input
+                    type="range" min="1" max="3" step="0.1"
+                    value={complexidade}
+                    onChange={(e) => setComplexidade(parseFloat(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox" id="simetria-personalizada"
+                    checked={simetriaPersonalizada}
+                    onChange={(e) => setSimetriaPersonalizada(e.target.checked)}
+                    className="w-4 h-4 accent-purple-500 bg-slate-800 border-slate-600 rounded"
+                  />
+                  <label htmlFor="simetria-personalizada" className="text-slate-300">Simetria de Espelho</label>
+                </div>
+
+                {simetriaPersonalizada && (
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <label className="text-slate-300">Eixos</label>
+                      <span className="text-slate-400">{eixosSimetria}</span>
+                    </div>
+                    <input
+                      type="range" min="1" max="12" step="1"
+                      value={eixosSimetria}
+                      onChange={(e) => setEixosSimetria(parseInt(e.target.value))}
+                      className="w-full accent-purple-500"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Accordion: Geometria & Fractais */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 flex justify-between items-center bg-slate-800 hover:bg-slate-700 transition-colors"
+              onClick={() => setActiveAccordion(activeAccordion === 'geometria' ? '' : 'geometria')}
+            >
+              <span className="font-semibold text-sm">📐 Geometria & Fractais</span>
+              <span>{activeAccordion === 'geometria' ? '▼' : '▶'}</span>
+            </button>
+
+            {activeAccordion === 'geometria' && (
+              <div className="p-4 space-y-3 text-sm bg-slate-900/30">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={flowerOfLife} onChange={(e) => setFlowerOfLife(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Flor da Vida</span>
+                </label>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={goldenSpiral} onChange={(e) => setGoldenSpiral(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Espiral Áurea</span>
+                </label>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={tessellation} onChange={(e) => setTessellation(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Grade Hexagonal</span>
+                </label>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={fractalMode} onChange={(e) => setFractalMode(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Modo Fractal</span>
+                </label>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={modoFibonacci} onChange={(e) => setModoFibonacci(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Pétalas em Fibonacci</span>
+                </label>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={modoFibonacciAvancado} onChange={(e) => setModoFibonacciAvancado(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Raio em Fibonacci</span>
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Accordion: Cores & Preenchimento */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 flex justify-between items-center bg-slate-800 hover:bg-slate-700 transition-colors"
+              onClick={() => setActiveAccordion(activeAccordion === 'cores' ? '' : 'cores')}
+            >
+              <span className="font-semibold text-sm">🎨 Cores & Efeitos</span>
+              <span>{activeAccordion === 'cores' ? '▼' : '▶'}</span>
+            </button>
+
+            {activeAccordion === 'cores' && (
+              <div className="p-4 space-y-4 text-sm bg-slate-900/30">
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="text-slate-300">Matiz Base (Hue)</label>
+                    <span className="text-slate-400">{corBase}°</span>
+                  </div>
+                  <input
+                    type="range" min="0" max="360"
+                    value={corBase}
+                    onChange={(e) => setCorBase(parseInt(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1">
+                  <label className="text-slate-300">Frequência Planetária</label>
+                  <select
+                    onChange={handlePlanetChange}
+                    className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Selecione...</option>
+                    {Object.keys(PLANETARY_DATA).map(planet => (
+                      <option key={planet} value={planet}>{planet}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={bioluminescenceMode} onChange={(e) => setBioluminescenceMode(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Bioluminescência (Neon)</span>
+                </label>
+              </div>
+            )}
+          </div>
+
+          {/* Accordion: Render & Animação */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 flex justify-between items-center bg-slate-800 hover:bg-slate-700 transition-colors"
+              onClick={() => setActiveAccordion(activeAccordion === 'animacao' ? '' : 'animacao')}
+            >
+              <span className="font-semibold text-sm">✨ Renderização & Animação</span>
+              <span>{activeAccordion === 'animacao' ? '▼' : '▶'}</span>
+            </button>
+
+            {activeAccordion === 'animacao' && (
+              <div className="p-4 space-y-4 text-sm bg-slate-900/30">
+
+                <div>
+                  <div className="flex justify-between mb-1">
+                    <label className="text-slate-300">Rotação Estática</label>
+                    <span className="text-slate-400">{rotacao}°</span>
+                  </div>
+                  <input
+                    type="range" min="0" max="360"
+                    value={rotacao}
+                    onChange={(e) => setRotacao(parseInt(e.target.value))}
+                    className="w-full accent-purple-500"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-700">
+                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
+                    <input type="checkbox" checked={rotating} onChange={(e) => setRotating(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                    <span className="text-slate-300">Auto Rotação</span>
+                  </label>
+                  {rotating && (
+                    <input type="range" min="-10" max="10" step="0.5" value={rotationSpeedRPM} onChange={(e) => setRotationSpeedRPM(parseFloat(e.target.value))} className="w-full accent-purple-500" />
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-slate-700">
+                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
+                    <input type="checkbox" checked={pulsing} onChange={(e) => setPulsing(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                    <span className="text-slate-300">Pulsação / Respiração</span>
+                  </label>
+                  {pulsing && (
+                    <input type="range" min="0.1" max="2.0" step="0.1" value={pulseFrequency} onChange={(e) => setPulseFrequency(parseFloat(e.target.value))} className="w-full accent-purple-500" />
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-slate-700">
+                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
+                    <input type="checkbox" checked={useMoonPhase} onChange={(e) => setUseMoonPhase(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                    <span className="text-slate-300">Fase da Lua ({getMoonPhaseName(moonPhaseAge)})</span>
+                  </label>
+                  {useMoonPhase && (
+                    <div className="space-y-2">
+                      <div className="flex justify-end">
+                        <button onClick={() => setMoonPhaseAge(calculateMoonPhase())} className="text-[10px] bg-slate-700 hover:bg-slate-600 text-white py-1 px-2 rounded">Fase de Hoje</button>
+                      </div>
+                      <input type="range" min="0" max="29.53" step="0.1" value={moonPhaseAge} onChange={(e) => setMoonPhaseAge(parseFloat(e.target.value))} className="w-full accent-purple-500" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2 border-t border-slate-700">
+                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
+                    <input type="checkbox" checked={cymaticsMode} onChange={(e) => setCymaticsMode(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                    <span className="text-slate-300">Cimática (Chladni)</span>
+                  </label>
+                  {cymaticsMode && (
+                    <div className="space-y-2 pl-6">
+                      <div className="flex justify-between">
+                        <label className="text-xs text-slate-400">Freq N</label>
+                        <span className="text-xs text-slate-400">{cymaticsN}</span>
+                      </div>
+                      <input type="range" min="1" max="10" step="1" value={cymaticsN} onChange={(e) => setCymaticsN(parseInt(e.target.value))} className="w-full accent-purple-500" />
+                      <div className="flex justify-between">
+                        <label className="text-xs text-slate-400">Freq M</label>
+                        <span className="text-xs text-slate-400">{cymaticsM}</span>
+                      </div>
+                      <input type="range" min="1" max="10" step="1" value={cymaticsM} onChange={(e) => setCymaticsM(parseInt(e.target.value))} className="w-full accent-purple-500" />
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* Coluna Direita - Visualização */}
+      <div className="md:col-span-8 h-full relative flex flex-col items-center justify-center bg-slate-950 p-4 overflow-hidden">
+        <canvas
+          ref={canvasRef}
+          width={1024}
+          height={1024}
+          className="w-full max-w-[85vh] aspect-square rounded-2xl shadow-2xl border border-slate-800 bg-black/50"
+        />
+        
+        {/* Floating Action Bar */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 bg-slate-900/80 backdrop-blur-md border border-slate-700 p-3 rounded-2xl shadow-2xl z-10">
+          <button
+            onClick={gerarMandalaAleatoria}
+            className="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)]"
           >
-            <option value={0}>Círculo (Padrão)</option>
-            <option value={3}>Triângulo</option>
-            <option value={4}>Quadrado</option>
-            <option value={5}>Pentágono</option>
-            <option value={6}>Hexágono</option>
-            <option value={8}>Octógono</option>
-            <option value={12}>Dodecágono</option>
-          </select>
-        </div>
-
-        <div className="flex flex-col space-y-2">
-          <label className="text-white">Frequência Planetária</label>
-          <select
-            onChange={handlePlanetChange}
-            className="bg-gray-700 text-white p-2 rounded border border-gray-600 focus:ring-purple-500 focus:border-purple-500"
-            defaultValue=""
+            🎲 Gerar Aleatória
+          </button>
+          <button
+            onClick={handleDownload}
+            className="bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300"
           >
-            <option value="" disabled>Selecione um Planeta</option>
-            {Object.keys(PLANETARY_DATA).map(planet => (
-              <option key={planet} value={planet}>{planet}</option>
-            ))}
-          </select>
+            💾 Exportar PNG
+          </button>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="bioluminescence-mode"
-            checked={bioluminescenceMode}
-            onChange={(e) => setBioluminescenceMode(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="bioluminescence-mode" className="text-white">Bioluminescência (Neon Glow)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="cymatics-mode"
-            checked={cymaticsMode}
-            onChange={(e) => setCymaticsMode(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="cymatics-mode" className="text-white">Cimática (Padrões de Chladni)</label>
-        </div>
-
-        {cymaticsMode && (
-          <div className="bg-gray-700 p-3 rounded-lg border border-gray-600 space-y-4">
-            <div>
-              <label className="block text-white mb-2">
-                Frequência N: {cymaticsN}
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                step="1"
-                value={cymaticsN}
-                onChange={(e) => setCymaticsN(parseInt(e.target.value))}
-                className="w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-white mb-2">
-                Frequência M: {cymaticsM}
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                step="1"
-                value={cymaticsM}
-                onChange={(e) => setCymaticsM(parseInt(e.target.value))}
-                className="w-full"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="simetria-personalizada"
-            checked={simetriaPersonalizada}
-            onChange={(e) => setSimetriaPersonalizada(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="simetria-personalizada" className="text-white">Simetria Personalizada (Caleidoscópio)</label>
-        </div>
-
-        {simetriaPersonalizada && (
-          <div>
-            <label className="block text-white mb-2">
-              Eixos de Simetria: {eixosSimetria}
-            </label>
-            <input
-              type="range"
-              min="1"
-              max="12"
-              step="1"
-              value={eixosSimetria}
-              onChange={(e) => setEixosSimetria(parseInt(e.target.value))}
-              className="w-full"
-            />
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 mb-4">
-          <input
-            type="checkbox"
-            id="rotating-mode"
-            checked={rotating}
-            onChange={(e) => setRotating(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="rotating-mode" className="text-white">Animação de Rotação (Girar)</label>
-        </div>
-
-        {rotating && (
-          <div>
-            <label className="block text-white mb-2">
-              Velocidade de Rotação: {rotationSpeedRPM} RPM
-            </label>
-            <input
-              type="range"
-              min="-10"
-              max="10"
-              step="0.5"
-              value={rotationSpeedRPM}
-              onChange={(e) => setRotationSpeedRPM(parseFloat(e.target.value))}
-              className="w-full"
-            />
-          </div>
-        )}
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="tessellation-mode"
-            checked={tessellation}
-            onChange={(e) => setTessellation(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="tessellation-mode" className="text-white">Tesselação (Grade Hexagonal)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="fibonacci-mode"
-            checked={modoFibonacci}
-            onChange={(e) => setModoFibonacci(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="fibonacci-mode" className="text-white">Modo Fibonacci (Pétalas)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="fibonacci-advanced-mode"
-            checked={modoFibonacciAvancado}
-            onChange={(e) => setModoFibonacciAvancado(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="fibonacci-advanced-mode" className="text-white">Modo Fibonacci Avançado (Raio)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="flower-of-life"
-            checked={flowerOfLife}
-            onChange={(e) => setFlowerOfLife(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="flower-of-life" className="text-white">Flor da Vida (Geometria Sagrada)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <label>
-            <input
-              type="checkbox"
-              checked={goldenSpiral}
-              onChange={(e) => setGoldenSpiral(e.target.checked)}
-              className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 mr-2"
-            />
-            <span className="text-white">Exibir Espiral Áurea</span>
-          </label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="fractal-mode"
-            checked={fractalMode}
-            onChange={(e) => setFractalMode(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="fractal-mode" className="text-white">Modo Fractal (Círculos Recursivos)</label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="pulsing-mode"
-            checked={pulsing}
-            onChange={(e) => setPulsing(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="pulsing-mode" className="text-white">Animação de Respiração/Pulsação</label>
-        </div>
-
-        {pulsing && (
-          <div>
-            <label className="block text-white mb-2">
-              Velocidade da Respiração: {pulseFrequency} Hz
-            </label>
-            <input
-              type="range"
-              min="0.1"
-              max="2.0"
-              step="0.1"
-              value={pulseFrequency}
-              onChange={(e) => setPulseFrequency(parseFloat(e.target.value))}
-              className="w-full"
-            />
-          </div>
-        )}
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="moon-phase-mode"
-            checked={useMoonPhase}
-            onChange={(e) => setUseMoonPhase(e.target.checked)}
-            className="w-4 h-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
-          />
-          <label htmlFor="moon-phase-mode" className="text-white">Influência da Fase da Lua</label>
-        </div>
-
-        {useMoonPhase && (
-          <div className="bg-gray-700 p-3 rounded-lg border border-gray-600">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-white">
-                Fase: {getMoonPhaseName(moonPhaseAge)} ({(moonPhaseAge).toFixed(1)} dias)
-              </label>
-              <button
-                onClick={() => setMoonPhaseAge(calculateMoonPhase())}
-                className="text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1 px-2 rounded transition-colors duration-300"
-              >
-                Fase de Hoje
-              </button>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="29.53"
-              step="0.1"
-              value={moonPhaseAge}
-              onChange={(e) => setMoonPhaseAge(parseFloat(e.target.value))}
-              className="w-full"
-            />
-          </div>
-        )}
-
-        <div>
-          <label htmlFor="petals-input" className="block text-white mb-2">
-            Pétalas: {numPetalas}
-          </label>
-          <input 
-            id="petals-input"
-            type="range" 
-            min="3" 
-            max="24" 
-            value={numPetalas} 
-            onChange={(e) => handlePetalasChange(parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-white mb-2">
-            Camadas: {numCamadas}
-          </label>
-          <input 
-            type="range" 
-            min="1" 
-            max="10" 
-            value={numCamadas} 
-            onChange={(e) => setNumCamadas(parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-white mb-2">
-            Cor Base: {corBase}°
-          </label>
-          <input 
-            type="range" 
-            min="0" 
-            max="360" 
-            value={corBase} 
-            onChange={(e) => setCorBase(parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-white mb-2">
-            Complexidade: {complexidade.toFixed(1)}
-          </label>
-          <input 
-            type="range" 
-            min="1" 
-            max="3" 
-            step="0.1" 
-            value={complexidade} 
-            onChange={(e) => setComplexidade(parseFloat(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-white mb-2">
-            Rotação: {rotacao}°
-          </label>
-          <input 
-            type="range" 
-            min="0" 
-            max="360" 
-            value={rotacao} 
-            onChange={(e) => setRotacao(parseInt(e.target.value))}
-            className="w-full"
-          />
-        </div>
-        
-        <button 
-          onClick={gerarMandalaAleatoria}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
-        >
-          Gerar Mandala Aleatória
-        </button>
-
-        <button
-          onClick={handleDownload}
-          className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300"
-        >
-          Baixar Alta Resolução (PNG)
-        </button>
       </div>
     </div>
   );

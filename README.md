@@ -1,5 +1,7 @@
 # Mandala Generator
 
+![Mandala Generator](ui_verification.png)
+
 Visualize e desenhe mandalas de forma interativa utilizando TypeScript e React. Este projeto combina arte, matemática e ciência para criar padrões geométricos fascinantes.
 
 ---
