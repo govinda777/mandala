@@ -28,59 +28,78 @@ describe('MandalaGenerator', () => {
   it('renders correctly', () => {
     render(<MandalaGenerator />)
     expect(screen.getAllByText(/Pétalas/i)[0]).toBeInTheDocument()
-    expect(screen.getByText(/Gerar Mandala Aleatória/i)).toBeInTheDocument()
+    expect(screen.getByText(/Gerar Aleatória/i)).toBeInTheDocument()
   })
 
   it('toggles Fibonacci mode', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Modo Fibonacci \(Pétalas\)/i)
+
+    // Open the accordion first
+    const accordionBtn = screen.getByText(/Geometria & Fractais/i)
+    fireEvent.click(accordionBtn)
+
+    const toggle = screen.getByText(/Pétalas em Fibonacci/i).previousSibling as HTMLInputElement
     expect(toggle).toBeInTheDocument()
-    expect(toggle).not.toBeChecked()
+    expect(toggle.checked).toBe(false)
 
     fireEvent.click(toggle)
-    expect(toggle).toBeChecked()
+    expect(toggle.checked).toBe(true)
   })
 
   it('toggles Fractal Mode', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Modo Fractal/i)
+
+    // Open the accordion first
+    const accordionBtn = screen.getByText(/Geometria & Fractais/i)
+    fireEvent.click(accordionBtn)
+
+    const toggle = screen.getByText(/Modo Fractal/i).previousSibling as HTMLInputElement
     expect(toggle).toBeInTheDocument()
-    expect(toggle).not.toBeChecked()
+    expect(toggle.checked).toBe(false)
 
     fireEvent.click(toggle)
-    expect(toggle).toBeChecked()
+    expect(toggle.checked).toBe(true)
   })
 
   it('snaps petal count to Fibonacci numbers when mode is enabled', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Modo Fibonacci \(Pétalas\)/i)
-    const petalInput = screen.getByLabelText(/Pétalas:/i)
+
+    // Get input (already visible in default open accordion)
+    const petalInput = screen.getByLabelText(/Pétalas/i)
 
     // Set petals to 10 (not Fibonacci)
     fireEvent.change(petalInput, { target: { value: '10' } })
 
+    // Open the geometry accordion
+    const accordionBtn = screen.getByText(/Geometria & Fractais/i)
+    fireEvent.click(accordionBtn)
+
     // Enable Fibonacci mode
+    const toggle = screen.getByText(/Pétalas em Fibonacci/i).previousSibling as HTMLInputElement
     fireEvent.click(toggle)
 
     // Should snap to 8 or 13 (nearest). 8 is closer to 10.
-    // However, the implementation might force update immediately.
-    // Let's check if the displayed value updates.
+    // The value 8 should be shown in the span inside the div.
 
-    // We expect the display to show a Fibonacci number.
-    // 3, 5, 8, 13, 21.
-    // 10 is between 8 and 13.
+    // We need to switch back to the "estrutura" accordion to see the value
+    const accordionEstrutura = screen.getByText(/Estrutura Geral/i)
+    fireEvent.click(accordionEstrutura)
 
-    // Let's assume we implement it to snap to nearest.
-    expect(screen.getByText(/Pétalas: 8/i)).toBeInTheDocument() // or 13
+    expect(screen.getByText('8')).toBeInTheDocument()
   })
 
   it('toggles Golden Spiral', () => {
     render(<MandalaGenerator />)
-    const toggle = screen.getByLabelText(/Espiral Áurea/i)
+
+    // Open the accordion first
+    const accordionBtn = screen.getByText(/Geometria & Fractais/i)
+    fireEvent.click(accordionBtn)
+
+    const toggle = screen.getByText(/Espiral Áurea/i).previousSibling as HTMLInputElement
     expect(toggle).toBeInTheDocument()
-    expect(toggle).not.toBeChecked()
+    expect(toggle.checked).toBe(false)
 
     fireEvent.click(toggle)
-    expect(toggle).toBeChecked()
+    expect(toggle.checked).toBe(true)
   })
 })
