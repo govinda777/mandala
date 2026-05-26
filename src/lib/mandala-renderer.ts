@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -24,6 +24,9 @@ export interface MandalaConfig {
   cymaticsN?: number;
   cymaticsM?: number;
   bioluminescenceMode?: boolean;
+  generativeMode?: boolean;
+  generativeLayers?: number;
+  generativePetals?: number;
 }
 
 export const drawMandala = (
@@ -50,7 +53,10 @@ export const drawMandala = (
     cymaticsMode,
     cymaticsN,
     cymaticsM,
-    bioluminescenceMode
+    bioluminescenceMode,
+    generativeMode,
+    generativeLayers = 20,
+    generativePetals = 30
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -83,6 +89,42 @@ export const drawMandala = (
   // Mover para o centro do canvas
   ctx.save();
   ctx.translate(width / 2, height / 2);
+
+  // GENERATIVE MODE OVERRIDE
+  if (generativeMode) {
+    const anglePerPetal = 360 / generativePetals;
+    const anglePerPetalRad = (anglePerPetal * Math.PI) / 180;
+
+    ctx.globalCompositeOperation = 'source-over';
+
+    // Generate deterministic layers based on petals and layers
+    // Seed based on number of petals and layers so it stays consistent during rotation but changes when parameters change
+    const seed = generativeLayers * 1000 + generativePetals;
+
+    const layers = generateGenerativeLayers(generativeLayers, generativePetals, tamanho, seed);
+
+    // Rotate the entire context by the continuous rotation angle
+    ctx.rotate((rotacao * Math.PI) / 180);
+
+    layers.forEach(layer => {
+      ctx.fillStyle = `hsla(${layer.hue}, 80%, 50%, 0.4)`;
+      const p = layer.petals;
+
+      for (let i = 0; i < generativePetals; i++) {
+        ctx.rotate(anglePerPetalRad);
+
+        ctx.beginPath();
+        ctx.moveTo(p.x1, 0);
+        ctx.bezierCurveTo(p.x2, p.y2, p.x3, p.y3, p.x4, 0);
+        ctx.bezierCurveTo(p.x3, -p.y3, p.x2, -p.y2, p.x1, 0);
+        ctx.fill();
+      }
+    });
+
+    ctx.restore();
+    return; // Stop rendering standard mandala
+  }
+
   ctx.rotate((rotacao * Math.PI) / 180);
 
   // Desenhar camadas da mandala

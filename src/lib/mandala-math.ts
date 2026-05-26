@@ -507,3 +507,91 @@ export const getBioluminescenceColor = (
 
   return `hsla(${Math.floor(hue)}, 100%, ${Math.floor(lightness)}%, ${alpha.toFixed(3)})`;
 };
+
+/**
+ * Simple deterministic pseudo-random number generator (PRNG)
+ * Based on a simple Linear Congruential Generator (LCG)
+ */
+export class SeededRandom {
+  private state: number;
+
+  constructor(seed: number) {
+    this.state = seed ? seed : Math.random();
+  }
+
+  // Returns a pseudo-random number between 0 and 1
+  next(): number {
+    this.state = (this.state * 9301 + 49297) % 233280;
+    return this.state / 233280;
+  }
+
+  // Returns a pseudo-random number between min and max
+  nextRange(min: number, max: number): number {
+    return min + this.next() * (max - min);
+  }
+}
+
+export interface GenerativePetalAnchor {
+  x1: number;
+  x2: number;
+  y2: number;
+  x3: number;
+  y3: number;
+  x4: number;
+}
+
+export interface GenerativeLayer {
+  scale: number;
+  hue: number;
+  petals: GenerativePetalAnchor;
+}
+
+/**
+ * Generates deterministic generative layers scaling from outside in.
+ * @param totalLayers Number of total layers to generate
+ * @param petalsPerLayer Number of petals per layer (used to calculate tangent constraint)
+ * @param baseRadius The maximum radius of the mandala
+ * @param seed Seed for deterministic randomness
+ */
+export const generateGenerativeLayers = (
+  totalLayers: number,
+  petalsPerLayer: number,
+  baseRadius: number,
+  seed: number = 12345
+): GenerativeLayer[] => {
+  const layers: GenerativeLayer[] = [];
+  const rng = new SeededRandom(seed);
+
+  // Angle of each petal based on total petals per layer
+  const angleRad = (Math.PI * 2) / petalsPerLayer;
+
+  // Constraint function: Y_max = X * tan(angle) * 0.9
+  // We use angleRad / 2 because the petal is symmetric across the X-axis (from 0 to half-width)
+  const calcMaxY = (x: number) => x * Math.tan(angleRad / 2) * 0.9;
+
+  // Generate layers from outside (scale=1.0) to inside
+  for (let layer = totalLayers; layer > 0; layer--) {
+    const scale = layer / totalLayers;
+
+    // Generate anchor points relative to the base radius and current scale
+    const x4 = baseRadius * scale; // Tip of the petal
+    const x1 = rng.nextRange(baseRadius * 0.6, baseRadius * 0.9) * scale; // Base of the petal (closest to center)
+
+    const x2 = rng.nextRange(baseRadius * 0.1, baseRadius * 0.8) * scale;
+    const y2 = rng.nextRange(5, calcMaxY(x2)); // Constrained Y
+
+    const x3 = rng.nextRange(baseRadius * 0.2, x4) * scale;
+    const y3 = rng.nextRange(5, calcMaxY(x3)); // Constrained Y
+
+    // Random Hue for this layer
+    const hue = Math.floor(rng.nextRange(0, 360));
+
+    layers.push({
+      scale,
+      hue,
+      petals: { x1, x2, y2, x3, y3, x4 }
+    });
+  }
+
+  return layers;
+};
