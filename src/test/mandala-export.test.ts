@@ -37,6 +37,7 @@ describe('Mandala Export', () => {
       moveTo: vi.fn(),
       lineTo: vi.fn(),
       arc: vi.fn(),
+      bezierCurveTo: vi.fn(),
       fill: vi.fn(),
       stroke: vi.fn(),
       createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),

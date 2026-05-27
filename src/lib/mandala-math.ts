@@ -507,3 +507,119 @@ export const getBioluminescenceColor = (
 
   return `hsla(${Math.floor(hue)}, 100%, ${Math.floor(lightness)}%, ${alpha.toFixed(3)})`;
 };
+
+/**
+ * Simple deterministic pseudo-random number generator (PRNG)
+ * Based on a simple Linear Congruential Generator (LCG)
+ */
+export class SeededRandom {
+  private state: number;
+
+  constructor(seed: number) {
+    this.state = seed ? seed : Math.random();
+  }
+
+  // Returns a pseudo-random number between 0 and 1
+  next(): number {
+    this.state = (this.state * 9301 + 49297) % 233280;
+    return this.state / 233280;
+  }
+
+  // Returns a pseudo-random number between min and max
+  nextRange(min: number, max: number): number {
+    return min + this.next() * (max - min);
+  }
+}
+
+export interface GenerativePetalAnchor {
+  x1: number;
+  x2: number;
+  y2: number;
+  x3: number;
+  y3: number;
+  x4: number;
+}
+
+export interface GenerativeLayer {
+  scale: number;
+  hue: number;
+  petals: GenerativePetalAnchor;
+}
+
+/**
+ * Generates deterministic generative layers scaling from outside in.
+ * @param numCamadas Number of total layers to generate
+ * @param numPetalas Number of petals per layer (used to calculate tangent constraint)
+ * @param baseRadius The maximum radius of the mandala
+ * @param complexidade Modulation parameter to adjust the noise/perturbation levels
+ * @param corBase Base hue color
+ * @param seed Seed for deterministic randomness
+ */
+export const generateGenerativeLayers = (
+  numCamadas: number,
+  numPetalas: number,
+  baseRadius: number,
+  complexidade: number,
+  corBase: number,
+  fibonacciAdvancedMode?: boolean,
+  seed: number = 12345
+): GenerativeLayer[] => {
+  const layers: GenerativeLayer[] = [];
+  const rng = new SeededRandom(seed);
+
+  // Angle of each petal based on total petals
+  const angleRad = (Math.PI * 2) / numPetalas;
+
+  // Base curvature based on complexity: 1.0 is default, higher complexity adds more elasticity
+  const curvatura = 1.0 + (complexidade - 1) * 0.2;
+
+  // Constraint function: Y_max = X * tan(angle/2) * curvatura
+  // Limit curvature strictly so petals don't heavily overlap
+  const limitCurvature = Math.min(curvatura, 1.5);
+  const calcMaxY = (x: number) => Math.max(2, x * Math.tan(angleRad / 2) * limitCurvature);
+
+  // Generate layers from outside (scale=1.0) to inside
+  for (let layer = numCamadas; layer > 0; layer--) {
+    const scale = fibonacciAdvancedMode ? calculateFibonacciRadius(layer, numCamadas) : layer / numCamadas;
+
+    // Perturbation factor based on complexity
+    const pFact = (complexidade - 1) * 0.1;
+
+    // Generate anchor points relative to the base radius and current scale
+    const x4 = baseRadius * scale; // Tip of the petal
+
+    const x1Min = Math.max(0, baseRadius * (0.6 - pFact));
+    const x1Max = Math.min(baseRadius * 0.9, baseRadius * (0.9 + pFact));
+    const x1 = rng.nextRange(x1Min, x1Max) * scale; // Base of the petal (closest to center)
+
+    const x2Min = Math.max(0, baseRadius * (0.1 - pFact));
+    const x2Max = Math.min(baseRadius * 0.8, baseRadius * (0.8 + pFact));
+    const x2 = rng.nextRange(x2Min, x2Max) * scale;
+
+    // Ensure bounds are valid for RNG (min < max)
+    const y2Max = calcMaxY(x2);
+    const y2Min = 2; // minimum safe Y
+    const y2 = y2Max > y2Min ? rng.nextRange(y2Min, y2Max) : y2Min;
+
+    const x3Min = Math.max(0, baseRadius * (0.2 - pFact));
+    const x3Max = x4; // Tip is max
+    const x3 = x3Min < x3Max ? rng.nextRange(x3Min, x3Max) * scale : x3Max * scale;
+
+    const y3Max = calcMaxY(x3);
+    const y3Min = 2;
+    const y3 = y3Max > y3Min ? rng.nextRange(y3Min, y3Max) : y3Min;
+
+    // Generate Hue based on base color with slight perturbations per layer for the watercolor effect
+    // Shift the hue slightly outwards using complexity and layer scale
+    const hueShift = rng.nextRange(-20 * complexidade, 20 * complexidade);
+    const layerHue = (corBase + hueShift + 360) % 360;
+
+    layers.push({
+      scale,
+      hue: Math.floor(layerHue),
+      petals: { x1, x2, y2, x3, y3, x4 }
+    });
+  }
+
+  return layers;
+};
