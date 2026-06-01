@@ -14,7 +14,6 @@ export default function MandalaGenerator() {
   const [modoFibonacciAvancado, setModoFibonacciAvancado] = useState(false);
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
-  const [fractalMode, setFractalMode] = useState(false);
   const [tessellation, setTessellation] = useState(false);
   const [pulsing, setPulsing] = useState(false);
   const [pulseFrequency, setPulseFrequency] = useState(0.2); // Hz
@@ -24,7 +23,7 @@ export default function MandalaGenerator() {
   const [currentAutoRotation, setCurrentAutoRotation] = useState(0);
   const [useMoonPhase, setUseMoonPhase] = useState(false);
   const [moonPhaseAge, setMoonPhaseAge] = useState(14.76); // Full moon by default
-  const [formaBase, setFormaBase] = useState(0); // 0 = Circle
+  const [polarCurveType, setPolarCurveType] = useState<'smooth' | 'sharp'>('smooth');
   const [simetriaPersonalizada, setSimetriaPersonalizada] = useState(false);
   const [eixosSimetria, setEixosSimetria] = useState(2);
   const [cymaticsMode, setCymaticsMode] = useState(false);
@@ -108,10 +107,9 @@ export default function MandalaGenerator() {
       rotacao,
       width: 0, // Will be overridden
       height: 0, // Will be overridden
-      formaBase: formaBase > 0 ? formaBase : undefined,
+      polarCurveType,
       flowerOfLife,
       goldenSpiral,
-      fractalMode,
       tessellation,
       pulseScale: currentPulseScale,
       moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
@@ -159,10 +157,9 @@ export default function MandalaGenerator() {
       rotacao: rotacao + currentAutoRotation,
       width: canvas.width,
       height: canvas.height,
-      formaBase: formaBase > 0 ? formaBase : undefined,
+      polarCurveType,
       flowerOfLife,
       goldenSpiral,
-      fractalMode,
       tessellation,
       pulseScale: currentPulseScale,
       moonPhaseAge: useMoonPhase ? moonPhaseAge : undefined,
@@ -179,7 +176,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, polarCurveType, flowerOfLife, goldenSpiral, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -207,19 +204,14 @@ export default function MandalaGenerator() {
             {activeAccordion === 'estrutura' && (
               <div className="p-4 space-y-4 text-sm bg-slate-900/30">
                 <div className="flex flex-col space-y-1">
-                  <label className="text-slate-300">Forma Base (Simetria)</label>
+                  <label className="text-slate-300">Forma da Curva Polar</label>
                   <select
-                    value={formaBase}
-                    onChange={(e) => setFormaBase(parseInt(e.target.value))}
+                    value={polarCurveType}
+                    onChange={(e) => setPolarCurveType(e.target.value as 'smooth' | 'sharp')}
                     className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-sm"
                   >
-                    <option value={0}>Círculo</option>
-                    <option value={3}>Triângulo</option>
-                    <option value={4}>Quadrado</option>
-                    <option value={5}>Pentágono</option>
-                    <option value={6}>Hexágono</option>
-                    <option value={8}>Octógono</option>
-                    <option value={12}>Dodecágono</option>
+                    <option value="smooth">Pétala Fluida (Seno)</option>
+                    <option value="sharp">Geométrica/Pontuda (Seno Absoluto)</option>
                   </select>
                 </div>
 
@@ -318,10 +310,6 @@ export default function MandalaGenerator() {
                   <span className="text-slate-300">Grade Hexagonal</span>
                 </label>
 
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input type="checkbox" checked={fractalMode} onChange={(e) => setFractalMode(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
-                  <span className="text-slate-300">Modo Fractal</span>
-                </label>
 
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input type="checkbox" checked={modoFibonacci} onChange={(e) => setModoFibonacci(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />

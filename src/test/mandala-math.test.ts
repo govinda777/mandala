@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFractalCircles, calculatePolygonRadiusMultiplier, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern } from '../lib/mandala-math';
+import { getNearestFibonacci, fibonacciNumbers, calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateFibonacciRadius, calculateMirroredAngle, calculateChladniPattern, evaluatePolarEquation, generatePolarLayers } from '../lib/mandala-math';
 
 describe('Mandala Math', () => {
   describe('Cymatics / Chladni Pattern', () => {
@@ -105,53 +105,37 @@ describe('Mandala Math', () => {
     });
   });
 
-  describe('calculatePolygonRadiusMultiplier', () => {
-    it('should return 1 for a circle (sides < 3)', () => {
-      expect(calculatePolygonRadiusMultiplier(0, 0)).toBe(1);
-      expect(calculatePolygonRadiusMultiplier(Math.PI, 2)).toBe(1);
+  describe('Polar Math Engine', () => {
+    it('evaluates smooth polar curve correctly', () => {
+      // r = R + A * sin(k*theta)
+      // theta = pi/2, k = 1 => sin(pi/2) = 1 => r = R + A
+      expect(evaluatePolarEquation(Math.PI / 2, 100, 50, 1, 'smooth')).toBeCloseTo(150);
+      // theta = 3pi/2 => sin(3pi/2) = -1 => r = R - A
+      expect(evaluatePolarEquation((3 * Math.PI) / 2, 100, 50, 1, 'smooth')).toBeCloseTo(50);
     });
 
-    it('should return 1 at the vertices of a square', () => {
-      const sides = 4;
-      // Vertices for a square are at 0, PI/2, PI, 3PI/2
-      expect(calculatePolygonRadiusMultiplier(0, sides)).toBeCloseTo(1, 5);
-      expect(calculatePolygonRadiusMultiplier(Math.PI / 2, sides)).toBeCloseTo(1, 5);
-      expect(calculatePolygonRadiusMultiplier(Math.PI, sides)).toBeCloseTo(1, 5);
-      expect(calculatePolygonRadiusMultiplier((3 * Math.PI) / 2, sides)).toBeCloseTo(1, 5);
+    it('evaluates sharp polar curve correctly', () => {
+      // r = R + A * |sin(k*theta)|
+      // theta = 3pi/2 => sin = -1 => |sin| = 1 => r = R + A
+      expect(evaluatePolarEquation((3 * Math.PI) / 2, 100, 50, 1, 'sharp')).toBeCloseTo(150);
     });
 
-    it('should return Math.cos(PI/4) at the midpoints of a square edges', () => {
-      const sides = 4;
-      // Midpoints are at PI/4, 3PI/4, 5PI/4, 7PI/4
-      const expected = Math.cos(Math.PI / 4);
-      expect(calculatePolygonRadiusMultiplier(Math.PI / 4, sides)).toBeCloseTo(expected, 5);
-      expect(calculatePolygonRadiusMultiplier((3 * Math.PI) / 4, sides)).toBeCloseTo(expected, 5);
-    });
-  });
-
-  describe('calculateFractalCircles', () => {
-    it('should return 1 circle (center) for depth 0', () => {
-      const circles = calculateFractalCircles(0, 0, 100, 0, 6);
-      expect(circles).toHaveLength(1);
-      expect(circles[0]).toEqual({ x: 0, y: 0, radius: 100 });
+    it('generates correct number of layers', () => {
+      const layers = generatePolarLayers(3, 8, 100, 1, 0);
+      expect(layers).toHaveLength(3);
     });
 
-    it('should return 1 + branches circles for depth 1', () => {
-      const branches = 6;
-      const circles = calculateFractalCircles(0, 0, 100, 1, branches);
-      expect(circles).toHaveLength(1 + branches);
-      // Verify radius of children is smaller (assuming 0.5 ratio)
-      expect(circles[1].radius).toBe(50);
-    });
+    it('generates points with expected structure and determinism', () => {
+      const layers1 = generatePolarLayers(2, 6, 100, 1, 0, 'smooth', false, 123);
+      const layers2 = generatePolarLayers(2, 6, 100, 1, 0, 'smooth', false, 123);
 
-    it('should handle depth 2 recursively', () => {
-      const branches = 4;
-      // Depth 0: 1
-      // Depth 1: 4
-      // Depth 2: 4 * 4 = 16
-      // Total: 21
-      const circles = calculateFractalCircles(0, 0, 100, 2, branches);
-      expect(circles).toHaveLength(1 + 4 + 16);
+      // Should be deterministic
+      expect(layers1[0].hue).toBe(layers2[0].hue);
+      expect(layers1[0].points.length).toBeGreaterThan(0);
+
+      // Should contain cartesian coordinates x and y
+      expect(layers1[0].points[0]).toHaveProperty('x');
+      expect(layers1[0].points[0]).toHaveProperty('y');
     });
   });
 

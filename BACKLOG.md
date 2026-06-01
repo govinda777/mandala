@@ -19,6 +19,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Motor Baseado em Coordenadas Polares**
+  - [x] Análise e limpeza do código Cartesiano Legado (Colisão Bézier).
+  - [x] Implementação matemática das funções polares ($R + A \cdot \sin(k\theta)$).
+  - [x] Refatoração completa de `mandala-renderer.ts` para renderizar as camadas usando caminhos (paths) baseados no Array de Polos.
+  - [x] Atualização de UI para selecionar entre 'Pétala Fluida' ou 'Pétala Geométrica'
+  - [x] Documentação e Testes (BDD) criados e passando.
+
 - [x] **Modo Fibonacci Avançado**
   - [x] Testes unitários criados e passando
   - [x] Função matemática implementada em `mandala-math.ts` (`calculateFibonacciRadius`)

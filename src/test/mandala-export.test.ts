@@ -40,6 +40,7 @@ describe('Mandala Export', () => {
       bezierCurveTo: vi.fn(),
       fill: vi.fn(),
       stroke: vi.fn(),
+      closePath: vi.fn(),
       createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
       quadraticCurveTo: vi.fn(),
     } as unknown as CanvasRenderingContext2D;

@@ -531,93 +531,108 @@ export class SeededRandom {
   }
 }
 
-export interface GenerativePetalAnchor {
-  x1: number;
-  x2: number;
-  y2: number;
-  x3: number;
-  y3: number;
-  x4: number;
+export interface PolarLayer {
+  points: Point[];
+  hue: number;
+  scale: number;
+  R: number; // Base radius
+  A: number; // Amplitude
 }
 
-export interface GenerativeLayer {
-  scale: number;
-  hue: number;
-  petals: GenerativePetalAnchor;
-}
+export type PolarCurveType = 'smooth' | 'sharp';
 
 /**
- * Generates deterministic generative layers scaling from outside in.
+ * Evaluates the Polar Rose equation for a given angle.
+ * r(θ) = R + A * sin(k * θ)  (or |sin(k * θ)| for sharp)
+ */
+export const evaluatePolarEquation = (
+  theta: number,
+  R: number,
+  A: number,
+  k: number,
+  curveType: PolarCurveType = 'smooth'
+): number => {
+  if (curveType === 'sharp') {
+    return R + A * Math.abs(Math.sin(k * theta));
+  }
+  return R + A * Math.sin(k * theta);
+};
+
+/**
+ * Generates deterministic layers using Polar Coordinates.
+ * Evaluates the curve r(θ) = R + A * sin(k * θ).
+ *
  * @param numCamadas Number of total layers to generate
- * @param numPetalas Number of petals per layer (used to calculate tangent constraint)
+ * @param numPetalas Number of petals per layer (the 'k' in polar equation)
  * @param baseRadius The maximum radius of the mandala
- * @param complexidade Modulation parameter to adjust the noise/perturbation levels
+ * @param complexidade Modulation parameter to adjust amplitude
  * @param corBase Base hue color
+ * @param curveType Smooth (sine) or Sharp (absolute sine)
+ * @param fibonacciAdvancedMode If true, scales radii using Fibonacci
  * @param seed Seed for deterministic randomness
  */
-export const generateGenerativeLayers = (
+export const generatePolarLayers = (
   numCamadas: number,
   numPetalas: number,
   baseRadius: number,
   complexidade: number,
   corBase: number,
+  curveType: PolarCurveType = 'smooth',
   fibonacciAdvancedMode?: boolean,
   seed: number = 12345
-): GenerativeLayer[] => {
-  const layers: GenerativeLayer[] = [];
+): PolarLayer[] => {
+  const layers: PolarLayer[] = [];
   const rng = new SeededRandom(seed);
 
-  // Angle of each petal based on total petals
-  const angleRad = (Math.PI * 2) / numPetalas;
+  // 'k' represents the number of petals in polar equations.
+  // For standard smooth sine, to get N petals, we actually need N petals.
+  // Wait, standard polar rose r = a * cos(k*theta):
+  // If k is integer: k petals if k is odd, 2k petals if k is even.
+  // We want EXACTLY `numPetalas` petals, going around 360 degrees.
+  // To achieve N peaks around 360 degrees, we can use k = N/2 if we use standard sin(k * theta),
+  // but wait! We use R + A * sin(k * theta).
+  // This equation naturally has 'k' peaks in 360 degrees!
+  // So k = numPetalas.
+  const k = numPetalas;
 
-  // Base curvature based on complexity: 1.0 is default, higher complexity adds more elasticity
-  const curvatura = 1.0 + (complexidade - 1) * 0.2;
-
-  // Constraint function: Y_max = X * tan(angle/2) * curvatura
-  // Limit curvature strictly so petals don't heavily overlap
-  const limitCurvature = Math.min(curvatura, 1.5);
-  const calcMaxY = (x: number) => Math.max(2, x * Math.tan(angleRad / 2) * limitCurvature);
-
-  // Generate layers from outside (scale=1.0) to inside
+  // Generate layers from outside (layer = numCamadas) to inside (layer = 1)
   for (let layer = numCamadas; layer > 0; layer--) {
-    const scale = fibonacciAdvancedMode ? calculateFibonacciRadius(layer, numCamadas) : layer / numCamadas;
+    const scale = fibonacciAdvancedMode
+      ? calculateFibonacciRadius(layer, numCamadas)
+      : layer / numCamadas;
 
-    // Perturbation factor based on complexity
-    const pFact = (complexidade - 1) * 0.1;
+    // Base radius R for this layer
+    const R = baseRadius * scale * 0.7; // 70% of available scale is base radius
+    // Amplitude A based on available scale and complexity
+    const maxA = baseRadius * scale * 0.3;
+    const pFact = (complexidade - 1) * 0.2; // 0 to 0.8 variation
+    const A = maxA * (0.8 + pFact * rng.nextRange(-1, 1)); // modulate amplitude
 
-    // Generate anchor points relative to the base radius and current scale
-    const x4 = baseRadius * scale; // Tip of the petal
+    // Adaptive angular resolution: more points for larger radii
+    // Minimum 180 points, max 1440. Proportional to radius.
+    const resolution = Math.max(180, Math.min(1440, Math.floor(R * 2)));
+    const step = (Math.PI * 2) / resolution;
 
-    const x1Min = Math.max(0, baseRadius * (0.6 - pFact));
-    const x1Max = Math.min(baseRadius * 0.9, baseRadius * (0.9 + pFact));
-    const x1 = rng.nextRange(x1Min, x1Max) * scale; // Base of the petal (closest to center)
+    const points: Point[] = [];
+    for (let theta = 0; theta < Math.PI * 2 + step; theta += step) {
+      // Evaluate r(θ)
+      const r = evaluatePolarEquation(theta, R, A, k, curveType);
 
-    const x2Min = Math.max(0, baseRadius * (0.1 - pFact));
-    const x2Max = Math.min(baseRadius * 0.8, baseRadius * (0.8 + pFact));
-    const x2 = rng.nextRange(x2Min, x2Max) * scale;
+      // Convert polar to cartesian
+      const x = r * Math.cos(theta);
+      const y = r * Math.sin(theta);
+      points.push({ x, y });
+    }
 
-    // Ensure bounds are valid for RNG (min < max)
-    const y2Max = calcMaxY(x2);
-    const y2Min = 2; // minimum safe Y
-    const y2 = y2Max > y2Min ? rng.nextRange(y2Min, y2Max) : y2Min;
-
-    const x3Min = Math.max(0, baseRadius * (0.2 - pFact));
-    const x3Max = x4; // Tip is max
-    const x3 = x3Min < x3Max ? rng.nextRange(x3Min, x3Max) * scale : x3Max * scale;
-
-    const y3Max = calcMaxY(x3);
-    const y3Min = 2;
-    const y3 = y3Max > y3Min ? rng.nextRange(y3Min, y3Max) : y3Min;
-
-    // Generate Hue based on base color with slight perturbations per layer for the watercolor effect
-    // Shift the hue slightly outwards using complexity and layer scale
     const hueShift = rng.nextRange(-20 * complexidade, 20 * complexidade);
     const layerHue = (corBase + hueShift + 360) % 360;
 
     layers.push({
-      scale,
+      points,
       hue: Math.floor(layerHue),
-      petals: { x1, x2, y2, x3, y3, x4 }
+      scale,
+      R,
+      A
     });
   }
 

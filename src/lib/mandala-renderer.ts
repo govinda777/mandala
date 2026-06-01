@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculateChladniPattern, generatePolarLayers, PolarCurveType } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -10,10 +10,9 @@ export interface MandalaConfig {
   rotacao: number;
   width: number;
   height: number;
-  formaBase?: number; // 0 for circle, 3 for triangle, 4 for square, etc.
+  polarCurveType?: PolarCurveType; // 'smooth' or 'sharp'
   flowerOfLife?: boolean;
   goldenSpiral?: boolean;
-  fractalMode?: boolean;
   pulseScale?: number;
   tessellation?: boolean;
   moonPhaseAge?: number;
@@ -38,10 +37,9 @@ export const drawMandala = (
     rotacao,
     width,
     height,
-    formaBase,
+    polarCurveType = 'smooth',
     flowerOfLife,
     goldenSpiral,
-    fractalMode,
     pulseScale = 1,
     tessellation,
     moonPhaseAge,
@@ -86,17 +84,24 @@ export const drawMandala = (
     }
   }
 
-  // Generate deterministic layers based on outside-in logic
+  // Generate deterministic layers based on polar math
   // Use numCamadas * 1000 + numPetalas as a stable seed to prevent flickering
   const seed = numCamadas * 1000 + numPetalas;
-  const layers = generateGenerativeLayers(numCamadas, numPetalas, tamanho, complexidade, corBase, fibonacciAdvancedMode, seed);
+  const layers = generatePolarLayers(
+    numCamadas,
+    numPetalas,
+    tamanho,
+    complexidade,
+    corBase,
+    polarCurveType,
+    fibonacciAdvancedMode,
+    seed
+  );
 
-  const anglePerPetal = 360 / numPetalas;
-
-  // Set composite operation for watercolor blending effect
+  // Set composite operation for blending effect
   ctx.globalCompositeOperation = bioluminescenceMode ? 'screen' : 'source-over';
 
-  // Draw generative layers from outside in
+  // Draw layers from outside in
   layers.forEach((layer) => {
     // Generate HSL color for the layer
     // Adjust luminosity based on moon phase settings
@@ -104,6 +109,7 @@ export const drawMandala = (
     const alpha = alphaBase * 0.6; // slightly transparent for overlaying
 
     let fillStyle = `hsla(${layer.hue}, 80%, ${lum}%, ${alpha})`;
+    let strokeStyle = `hsla(${layer.hue}, 80%, 80%, 0.4)`; // Deterministic stroke color
 
     // Bioluminescence Override
     if (bioluminescenceMode) {
@@ -111,52 +117,73 @@ export const drawMandala = (
       const distFromCenter = layer.scale * tamanho;
       const intensity = calculateBioluminescenceIntensity(distFromCenter, tamanho);
       fillStyle = getBioluminescenceColor(intensity, corBase);
+      strokeStyle = getBioluminescenceColor(intensity, corBase); // matching stroke
     }
 
     ctx.fillStyle = fillStyle;
+    ctx.strokeStyle = strokeStyle;
+    ctx.lineWidth = 1;
 
-    const { x1, x2, y2, x3, y3, x4 } = layer.petals;
+    // We can draw the main layer shape as a single continuous path
+    // If symmetry is enabled, we draw it rotated/mirrored
 
-    // Draw all petals for this layer
-    for (let i = 0; i < numPetalas; i++) {
-      const currentAngleRad = (anglePerPetal * i * Math.PI) / 180;
+    const drawLayerPath = (angleOffset: number, mirrorAxis?: number) => {
+      ctx.save();
+      ctx.rotate(angleOffset);
 
-      const drawSymmetricPetal = (angle: number) => {
+      ctx.beginPath();
+      layer.points.forEach((point, i) => {
+        let { x, y } = point;
+
+        // If mirroring across an axis, we reflect the point.
+        // Wait, calculateMirroredAngle is for mirroring a whole shape's rotation angle.
+        // If we want to mirror the shape itself, we can flip Y.
+        if (mirrorAxis !== undefined) {
+          // Reflecting about the X-axis locally if mirrorAxis is just a toggle,
+          // but the true mirror formula: rotate by axis, flip Y, rotate back.
+          // But actually `simetriaPersonalizada` currently mirrors *petals* by `calculateMirroredAngle`.
+          // Since our polar math draws the *entire layer at once*, the layer itself is 360 degrees.
+          // Rotating the whole 360-degree layer just shifts it.
+          // To keep the kaleidoscope effect, we rotate the *entire layer* by the mirrored angles!
+        }
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      if(ctx.closePath) ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
+    // Draw base layer (no rotation offset)
+    drawLayerPath(0);
+
+    // Apply mirrored kaleidoscope symmetry if enabled
+    if (simetriaPersonalizada && axes.length > 0) {
+      axes.forEach(axis => {
+        // Since the whole layer is 360 deg, reflecting it means we can just flip it or rotate it.
+        // Actually, to reflect a path, we can apply a scale transform.
         ctx.save();
-        ctx.rotate(angle);
-
-        // Multiplicador Poligonal Base
-        const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angle, formaBase) : 1;
+        ctx.rotate(axis);
+        ctx.scale(1, -1); // mirror across the axis
+        ctx.rotate(-axis);
 
         ctx.beginPath();
-        ctx.moveTo(x1 * mult, 0);
-
-        // Upper half of the petal (Bezier Curve)
-        ctx.bezierCurveTo(x2 * mult, y2 * mult, x3 * mult, y3 * mult, x4 * mult, 0);
-
-        // Lower half of the petal (Mirrored -Y Bezier Curve)
-        ctx.bezierCurveTo(x3 * mult, -y3 * mult, x2 * mult, -y2 * mult, x1 * mult, 0);
-
-        ctx.fill();
-
-        // Option to draw strokes based on fractalMode
-        if (fractalMode) {
-          ctx.strokeStyle = `hsla(${layer.hue}, 80%, 80%, 0.3)`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-        ctx.restore();
-      };
-
-      drawSymmetricPetal(currentAngleRad);
-
-      // Apply mirrored kaleidoscope symmetry if enabled
-      if (simetriaPersonalizada && axes.length > 0) {
-        axes.forEach(axis => {
-          const mirroredAngle = calculateMirroredAngle(currentAngleRad, axis);
-          drawSymmetricPetal(mirroredAngle);
+        layer.points.forEach((point, i) => {
+          if (i === 0) ctx.moveTo(point.x, point.y);
+          else ctx.lineTo(point.x, point.y);
         });
-      }
+        if(ctx.closePath) ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.restore();
+      });
     }
   });
 
@@ -182,7 +209,7 @@ export const drawMandala = (
         if (i === 0) ctx.moveTo(hx, hy);
         else ctx.lineTo(hx, hy);
       }
-      ctx.closePath();
+      if(ctx.closePath) ctx.closePath();
       ctx.stroke();
     });
     ctx.restore();

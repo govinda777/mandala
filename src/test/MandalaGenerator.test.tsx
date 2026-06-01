@@ -46,14 +46,14 @@ describe('MandalaGenerator', () => {
     expect(toggle.checked).toBe(true)
   })
 
-  it('toggles Fractal Mode', () => {
+  it('toggles Tessellation', () => {
     render(<MandalaGenerator />)
 
     // Open the accordion first
     const accordionBtn = screen.getByText(/Geometria & Fractais/i)
     fireEvent.click(accordionBtn)
 
-    const toggle = screen.getByText(/Modo Fractal/i).previousSibling as HTMLInputElement
+    const toggle = screen.getByText(/Grade Hexagonal/i).previousSibling as HTMLInputElement
     expect(toggle).toBeInTheDocument()
     expect(toggle.checked).toBe(false)
 
