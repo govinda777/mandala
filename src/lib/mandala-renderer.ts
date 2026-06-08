@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -24,6 +24,7 @@ export interface MandalaConfig {
   cymaticsN?: number;
   cymaticsM?: number;
   bioluminescenceMode?: boolean;
+  polarCurveType?: 'smooth' | 'sharp' | 'generative';
 }
 
 export const drawMandala = (
@@ -117,6 +118,13 @@ export const drawMandala = (
 
     const { x1, x2, y2, x3, y3, x4 } = layer.petals;
 
+    // Calculate polar points once per layer if polar mode is active
+    let polarPoints: import('./mandala-math').Point[] = [];
+    if (config.polarCurveType === 'smooth' || config.polarCurveType === 'sharp') {
+      // For polar curves, baseRadius is the scale * base petal length
+      polarPoints = calculatePolarPetalPoints(layer.scale * tamanho * 0.5, numPetalas, config.polarCurveType, 20);
+    }
+
     // Draw all petals for this layer
     for (let i = 0; i < numPetalas; i++) {
       const currentAngleRad = (anglePerPetal * i * Math.PI) / 180;
@@ -129,13 +137,30 @@ export const drawMandala = (
         const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angle, formaBase) : 1;
 
         ctx.beginPath();
-        ctx.moveTo(x1 * mult, 0);
 
-        // Upper half of the petal (Bezier Curve)
-        ctx.bezierCurveTo(x2 * mult, y2 * mult, x3 * mult, y3 * mult, x4 * mult, 0);
+        if (config.polarCurveType === 'smooth' || config.polarCurveType === 'sharp') {
+          // Draw using polar points
+          polarPoints.forEach((p, index) => {
+            const x = p.x * mult;
+            const y = p.y * mult;
+            if (index === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
 
-        // Lower half of the petal (Mirrored -Y Bezier Curve)
-        ctx.bezierCurveTo(x3 * mult, -y3 * mult, x2 * mult, -y2 * mult, x1 * mult, 0);
+          // Mirror lower half (this works if points map only 0..anglePerPetal and we just flip Y)
+          for (let j = polarPoints.length - 1; j >= 0; j--) {
+             const x = polarPoints[j].x * mult;
+             const y = -polarPoints[j].y * mult;
+             ctx.lineTo(x, y);
+          }
+        } else {
+          // Generative (Cartesian Bezier) drawing
+          ctx.moveTo(x1 * mult, 0);
+          // Upper half of the petal (Bezier Curve)
+          ctx.bezierCurveTo(x2 * mult, y2 * mult, x3 * mult, y3 * mult, x4 * mult, 0);
+          // Lower half of the petal (Mirrored -Y Bezier Curve)
+          ctx.bezierCurveTo(x3 * mult, -y3 * mult, x2 * mult, -y2 * mult, x1 * mult, 0);
+        }
 
         ctx.fill();
 

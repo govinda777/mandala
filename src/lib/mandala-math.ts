@@ -623,3 +623,50 @@ export const generateGenerativeLayers = (
 
   return layers;
 };
+
+/**
+ * Calculates a series of points for a single petal using polar equations.
+ * @param baseRadius The base radius of the layer.
+ * @param numPetals The total number of petals in the layer (determines the frequency 'k').
+ * @param curveType The type of polar curve ('smooth' or 'sharp').
+ * @param pointsPerPetal The resolution of the petal curve.
+ * @returns An array of Cartesian points for the petal path.
+ */
+export const calculatePolarPetalPoints = (
+  baseRadius: number,
+  numPetals: number,
+  curveType: 'smooth' | 'sharp',
+  pointsPerPetal: number = 20
+): Point[] => {
+  const points: Point[] = [];
+  const anglePerPetal = (Math.PI * 2) / numPetals;
+
+  // A defines the amplitude (how far the petal sticks out from the base radius)
+  // We limit amplitude so it looks good relative to the base radius
+  const A = baseRadius * 0.8;
+
+  for (let i = 0; i <= pointsPerPetal; i++) {
+    // Theta goes from 0 to anglePerPetal
+    const theta = (i / pointsPerPetal) * anglePerPetal;
+
+    // Normalize theta to 0..PI to represent one "bump" of the sine wave
+    const normalizedTheta = (theta / anglePerPetal) * Math.PI;
+
+    let r = baseRadius;
+
+    if (curveType === 'smooth') {
+      // Polar Rose equation segment (smooth bump)
+      r += A * Math.sin(normalizedTheta);
+    } else if (curveType === 'sharp') {
+      // Powered sine wave creates a sharper peak (e.g., sin^4)
+      r += A * Math.pow(Math.sin(normalizedTheta), 4);
+    }
+
+    points.push({
+      x: r * Math.cos(theta),
+      y: r * Math.sin(theta)
+    });
+  }
+
+  return points;
+};
