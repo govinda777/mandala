@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -119,7 +119,7 @@ export const drawMandala = (
     const { x1, x2, y2, x3, y3, x4 } = layer.petals;
 
     // Calculate polar points once per layer if polar mode is active
-    let polarPoints: import('./mandala-math').Point[] = [];
+    let polarPoints: Point[] = [];
     if (config.polarCurveType === 'smooth' || config.polarCurveType === 'sharp') {
       // For polar curves, baseRadius is the scale * base petal length
       polarPoints = calculatePolarPetalPoints(layer.scale * tamanho * 0.5, numPetalas, config.polarCurveType, 20);
