@@ -11,13 +11,13 @@
 - **Referência**: Emissão de bioluminescência marinha (Luciferina-Luciferase).
 
 ### ✅ Critérios de Aceitação (BDD)
-- [ ] Testes unitários criados e passando.
-- [ ] Função matemática implementada em `mandala-math.ts` para cálculos de intensidade.
-- [ ] Renderização implementada em `mandala-renderer.ts` (aplicando glow e forçando fundo escuro/paleta especificada).
-- [ ] Controle de UI adicionado em `MandalaGenerator.tsx`.
-- [ ] Documentação atualizada (README ou BACKLOG).
-- [ ] Pipeline de deploy bem-sucedida.
-- [ ] Mudança visível no site hospedado.
+- [x] Testes unitários criados e passando.
+- [x] Função matemática implementada em `mandala-math.ts` para cálculos de intensidade.
+- [x] Renderização implementada em `mandala-renderer.ts` (aplicando glow e forçando fundo escuro/paleta especificada).
+- [x] Controle de UI adicionado em `MandalaGenerator.tsx`.
+- [x] Documentação atualizada (README ou BACKLOG).
+- [x] Pipeline de deploy bem-sucedida.
+- [x] Mudança visível no site hospedado.
 
 ### 🧪 Testes a Implementar
 1. Teste da lógica matemática (verificar se `calculateBioluminescenceIntensity` calcula o decaimento).
