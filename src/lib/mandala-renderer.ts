@@ -107,10 +107,12 @@ export const drawMandala = (
     let fillStyle = `hsla(${layer.hue}, 80%, ${lum}%, ${alpha})`;
 
     // Bioluminescence Override
+    let glowIntensity = 0;
     if (bioluminescenceMode) {
       // Calculate inverse square intensity based on distance from center (using layer.scale)
       const distFromCenter = layer.scale * tamanho;
       const intensity = calculateBioluminescenceIntensity(distFromCenter, tamanho);
+      glowIntensity = intensity;
       fillStyle = getBioluminescenceColor(intensity, corBase);
     }
 
@@ -132,6 +134,11 @@ export const drawMandala = (
       const drawSymmetricPetal = (angle: number) => {
         ctx.save();
         ctx.rotate(angle);
+
+        if (bioluminescenceMode) {
+          ctx.shadowBlur = 10 + glowIntensity * 20;
+          ctx.shadowColor = fillStyle;
+        }
 
         // Multiplicador Poligonal Base
         const mult = (formaBase && formaBase >= 3) ? calculatePolygonRadiusMultiplier(angle, formaBase) : 1;

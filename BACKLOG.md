@@ -28,6 +28,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Bioluminescência**: Paletas de cores e brilhos inspirados em organismos bioluminescentes.
+  - [x] Atualizar documentação e backlog.
+  - [x] Implementar testes unitários para cálculo de intensidade luminosa.
+  - [x] Implementar a lógica matemática de decaimento de luz ($1/r^2$).
+  - [x] Implementar a renderização com glow effect no Canvas.
+  - [x] Adicionar controle UI para o modo Bioluminescência.
+
 - [x] **Modo Fibonacci Avançado**
   - [x] Testes unitários criados e passando
   - [x] Função matemática implementada em `mandala-math.ts` (`calculateFibonacciRadius`)
