@@ -3,6 +3,22 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
+- [ ] **Curva Polar das Pétalas (Smooth/Sharp)**: Substituir geração cartesiana legada por silhueta matemática baseada em equações polares.
+  - [ ] Atualizar documentação e backlog.
+  - [ ] Implementar testes unitários para `calculatePolarPetalPoints`.
+  - [ ] Implementar matemática da Rosa Polar em `mandala-math.ts`.
+  - [ ] Implementar renderização contínua com `lineTo` em `mandala-renderer.ts`.
+  - [ ] Adicionar controle UI (Generativo, Suave, Afiado) em `MandalaGenerator.tsx`.
+
+## ✅ Concluído
+
+- [x] **Bioluminescência**: Paletas de cores e brilhos inspirados em organismos bioluminescentes.
+  - [x] Atualizar documentação e backlog.
+  - [x] Implementar testes unitários para cálculo de intensidade luminosa.
+  - [x] Implementar a lógica matemática de decaimento de luz ($1/r^2$).
+  - [x] Implementar a renderização com glow effect no Canvas.
+  - [x] Adicionar controle UI para o modo Bioluminescência.
+
 - [x] **Cimática (Padrões de Chladni)**: Simular padrões de interferência e frequências ressonantes em modos de vibração 2D.
   - [x] Atualizar documentação e backlog.
   - [x] Implementar testes unitários para a geração do padrão Chladni.

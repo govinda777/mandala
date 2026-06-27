@@ -31,6 +31,7 @@ export default function MandalaGenerator() {
   const [cymaticsN, setCymaticsN] = useState(3);
   const [cymaticsM, setCymaticsM] = useState(5);
   const [bioluminescenceMode, setBioluminescenceMode] = useState(false);
+  const [polarCurveType, setPolarCurveType] = useState<'smooth' | 'sharp' | 'generative'>('generative');
   const [activeAccordion, setActiveAccordion] = useState<string>('estrutura');
 
   // Animation Loop
@@ -121,7 +122,8 @@ export default function MandalaGenerator() {
       cymaticsMode,
       cymaticsN,
       cymaticsM,
-      bioluminescenceMode
+      bioluminescenceMode,
+      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined
     };
 
     const width = 2048;
@@ -172,14 +174,15 @@ export default function MandalaGenerator() {
       cymaticsMode,
       cymaticsN,
       cymaticsM,
-      bioluminescenceMode
+      bioluminescenceMode,
+      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType]);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -220,6 +223,19 @@ export default function MandalaGenerator() {
                     <option value={6}>Hexágono</option>
                     <option value={8}>Octógono</option>
                     <option value={12}>Dodecágono</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-slate-300 mb-1 text-sm">Formato da Pétala</label>
+                  <select
+                    value={polarCurveType}
+                    onChange={(e) => setPolarCurveType(e.target.value as 'smooth' | 'sharp' | 'generative')}
+                    className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-sm"
+                  >
+                    <option value="generative">Generativo (Cartesiano)</option>
+                    <option value="smooth">Suave (Rosa Polar)</option>
+                    <option value="sharp">Afiado (Rosa Polar)</option>
                   </select>
                 </div>
 
