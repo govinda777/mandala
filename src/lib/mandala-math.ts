@@ -125,6 +125,141 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
   return points;
 };
 
+export interface SharedMandalaConfig {
+  numPetalas: number;
+  numCamadas: number;
+  corBase: number;
+  complexidade: number;
+  rotacao: number;
+  modoFibonacci: boolean;
+  modoFibonacciAvancado: boolean;
+  flowerOfLife: boolean;
+  goldenSpiral: boolean;
+  fractalMode: boolean;
+  tessellation: boolean;
+  pulsing: boolean;
+  pulseFrequency: number;
+  rotating: boolean;
+  rotationSpeedRPM: number;
+  useMoonPhase: boolean;
+  moonPhaseAge: number;
+  formaBase: number;
+  simetriaPersonalizada: boolean;
+  eixosSimetria: number;
+  cymaticsMode: boolean;
+  cymaticsN: number;
+  cymaticsM: number;
+  bioluminescenceMode: boolean;
+  polarCurveType: 'smooth' | 'sharp' | 'generative';
+}
+
+export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
+  numPetalas: 12,
+  numCamadas: 5,
+  corBase: 180,
+  complexidade: 1,
+  rotacao: 0,
+  modoFibonacci: false,
+  modoFibonacciAvancado: false,
+  flowerOfLife: false,
+  goldenSpiral: false,
+  fractalMode: false,
+  tessellation: false,
+  pulsing: false,
+  pulseFrequency: 0.2,
+  rotating: false,
+  rotationSpeedRPM: 1,
+  useMoonPhase: false,
+  moonPhaseAge: 14.76,
+  formaBase: 0,
+  simetriaPersonalizada: false,
+  eixosSimetria: 2,
+  cymaticsMode: false,
+  cymaticsN: 3,
+  cymaticsM: 5,
+  bioluminescenceMode: false,
+  polarCurveType: 'generative'
+};
+
+/**
+ * Encodes a MandalaConfig into a URL-safe Base64 string.
+ */
+export const encodeMandalaConfig = (config: Partial<SharedMandalaConfig>): string => {
+  try {
+    const jsonStr = JSON.stringify(config);
+    // Safe Base64 for UTF-8 strings
+    const base64 = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, (_, p1) => {
+      return String.fromCharCode(parseInt(p1, 16));
+    }));
+    // Make URL safe: replace '+', '/' and remove '=' padding
+    return base64
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  } catch (error) {
+    console.error('Failed to encode mandala config', error);
+    return '';
+  }
+};
+
+/**
+ * Decodes a URL-safe Base64 string back into a full SharedMandalaConfig.
+ */
+export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
+  try {
+    if (!encoded) return { ...DEFAULT_MANDALA_CONFIG };
+
+    // Restore standard Base64 characters and padding
+    let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+
+    const jsonStr = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+
+    const parsed = JSON.parse(jsonStr);
+
+    // Merge parsed config with defaults to ensure complete config object
+    return {
+      numPetalas: typeof parsed.numPetalas === 'number' ? parsed.numPetalas : DEFAULT_MANDALA_CONFIG.numPetalas,
+      numCamadas: typeof parsed.numCamadas === 'number' ? parsed.numCamadas : DEFAULT_MANDALA_CONFIG.numCamadas,
+      corBase: typeof parsed.corBase === 'number' ? parsed.corBase : DEFAULT_MANDALA_CONFIG.corBase,
+      complexidade: typeof parsed.complexidade === 'number' ? parsed.complexidade : DEFAULT_MANDALA_CONFIG.complexidade,
+      rotacao: typeof parsed.rotacao === 'number' ? parsed.rotacao : DEFAULT_MANDALA_CONFIG.rotacao,
+      modoFibonacci: typeof parsed.modoFibonacci === 'boolean' ? parsed.modoFibonacci : DEFAULT_MANDALA_CONFIG.modoFibonacci,
+      modoFibonacciAvancado: typeof parsed.modoFibonacciAvancado === 'boolean' ? parsed.modoFibonacciAvancado : DEFAULT_MANDALA_CONFIG.modoFibonacciAvancado,
+      flowerOfLife: typeof parsed.flowerOfLife === 'boolean' ? parsed.flowerOfLife : DEFAULT_MANDALA_CONFIG.flowerOfLife,
+      goldenSpiral: typeof parsed.goldenSpiral === 'boolean' ? parsed.goldenSpiral : DEFAULT_MANDALA_CONFIG.goldenSpiral,
+      fractalMode: typeof parsed.fractalMode === 'boolean' ? parsed.fractalMode : DEFAULT_MANDALA_CONFIG.fractalMode,
+      tessellation: typeof parsed.tessellation === 'boolean' ? parsed.tessellation : DEFAULT_MANDALA_CONFIG.tessellation,
+      pulsing: typeof parsed.pulsing === 'boolean' ? parsed.pulsing : DEFAULT_MANDALA_CONFIG.pulsing,
+      pulseFrequency: typeof parsed.pulseFrequency === 'number' ? parsed.pulseFrequency : DEFAULT_MANDALA_CONFIG.pulseFrequency,
+      rotating: typeof parsed.rotating === 'boolean' ? parsed.rotating : DEFAULT_MANDALA_CONFIG.rotating,
+      rotationSpeedRPM: typeof parsed.rotationSpeedRPM === 'number' ? parsed.rotationSpeedRPM : DEFAULT_MANDALA_CONFIG.rotationSpeedRPM,
+      useMoonPhase: typeof parsed.useMoonPhase === 'boolean' ? parsed.useMoonPhase : DEFAULT_MANDALA_CONFIG.useMoonPhase,
+      moonPhaseAge: typeof parsed.moonPhaseAge === 'number' ? parsed.moonPhaseAge : DEFAULT_MANDALA_CONFIG.moonPhaseAge,
+      formaBase: typeof parsed.formaBase === 'number' ? parsed.formaBase : DEFAULT_MANDALA_CONFIG.formaBase,
+      simetriaPersonalizada: typeof parsed.simetriaPersonalizada === 'boolean' ? parsed.simetriaPersonalizada : DEFAULT_MANDALA_CONFIG.simetriaPersonalizada,
+      eixosSimetria: typeof parsed.eixosSimetria === 'number' ? parsed.eixosSimetria : DEFAULT_MANDALA_CONFIG.eixosSimetria,
+      cymaticsMode: typeof parsed.cymaticsMode === 'boolean' ? parsed.cymaticsMode : DEFAULT_MANDALA_CONFIG.cymaticsMode,
+      cymaticsN: typeof parsed.cymaticsN === 'number' ? parsed.cymaticsN : DEFAULT_MANDALA_CONFIG.cymaticsN,
+      cymaticsM: typeof parsed.cymaticsM === 'number' ? parsed.cymaticsM : DEFAULT_MANDALA_CONFIG.cymaticsM,
+      bioluminescenceMode: typeof parsed.bioluminescenceMode === 'boolean' ? parsed.bioluminescenceMode : DEFAULT_MANDALA_CONFIG.bioluminescenceMode,
+      polarCurveType: (parsed.polarCurveType === 'smooth' || parsed.polarCurveType === 'sharp' || parsed.polarCurveType === 'generative')
+        ? parsed.polarCurveType
+        : DEFAULT_MANDALA_CONFIG.polarCurveType
+    };
+  } catch (error) {
+    console.error('Failed to decode mandala config', error);
+    return { ...DEFAULT_MANDALA_CONFIG };
+  }
+};
+
 /**
  * Calculates a scaling factor for a pulsing animation.
  * @param time Time in milliseconds.

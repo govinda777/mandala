@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci, calculatePulseScale, calculateAutoRotation, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName } from '../lib/mandala-math';
+import { getNearestFibonacci, calculatePulseScale, calculateAutoRotation, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName, encodeMandalaConfig, decodeMandalaConfig } from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
 import { generateHighResDataURL, triggerDownload } from '../lib/mandala-export';
 
 export default function MandalaGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [copied, setCopied] = useState(false);
   const [numPetalas, setNumPetalas] = useState(12);
   const [numCamadas, setNumCamadas] = useState(5);
   const [corBase, setCorBase] = useState(180);
@@ -132,6 +133,46 @@ export default function MandalaGenerator() {
     triggerDownload(dataUrl, `mandala-${Date.now()}.png`);
   };
 
+  const handleShare = () => {
+    const config = {
+      numPetalas,
+      numCamadas,
+      corBase,
+      complexidade,
+      rotacao,
+      modoFibonacci,
+      modoFibonacciAvancado,
+      flowerOfLife,
+      goldenSpiral,
+      fractalMode,
+      tessellation,
+      pulsing,
+      pulseFrequency,
+      rotating,
+      rotationSpeedRPM,
+      useMoonPhase,
+      moonPhaseAge,
+      formaBase,
+      simetriaPersonalizada,
+      eixosSimetria,
+      cymaticsMode,
+      cymaticsN,
+      cymaticsM,
+      bioluminescenceMode,
+      polarCurveType
+    };
+
+    const encoded = encodeMandalaConfig(config);
+    const shareUrl = `${window.location.origin}${window.location.pathname}?state=${encoded}`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy link', err);
+    });
+  };
+
   // Gerar mandala aleatória complexa
   const gerarMandalaAleatoria = () => {
     let novasPetalas = Math.floor(Math.random() * 18) + 6;
@@ -183,6 +224,44 @@ export default function MandalaGenerator() {
   useEffect(() => {
     renderizarMandala();
   }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType]);
+
+  // Carregar estado compartilhado pela URL, se houver
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const stateParam = urlParams.get('state');
+    if (stateParam) {
+      try {
+        const decoded = decodeMandalaConfig(stateParam);
+        setNumPetalas(decoded.numPetalas);
+        setNumCamadas(decoded.numCamadas);
+        setCorBase(decoded.corBase);
+        setComplexidade(decoded.complexidade);
+        setRotacao(decoded.rotacao);
+        setModoFibonacci(decoded.modoFibonacci);
+        setModoFibonacciAvancado(decoded.modoFibonacciAvancado);
+        setFlowerOfLife(decoded.flowerOfLife);
+        setGoldenSpiral(decoded.goldenSpiral);
+        setFractalMode(decoded.fractalMode);
+        setTessellation(decoded.tessellation);
+        setPulsing(decoded.pulsing);
+        setPulseFrequency(decoded.pulseFrequency);
+        setRotating(decoded.rotating);
+        setRotationSpeedRPM(decoded.rotationSpeedRPM);
+        setUseMoonPhase(decoded.useMoonPhase);
+        setMoonPhaseAge(decoded.moonPhaseAge);
+        setFormaBase(decoded.formaBase);
+        setSimetriaPersonalizada(decoded.simetriaPersonalizada);
+        setEixosSimetria(decoded.eixosSimetria);
+        setCymaticsMode(decoded.cymaticsMode);
+        setCymaticsN(decoded.cymaticsN);
+        setCymaticsM(decoded.cymaticsM);
+        setBioluminescenceMode(decoded.bioluminescenceMode);
+        setPolarCurveType(decoded.polarCurveType);
+      } catch (e) {
+        console.error('Failed to load shared state', e);
+      }
+    }
+  }, []);
 
   // Redesenhar quando o componente montar
   useEffect(() => {
@@ -510,6 +589,12 @@ export default function MandalaGenerator() {
             className="bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300"
           >
             💾 Exportar PNG
+          </button>
+          <button
+            onClick={handleShare}
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+          >
+            {copied ? '✅ Copiado!' : '🔗 Compartilhar'}
           </button>
         </div>
       </div>

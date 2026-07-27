@@ -3,14 +3,20 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
-- [ ] **Curva Polar das Pétalas (Smooth/Sharp)**: Substituir geração cartesiana legada por silhueta matemática baseada em equações polares.
-  - [ ] Atualizar documentação e backlog.
-  - [ ] Implementar testes unitários para `calculatePolarPetalPoints`.
-  - [ ] Implementar matemática da Rosa Polar em `mandala-math.ts`.
-  - [ ] Implementar renderização contínua com `lineTo` em `mandala-renderer.ts`.
-  - [ ] Adicionar controle UI (Generativo, Suave, Afiado) em `MandalaGenerator.tsx`.
+- [ ] **Compartilhamento via URL (Share Link)**: Permitir salvar e compartilhar a configuração exata de uma mandala por meio de uma string codificada na URL.
+  - [ ] Criar documentação do recurso em `docs/features/share-link.md`.
+  - [ ] Implementar testes unitários para a serialização e desserialização de configurações de mandala.
+  - [ ] Criar funções matemáticas puras `encodeMandalaConfig` e `decodeMandalaConfig` em `src/lib/mandala-math.ts`.
+  - [ ] Ler parâmetros da URL na inicialização e adicionar um botão de compartilhamento com cópia rápida para o clipboard em `src/components/MandalaGenerator.tsx`.
 
 ## ✅ Concluído
+
+- [x] **Curva Polar das Pétalas (Smooth/Sharp)**: Substituir geração cartesiana legada por silhueta matemática baseada em equações polares.
+  - [x] Atualizar documentação e backlog.
+  - [x] Implementar testes unitários para `calculatePolarPetalPoints`.
+  - [x] Implementar matemática da Rosa Polar em `mandala-math.ts`.
+  - [x] Implementar renderização contínua com `lineTo` em `mandala-renderer.ts`.
+  - [x] Adicionar controle UI (Generativo, Suave, Afiado) em `MandalaGenerator.tsx`.
 
 - [x] **Bioluminescência**: Paletas de cores e brilhos inspirados em organismos bioluminescentes.
   - [x] Atualizar documentação e backlog.
@@ -25,15 +31,6 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
   - [x] Implementar a lógica matemática.
   - [x] Implementar o renderizador Canvas para a visualização dos pontos nodais de Chladni.
   - [x] Adicionar controles UI para ativar o modo cimática e controlar as frequências `n` e `m`.
-
-## ✅ Concluído
-
-- [x] **Bioluminescência**: Paletas de cores e brilhos inspirados em organismos bioluminescentes.
-  - [x] Atualizar documentação e backlog.
-  - [x] Implementar testes unitários para cálculo de intensidade luminosa.
-  - [x] Implementar a lógica matemática de decaimento de luz ($1/r^2$).
-  - [x] Implementar a renderização com glow effect no Canvas.
-  - [x] Adicionar controle UI para o modo Bioluminescência.
 
 - [x] **Modo Fibonacci Avançado**
   - [x] Testes unitários criados e passando
