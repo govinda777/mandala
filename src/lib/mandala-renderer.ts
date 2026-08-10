@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, Point } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -25,6 +25,8 @@ export interface MandalaConfig {
   cymaticsM?: number;
   bioluminescenceMode?: boolean;
   polarCurveType?: 'smooth' | 'sharp' | 'generative';
+  astrologicalChart?: boolean;
+  astrologicalDate?: string;
 }
 
 export const drawMandala = (
@@ -52,7 +54,9 @@ export const drawMandala = (
     cymaticsMode,
     cymaticsN,
     cymaticsM,
-    bioluminescenceMode
+    bioluminescenceMode,
+    astrologicalChart,
+    astrologicalDate
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -242,6 +246,13 @@ export const drawMandala = (
     drawGoldenSpiral(ctx, spiralPoints, `hsla(${(corBase + 180) % 360}, 80%, 60%, 0.8)`);
     ctx.restore();
   }
+
+  if (astrologicalChart) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawAstrologicalChartOverlay(ctx, tamanho, astrologicalDate || '2000-01-01T12:00', corBase);
+    ctx.restore();
+  }
 };
 
 const drawFlowerOfLifeOverlay = (
@@ -283,6 +294,159 @@ const drawChladniOverlay = (
     ctx.beginPath();
     ctx.arc(p.x, p.y, 2.0, 0, Math.PI * 2);
     ctx.fill();
+  });
+
+  ctx.restore();
+};
+
+const drawAstrologicalChartOverlay = (
+  ctx: CanvasRenderingContext2D,
+  radius: number,
+  dateStr: string,
+  corBase: number
+) => {
+  const parsedDate = new Date(dateStr);
+  const positions = calculatePlanetaryPositions(isNaN(parsedDate.getTime()) ? new Date() : parsedDate);
+  const aspects = calculateAstrologicalAspects(positions);
+
+  // 1. Draw Zodiac ring divisions
+  const outerRadius = radius * 1.1;
+  const innerRadius = radius * 0.95;
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+
+  // Zodiac outer border
+  ctx.strokeStyle = `hsla(${corBase}, 60%, 40%, 0.4)`;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(0, 0, outerRadius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Zodiac inner border
+  ctx.beginPath();
+  ctx.arc(0, 0, innerRadius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Draw 12 signs divisions and labels
+  const signs = [
+    'Áries', 'Touro', 'Gêmeos', 'Câncer',
+    'Leão', 'Virgem', 'Libra', 'Escorpião',
+    'Sagitário', 'Capricórnio', 'Aquário', 'Peixes'
+  ];
+
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  for (let i = 0; i < 12; i++) {
+    const startAngle = (i * 30 * Math.PI) / 180;
+
+    // Draw division line
+    ctx.strokeStyle = `hsla(${corBase}, 50%, 50%, 0.2)`;
+    ctx.beginPath();
+    ctx.moveTo(innerRadius * Math.cos(startAngle), innerRadius * Math.sin(startAngle));
+    ctx.lineTo(outerRadius * Math.cos(startAngle), outerRadius * Math.sin(startAngle));
+    ctx.stroke();
+
+    // Draw text
+    const textAngle = startAngle + (15 * Math.PI) / 180;
+    const textRadius = (innerRadius + outerRadius) / 2;
+    ctx.fillStyle = `hsla(${(corBase + 120) % 360}, 70%, 80%, 0.7)`;
+    ctx.save();
+    ctx.translate(textRadius * Math.cos(textAngle), textRadius * Math.sin(textAngle));
+    ctx.rotate(textAngle + Math.PI / 2); // Make text stand out nicely
+    ctx.fillText(signs[i], 0, 0);
+    ctx.restore();
+  }
+
+  // 2. Draw planetary orbits and planets
+  const planetColors: Record<string, string> = {
+    Sun: '#FFD700',      // Yellow/Gold
+    Moon: '#E0F7FA',     // Pearlescent / light blue
+    Mercury: '#FF7043',   // Orange-red
+    Venus: '#F48FB1',     // Soft Pink
+    Mars: '#EF5350',      // Vivid Red
+    Jupiter: '#CE93D8',   // Lilac/Purple
+    Saturn: '#B0BEC5'     // Silver/Slate
+  };
+
+  const planetRadii = [
+    { name: 'Sun', r: radius * 0.15 },
+    { name: 'Moon', r: radius * 0.25 },
+    { name: 'Mercury', r: radius * 0.38 },
+    { name: 'Venus', r: radius * 0.50 },
+    { name: 'Mars', r: radius * 0.62 },
+    { name: 'Jupiter', r: radius * 0.75 },
+    { name: 'Saturn', r: radius * 0.88 }
+  ];
+
+  // Draw orbits
+  ctx.strokeStyle = `hsla(${corBase}, 40%, 30%, 0.15)`;
+  ctx.lineWidth = 1;
+  planetRadii.forEach((orb) => {
+    ctx.beginPath();
+    ctx.arc(0, 0, orb.r, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  // 3. Draw aspect lines first so planets sit on top
+  aspects.forEach((aspect) => {
+    const orb1 = planetRadii.find((o) => o.name === aspect.p1);
+    const orb2 = planetRadii.find((o) => o.name === aspect.p2);
+    if (!orb1 || !orb2) return;
+
+    const angle1 = (positions[aspect.p1] * Math.PI) / 180;
+    const angle2 = (positions[aspect.p2] * Math.PI) / 180;
+
+    const x1 = orb1.r * Math.cos(angle1);
+    const y1 = orb1.r * Math.sin(angle1);
+    const x2 = orb2.r * Math.cos(angle2);
+    const y2 = orb2.r * Math.sin(angle2);
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+
+    // Color code aspects: Red for square/opposition, Blue for trine, Gold/White for conjunction
+    if (aspect.type === 'conjunction') {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.lineWidth = 1.5;
+    } else if (aspect.type === 'opposition') {
+      ctx.strokeStyle = 'rgba(239, 83, 80, 0.55)'; // Red
+      ctx.lineWidth = 1.2;
+    } else if (aspect.type === 'square') {
+      ctx.strokeStyle = 'rgba(244, 143, 177, 0.55)'; // Pink/Reddish-pink
+      ctx.lineWidth = 1.2;
+    } else { // trine
+      ctx.strokeStyle = 'rgba(41, 182, 246, 0.55)'; // Blue
+      ctx.lineWidth = 1.2;
+    }
+    ctx.stroke();
+  });
+
+  // 4. Draw Planet Spheres
+  planetRadii.forEach((planet) => {
+    const angleRad = (positions[planet.name] * Math.PI) / 180;
+    const px = planet.r * Math.cos(angleRad);
+    const py = planet.r * Math.sin(angleRad);
+
+    const pColor = planetColors[planet.name] || '#FFF';
+
+    // Glow effect for the planetary spheres
+    ctx.save();
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = pColor;
+    ctx.fillStyle = pColor;
+    ctx.beginPath();
+    ctx.arc(px, py, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    // Planet initials text label
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = 'bold 7px sans-serif';
+    ctx.fillText(planet.name.substring(0, 2), px, py - 10);
   });
 
   ctx.restore();

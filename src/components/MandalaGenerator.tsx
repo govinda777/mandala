@@ -33,6 +33,8 @@ export default function MandalaGenerator() {
   const [cymaticsM, setCymaticsM] = useState(5);
   const [bioluminescenceMode, setBioluminescenceMode] = useState(false);
   const [polarCurveType, setPolarCurveType] = useState<'smooth' | 'sharp' | 'generative'>('generative');
+  const [astrologicalChart, setAstrologicalChart] = useState(false);
+  const [astrologicalDate, setAstrologicalDate] = useState('2000-01-01T12:00');
   const [activeAccordion, setActiveAccordion] = useState<string>('estrutura');
 
   // Animation Loop
@@ -124,7 +126,9 @@ export default function MandalaGenerator() {
       cymaticsN,
       cymaticsM,
       bioluminescenceMode,
-      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined
+      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined,
+      astrologicalChart,
+      astrologicalDate
     };
 
     const width = 2048;
@@ -159,7 +163,9 @@ export default function MandalaGenerator() {
       cymaticsN,
       cymaticsM,
       bioluminescenceMode,
-      polarCurveType
+      polarCurveType,
+      astrologicalChart,
+      astrologicalDate
     };
 
     const encoded = encodeMandalaConfig(config);
@@ -216,14 +222,16 @@ export default function MandalaGenerator() {
       cymaticsN,
       cymaticsM,
       bioluminescenceMode,
-      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined
+      polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined,
+      astrologicalChart,
+      astrologicalDate
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType, astrologicalChart, astrologicalDate]);
 
   // Carregar estado compartilhado pela URL, se houver
   useEffect(() => {
@@ -257,6 +265,8 @@ export default function MandalaGenerator() {
         setCymaticsM(decoded.cymaticsM);
         setBioluminescenceMode(decoded.bioluminescenceMode);
         setPolarCurveType(decoded.polarCurveType);
+        setAstrologicalChart(decoded.astrologicalChart);
+        setAstrologicalDate(decoded.astrologicalDate);
       } catch (e) {
         console.error('Failed to load shared state', e);
       }
@@ -427,6 +437,70 @@ export default function MandalaGenerator() {
                   <input type="checkbox" checked={modoFibonacciAvancado} onChange={(e) => setModoFibonacciAvancado(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
                   <span className="text-slate-300">Raio em Fibonacci</span>
                 </label>
+              </div>
+            )}
+          </div>
+
+          {/* Accordion: Cosmologia & Astrologia */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden">
+            <button
+              className="w-full px-4 py-3 flex justify-between items-center bg-slate-800 hover:bg-slate-700 transition-colors"
+              onClick={() => setActiveAccordion(activeAccordion === 'cosmologia' ? '' : 'cosmologia')}
+            >
+              <span className="font-semibold text-sm">🌌 Cosmologia & Astrologia</span>
+              <span>{activeAccordion === 'cosmologia' ? '▼' : '▶'}</span>
+            </button>
+
+            {activeAccordion === 'cosmologia' && (
+              <div className="p-4 space-y-4 text-sm bg-slate-900/30">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={astrologicalChart}
+                    onChange={(e) => setAstrologicalChart(e.target.checked)}
+                    className="w-4 h-4 accent-purple-500 rounded"
+                  />
+                  <span className="text-slate-300 font-medium">Mapa Astral</span>
+                </label>
+
+                {astrologicalChart && (
+                  <div className="space-y-3 pl-2 border-l-2 border-purple-500/30">
+                    <div className="flex flex-col space-y-1">
+                      <label className="text-xs text-slate-400">Data e Hora (Local)</label>
+                      <input
+                        type="datetime-local"
+                        value={astrologicalDate}
+                        onChange={(e) => setAstrologicalDate(e.target.value)}
+                        className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-xs"
+                      />
+                    </div>
+
+                    <div className="flex flex-col space-y-1">
+                      <label className="text-xs text-slate-400">Eventos Históricos</label>
+                      <select
+                        onChange={(e) => {
+                          if (e.target.value === 'now') {
+                            const now = new Date();
+                            const offset = now.getTimezoneOffset();
+                            const localNow = new Date(now.getTime() - offset * 60 * 1000);
+                            setAstrologicalDate(localNow.toISOString().slice(0, 16));
+                          } else if (e.target.value) {
+                            setAstrologicalDate(e.target.value);
+                          }
+                        }}
+                        className="bg-slate-800 text-slate-100 p-1.5 rounded border border-slate-600 focus:ring-purple-500 focus:border-purple-500 text-xs"
+                        defaultValue=""
+                      >
+                        <option value="" disabled>Escolha um evento...</option>
+                        <option value="now">Momento Atual</option>
+                        <option value="2009-01-03T18:15">Bloco Gênesis do Bitcoin (2009)</option>
+                        <option value="1969-07-20T20:17">Homem na Lua (Apollo 11)</option>
+                        <option value="2000-01-01T12:00">Virada do Milênio / Y2K (2000)</option>
+                        <option value="1989-11-09T18:00">Queda do Muro de Berlim (1989)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

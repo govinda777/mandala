@@ -28,7 +28,9 @@ describe('Share Link Serialization', () => {
       cymaticsN: 2,
       cymaticsM: 3,
       bioluminescenceMode: true,
-      polarCurveType: 'smooth' as 'smooth' | 'sharp' | 'generative'
+      polarCurveType: 'smooth' as 'smooth' | 'sharp' | 'generative',
+      astrologicalChart: false,
+      astrologicalDate: '2000-01-01T12:00'
     };
 
     const encoded = encodeMandalaConfig(originalConfig);
