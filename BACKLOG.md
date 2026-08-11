@@ -3,13 +3,20 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
-- [ ] **Compartilhamento via URL (Share Link)**: Permitir salvar e compartilhar a configuração exata de uma mandala por meio de uma string codificada na URL.
-  - [ ] Criar documentação do recurso em `docs/features/share-link.md`.
-  - [ ] Implementar testes unitários para a serialização e desserialização de configurações de mandala.
-  - [ ] Criar funções matemáticas puras `encodeMandalaConfig` e `decodeMandalaConfig` em `src/lib/mandala-math.ts`.
-  - [ ] Ler parâmetros da URL na inicialização e adicionar um botão de compartilhamento com cópia rápida para o clipboard em `src/components/MandalaGenerator.tsx`.
+- [ ] **Mapa Astral (Astrological Chart Overlay)**: Gerar e sobrepor um mapa astral na mandala baseado em uma data/hora fornecida.
+  - [ ] Criar documentação do recurso em `docs/features/astrological-chart.md`.
+  - [ ] Implementar testes unitários para cálculo de posições planetárias e aspectos astrológicos.
+  - [ ] Implementar as funções matemáticas puras `calculatePlanetaryPositions` e `calculateAstrologicalAspects` em `src/lib/mandala-math.ts`.
+  - [ ] Renderizar as órbitas, planetas, linhas de aspectos e o anel do zodíaco no Canvas em `src/lib/mandala-renderer.ts`.
+  - [ ] Adicionar controle de UI (data/hora, eventos históricos) em `src/components/MandalaGenerator.tsx`.
 
 ## ✅ Concluído
+
+- [x] **Compartilhamento via URL (Share Link)**: Permitir salvar e compartilhar a configuração exata de uma mandala por meio de uma string codificada na URL.
+  - [x] Criar documentação do recurso em `docs/features/share-link.md`.
+  - [x] Implementar testes unitários para a serialização e desserialização de configurações de mandala.
+  - [x] Criar funções matemáticas puras `encodeMandalaConfig` e `decodeMandalaConfig` em `src/lib/mandala-math.ts`.
+  - [x] Ler parâmetros da URL na inicialização e adicionar um botão de compartilhamento com cópia rápida para o clipboard em `src/components/MandalaGenerator.tsx`.
 
 - [x] **Curva Polar das Pétalas (Smooth/Sharp)**: Substituir geração cartesiana legada por silhueta matemática baseada em equações polares.
   - [x] Atualizar documentação e backlog.

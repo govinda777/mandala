@@ -125,6 +125,100 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
   return points;
 };
 
+/**
+ * Calculates planetary positions (0 to 360 degrees) for a given Date.
+ * We use an epoch base (J2000.0: Jan 1, 2000, 12:00 UTC) with synodic/sideral orbital periods in days.
+ */
+export const calculatePlanetaryPositions = (date: Date): Record<string, number> => {
+  let timeDiffDays = 0;
+
+  if (date instanceof Date && !isNaN(date.getTime())) {
+    // Epoch reference: Jan 1, 2000, 12:00 UTC
+    const epoch = new Date('2000-01-01T12:00:00Z').getTime();
+    timeDiffDays = (date.getTime() - epoch) / (1000 * 60 * 60 * 24);
+  } else {
+    // If invalid date, default to 0 days difference (J2000 epoch itself)
+    timeDiffDays = 0;
+  }
+
+  // Define period (T) in days and epoch position (theta_0) in degrees for each body
+  const planets = [
+    { name: 'Sun', period: 365.256, epochAngle: 280.46 },     // Year orbit relative background
+    { name: 'Moon', period: 27.321, epochAngle: 218.316 },    // Lunar sidereal month
+    { name: 'Mercury', period: 87.969, epochAngle: 252.25 },
+    { name: 'Venus', period: 224.701, epochAngle: 181.98 },
+    { name: 'Mars', period: 686.980, epochAngle: 355.45 },
+    { name: 'Jupiter', period: 4332.589, epochAngle: 34.404 },
+    { name: 'Saturn', period: 10759.22, epochAngle: 50.07 }
+  ];
+
+  const positions: Record<string, number> = {};
+
+  planets.forEach((p) => {
+    // Angle = (epochAngle + (360 * days) / period) % 360
+    let angle = (p.epochAngle + (360 * timeDiffDays) / p.period) % 360;
+    if (angle < 0) {
+      angle += 360;
+    }
+    positions[p.name] = angle;
+  });
+
+  return positions;
+};
+
+export interface AstrologicalAspect {
+  p1: string;
+  p2: string;
+  type: 'conjunction' | 'opposition' | 'trine' | 'square';
+  angleDiff: number;
+}
+
+/**
+ * Calculates astrological aspects between planets based on an orb of 6 degrees.
+ */
+export const calculateAstrologicalAspects = (
+  positions: Record<string, number>
+): AstrologicalAspect[] => {
+  const aspects: AstrologicalAspect[] = [];
+  const planetNames = Object.keys(positions);
+  const orb = 6;
+
+  const targetAspects = [
+    { type: 'conjunction' as const, angle: 0 },
+    { type: 'opposition' as const, angle: 180 },
+    { type: 'trine' as const, angle: 120 },
+    { type: 'square' as const, angle: 90 }
+  ];
+
+  for (let i = 0; i < planetNames.length; i++) {
+    for (let j = i + 1; j < planetNames.length; j++) {
+      const p1 = planetNames[i];
+      const p2 = planetNames[j];
+      const a1 = positions[p1];
+      const a2 = positions[p2];
+
+      let diff = Math.abs(a1 - a2) % 360;
+      if (diff > 180) {
+        diff = 360 - diff;
+      }
+
+      for (const target of targetAspects) {
+        if (Math.abs(diff - target.angle) <= orb) {
+          aspects.push({
+            p1,
+            p2,
+            type: target.type,
+            angleDiff: diff
+          });
+          break; // Stop looking for other aspects for this planet pair
+        }
+      }
+    }
+  }
+
+  return aspects;
+};
+
 export interface SharedMandalaConfig {
   numPetalas: number;
   numCamadas: number;
@@ -151,6 +245,8 @@ export interface SharedMandalaConfig {
   cymaticsM: number;
   bioluminescenceMode: boolean;
   polarCurveType: 'smooth' | 'sharp' | 'generative';
+  astrologicalChart: boolean;
+  astrologicalDate: string;
 }
 
 export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
@@ -178,7 +274,9 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   cymaticsN: 3,
   cymaticsM: 5,
   bioluminescenceMode: false,
-  polarCurveType: 'generative'
+  polarCurveType: 'generative',
+  astrologicalChart: false,
+  astrologicalDate: '2000-01-01T12:00'
 };
 
 /**
@@ -252,7 +350,9 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
       bioluminescenceMode: typeof parsed.bioluminescenceMode === 'boolean' ? parsed.bioluminescenceMode : DEFAULT_MANDALA_CONFIG.bioluminescenceMode,
       polarCurveType: (parsed.polarCurveType === 'smooth' || parsed.polarCurveType === 'sharp' || parsed.polarCurveType === 'generative')
         ? parsed.polarCurveType
-        : DEFAULT_MANDALA_CONFIG.polarCurveType
+        : DEFAULT_MANDALA_CONFIG.polarCurveType,
+      astrologicalChart: typeof parsed.astrologicalChart === 'boolean' ? parsed.astrologicalChart : DEFAULT_MANDALA_CONFIG.astrologicalChart,
+      astrologicalDate: typeof parsed.astrologicalDate === 'string' ? parsed.astrologicalDate : DEFAULT_MANDALA_CONFIG.astrologicalDate
     };
   } catch (error) {
     console.error('Failed to decode mandala config', error);
