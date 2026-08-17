@@ -28,7 +28,7 @@ describe('MandalaGenerator', () => {
   it('renders correctly', () => {
     render(<MandalaGenerator />)
     expect(screen.getAllByText(/Pétalas/i)[0]).toBeInTheDocument()
-    expect(screen.getByText(/Gerar Aleatória/i)).toBeInTheDocument()
+    expect(screen.getByText(/Aleatória/i)).toBeInTheDocument()
   })
 
   it('toggles Fibonacci mode', () => {

@@ -71,44 +71,17 @@ export const calculateFlowerOfLifeCenters = (radius: number, layers: number): Po
 
   if (layers < 1) return points;
 
-  // Hexagonal basis vectors
-  // v1 = (1, 0) * radius
-  // v2 = (1/2, sqrt(3)/2) * radius
   const angle60 = Math.PI / 3;
 
   for (let l = 1; l <= layers; l++) {
-      // For each layer l, we have 6*l points.
-      // We can iterate through the 6 sectors.
-      // Start at a vertex of the hexagon: (l * radius, 0)
-      // Then move along the edge 'l' times.
-
       for (let i = 0; i < 6; i++) {
-          // Direction of the edge: (i + 2) * 60 degrees.
-          // Wait, standard algorithm:
-          // Start at direction i*60. Move j steps in direction (i+2)*60.
-
-          // Let's iterate sectors 0 to 5
-          // Sector 0: start at (l, 0). Move in direction 120 deg (2*60).
-          // But actually, the ring is simple:
-          // Walk around the hexagon of radius l.
-
           const startAngle = i * angle60;
-
-          // Vertices of the layer hexagon
-          // But we need points ALONG the edge too.
-
-          // Vector for this side of the hexagon.
-          // Side goes from Vertex(i) to Vertex(i+1).
-          // Vertex(i) = (l*r * cos(i*60), l*r * sin(i*60))
 
           const vAx = l * radius * Math.cos(startAngle);
           const vAy = l * radius * Math.sin(startAngle);
 
           const vBx = l * radius * Math.cos(((i + 1) % 6) * angle60);
           const vBy = l * radius * Math.sin(((i + 1) % 6) * angle60);
-
-          // Steps along the edge
-          // There are l steps. The 0th step is Vertex A. The l-th step is Vertex B (which belongs to next sector start).
 
           const dx = (vBx - vAx) / l;
           const dy = (vBy - vAy) / l;
@@ -155,7 +128,6 @@ export const calculatePlanetaryPositions = (date: Date): Record<string, number> 
   const positions: Record<string, number> = {};
 
   planets.forEach((p) => {
-    // Angle = (epochAngle + (360 * days) / period) % 360
     let angle = (p.epochAngle + (360 * timeDiffDays) / p.period) % 360;
     if (angle < 0) {
       angle += 360;
@@ -210,7 +182,7 @@ export const calculateAstrologicalAspects = (
             type: target.type,
             angleDiff: diff
           });
-          break; // Stop looking for other aspects for this planet pair
+          break;
         }
       }
     }
@@ -279,17 +251,96 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   astrologicalDate: '2000-01-01T12:00'
 };
 
+export interface RarityResult {
+  score: number;
+  tier: 'Comum' | 'Incomum' | 'Raro' | 'Lendário';
+}
+
+/**
+ * Calculates rarity score and tier for a given mandala configuration.
+ */
+export const calculateMandalaRarity = (config: SharedMandalaConfig): RarityResult => {
+  let score = config.numPetalas + (config.numCamadas * 5) + Math.round(config.complexidade * 10);
+
+  if (config.flowerOfLife) score += 25;
+  if (config.goldenSpiral) score += 30;
+  if (config.tessellation) score += 20;
+  if (config.modoFibonacci || config.modoFibonacciAvancado) score += 35;
+  if (config.bioluminescenceMode) score += 40;
+  if (config.cymaticsMode) score += 45;
+  if (config.astrologicalChart) score += 50;
+  if (config.simetriaPersonalizada) score += 20;
+  if (config.useMoonPhase) score += 15;
+  if (config.polarCurveType && config.polarCurveType !== 'generative') score += 15;
+
+  let tier: 'Comum' | 'Incomum' | 'Raro' | 'Lendário' = 'Comum';
+  if (score >= 200) {
+    tier = 'Lendário';
+  } else if (score >= 140) {
+    tier = 'Raro';
+  } else if (score >= 80) {
+    tier = 'Incomum';
+  }
+
+  return { score, tier };
+};
+
+export interface NFTAttribute {
+  trait_type: string;
+  value: string | number;
+}
+
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  attributes: NFTAttribute[];
+}
+
+/**
+ * Generates OpenSea / ERC-721 / ERC-1155 compliant metadata for the mandala.
+ */
+export const generateNFTMetadata = (
+  config: SharedMandalaConfig,
+  imageUrl: string = ''
+): NFTMetadata => {
+  const rarity = calculateMandalaRarity(config);
+
+  const attributes: NFTAttribute[] = [
+    { trait_type: 'Petals', value: config.numPetalas },
+    { trait_type: 'Layers', value: config.numCamadas },
+    { trait_type: 'Base Hue', value: `${config.corBase}°` },
+    { trait_type: 'Complexity', value: config.complexidade },
+    { trait_type: 'Base Form', value: config.formaBase === 0 ? 'Circle' : `${config.formaBase}-sided` },
+    { trait_type: 'Petal Style', value: config.polarCurveType || 'generative' },
+    { trait_type: 'Flower of Life', value: config.flowerOfLife ? 'Active' : 'Inactive' },
+    { trait_type: 'Golden Spiral', value: config.goldenSpiral ? 'Active' : 'Inactive' },
+    { trait_type: 'Hexagonal Grid', value: config.tessellation ? 'Active' : 'Inactive' },
+    { trait_type: 'Fibonacci Mode', value: config.modoFibonacci || config.modoFibonacciAvancado ? 'Active' : 'Inactive' },
+    { trait_type: 'Bioluminescence', value: config.bioluminescenceMode ? 'Active' : 'Inactive' },
+    { trait_type: 'Cymatics', value: config.cymaticsMode ? 'Active' : 'Inactive' },
+    { trait_type: 'Astrological Chart', value: config.astrologicalChart ? 'Active' : 'Inactive' },
+    { trait_type: 'Rarity Score', value: rarity.score },
+    { trait_type: 'Rarity Tier', value: rarity.tier }
+  ];
+
+  return {
+    name: `Mandala #${Math.abs(config.corBase * 100 + config.numPetalas)}`,
+    description: 'Generative mathematical artwork synthesized through sacred geometry, planetary frequencies, and harmonic polar equations.',
+    image: imageUrl,
+    attributes
+  };
+};
+
 /**
  * Encodes a MandalaConfig into a URL-safe Base64 string.
  */
 export const encodeMandalaConfig = (config: Partial<SharedMandalaConfig>): string => {
   try {
     const jsonStr = JSON.stringify(config);
-    // Safe Base64 for UTF-8 strings
     const base64 = btoa(encodeURIComponent(jsonStr).replace(/%([0-9A-F]{2})/g, (_, p1) => {
       return String.fromCharCode(parseInt(p1, 16));
     }));
-    // Make URL safe: replace '+', '/' and remove '=' padding
     return base64
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
@@ -307,7 +358,6 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
   try {
     if (!encoded) return { ...DEFAULT_MANDALA_CONFIG };
 
-    // Restore standard Base64 characters and padding
     let base64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
     while (base64.length % 4) {
       base64 += '=';
@@ -322,7 +372,6 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
 
     const parsed = JSON.parse(jsonStr);
 
-    // Merge parsed config with defaults to ensure complete config object
     return {
       numPetalas: typeof parsed.numPetalas === 'number' ? parsed.numPetalas : DEFAULT_MANDALA_CONFIG.numPetalas,
       numCamadas: typeof parsed.numCamadas === 'number' ? parsed.numCamadas : DEFAULT_MANDALA_CONFIG.numCamadas,
@@ -372,9 +421,6 @@ export const calculatePulseScale = (
   frequency: number,
   amplitude: number = 0.05
 ): number => {
-  // Convert frequency (Hz) to angular frequency (radians/ms)
-  // omega = 2 * PI * f (where f is in Hz)
-  // angle = omega * (time / 1000)
   const angle = 2 * Math.PI * frequency * (time / 1000);
   return 1 + amplitude * Math.sin(angle);
 };
@@ -389,8 +435,6 @@ export const calculateAutoRotation = (
   time: number,
   speedRPM: number
 ): number => {
-  // 1 RPM = 360 degrees per 60000 milliseconds
-  // degrees_per_ms = (360 * speedRPM) / 60000 = (6 * speedRPM) / 1000
   const degreesPerMs = (6 * speedRPM) / 1000;
   return time * degreesPerMs;
 };
@@ -413,21 +457,13 @@ export const calculateFractalCircles = (
 ): Circle[] => {
   const circles: Circle[] = [];
 
-  // Add current circle
   circles.push({ x: centerX, y: centerY, radius });
 
   if (depth <= 0) return circles;
 
-  // Calculate children
-  // Ratio 0.5 implies the next circle is half the size
   const ratio = 0.5;
   const newRadius = radius * ratio;
-
-  // Position children around the current circle
-  // We place them so they touch the current circle (distance = radius + newRadius)
-  // or maybe overlapping? Let's use touching for now.
   const distance = radius + newRadius;
-
   const angleStep = (Math.PI * 2) / branches;
 
   for (let i = 0; i < branches; i++) {
@@ -435,7 +471,6 @@ export const calculateFractalCircles = (
     const cx = centerX + distance * Math.cos(angle);
     const cy = centerY + distance * Math.sin(angle);
 
-    // Recursive call
     const children = calculateFractalCircles(cx, cy, newRadius, depth - 1, branches);
     circles.push(...children);
   }
@@ -460,18 +495,11 @@ export function calculateGoldenSpiral(
 ): Point[] {
   const points: Point[] = [];
   const PHI = (1 + Math.sqrt(5)) / 2;
-  // Growth factor b for Golden Spiral: r = a * e^(b * theta)
-  // r grows by factor PHI every quarter turn (PI/2)
-  // PHI = e^(b * PI/2) => ln(PHI) = b * PI/2 => b = 2 * ln(PHI) / PI
   const b = (2 * Math.log(PHI)) / Math.PI;
 
   const maxTheta = turns * 2 * Math.PI;
-
-  // Calculate 'a' so that at maxTheta, radius is maxRadius
-  // maxRadius = a * e^(b * maxTheta) => a = maxRadius / e^(b * maxTheta)
   const a = maxRadius / Math.exp(b * maxTheta);
 
-  // Resolution: points per turn
   const pointsPerTurn = 100;
   const totalPoints = Math.ceil(turns * pointsPerTurn);
 
@@ -496,18 +524,13 @@ export function calculateGoldenSpiral(
  * @returns A multiplier between Math.cos(PI/sides) and 1.0.
  */
 export const calculatePolygonRadiusMultiplier = (angle: number, sides: number): number => {
-  if (sides < 3) return 1.0; // Circle fallback
+  if (sides < 3) return 1.0;
   const pi = Math.PI;
   const sectorAngle = 2 * pi / sides;
 
-  // Normalize angle to [0, 2pi)
   const a = ((angle % (2 * pi)) + 2 * pi) % (2 * pi);
-
-  // Find angle within the current sector (from 0 to sectorAngle)
   const aMod = a % sectorAngle;
 
-  // Polar equation of a regular polygon:
-  // r(theta) = cos(pi / n) / cos(theta_mod_sector - pi / n)
   return Math.cos(pi / sides) / Math.cos(aMod - pi / sides);
 };
 
@@ -527,13 +550,8 @@ export const calculateHexagonGrid = (
 
   if (radius <= 0) return points;
 
-  // Horizontal spacing: sqrt(3) * radius
   const dx = Math.sqrt(3) * radius;
-  // Vertical spacing: 1.5 * radius
   const dy = 1.5 * radius;
-
-  // Calculate number of columns and rows needed to cover the area + buffer
-  // We center the grid roughly or just start from 0 with buffer.
 
   const buffer = radius * 2;
   const startX = -buffer;
@@ -546,7 +564,6 @@ export const calculateHexagonGrid = (
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      // Offset for odd rows
       const xOffset = (row % 2) !== 0 ? dx / 2 : 0;
 
       const x = startX + col * dx + xOffset;
@@ -594,15 +611,13 @@ export const getPlanetaryConfig = (planetName: string): PlanetConfig | undefined
  * @returns The phase of the moon from 0 to 29.530588853 (days in a lunar month).
  */
 export const calculateMoonPhase = (date: Date = new Date()): number => {
-  // Known new moon timestamp (e.g., Jan 6, 2000, 18:14 UTC)
   const knownNewMoon = new Date('2000-01-06T18:14:00Z').getTime();
-  const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000; // in milliseconds
+  const lunarCycle = 29.530588853 * 24 * 60 * 60 * 1000;
   const currentTimestamp = date.getTime();
 
   const timeDiff = currentTimestamp - knownNewMoon;
   const phaseIndex = (timeDiff % lunarCycle) / lunarCycle;
 
-  // Handle dates before the known new moon
   let finalPhase = phaseIndex;
   if (finalPhase < 0) {
     finalPhase += 1;
@@ -635,8 +650,6 @@ export const getMoonPhaseName = (age: number): string => {
  */
 export const getMoonIllumination = (age: number): number => {
   const lunarCycle = 29.530588853;
-  // Illumination follows a cosine curve based on the angle
-  // 0 -> 0, 14.76 -> 1, 29.53 -> 0
   const phaseAngle = (age / lunarCycle) * 2 * Math.PI;
   return 0.5 * (1 - Math.cos(phaseAngle));
 };
@@ -644,32 +657,20 @@ export const getMoonIllumination = (age: number): number => {
 /**
  * Calcula pontos que compõem o padrão de Chladni (Cimática) numa placa 2D (círculo).
  * Encontra os pontos nodais onde a interferência de onda é destrutiva.
- * @param n Frequência de onda n
- * @param m Frequência de onda m
- * @param radius Raio máximo para a geração dos pontos
- * @param resolution O número de pontos a avaliar ou "densidade"
- * @param threshold O limiar abaixo do qual consideramos que a amplitude é zero (nó)
  */
 export const calculateChladniPattern = (
   n: number,
   m: number,
   radius: number,
-  resolution: number = 100, // Reduced resolution for testing, though normally a dense grid
+  resolution: number = 100,
   threshold: number = 0.1
 ): Point[] => {
   const points: Point[] = [];
-
-  // Create a grid of points to check
-  // Using a grid instead of random points creates a more stable structure that doesn't flicker on re-render.
-  // We'll iterate over coordinates x,y from -radius to +radius
-
   const step = (radius * 2) / resolution;
 
   for (let x = -radius; x <= radius; x += step) {
     for (let y = -radius; y <= radius; y += step) {
-      // Only keep points inside the circle
       if (x * x + y * y <= radius * radius) {
-
         const nx = x / radius;
         const ny = y / radius;
 
@@ -677,7 +678,6 @@ export const calculateChladniPattern = (
                   Math.cos(m * Math.PI * nx) * Math.cos(n * Math.PI * ny);
 
         if (Math.abs(z) < threshold) {
-          // Add some local random jitter to make it look like sand, using coordinates as seed so it's stable
           const seed = x * 12.9898 + y * 78.233;
           const random1 = (Math.sin(seed) * 43758.5453) % 1;
           const random2 = (Math.sin(seed + 1.23) * 43758.5453) % 1;
@@ -697,55 +697,37 @@ export const calculateChladniPattern = (
 /**
  * Calcula a intensidade da luz bioluminescente num determinado raio
  * baseando-se na lei do inverso do quadrado, atenuada para renderização.
- * @param radius Distância do centro
- * @param maxRadius Raio máximo para normalização
- * @returns Intensidade da emissão de luz (0 a 2.0)
  */
 export const calculateBioluminescenceIntensity = (
   radius: number,
   maxRadius: number
 ): number => {
-  // Para evitar divisão por zero ou intensidades infinitas perto do centro
-  // adicionamos um offset baseado no tamanho.
   const offset = maxRadius * 0.1;
   const distance = radius + offset;
-
-  // Intensidade base no centro "imaginário"
   const I0 = maxRadius * maxRadius * 0.05;
-
   const intensity = I0 / (distance * distance);
-
-  // Limitar a intensidade máxima para 2.0 (super-brilho) para não estourar
   return Math.min(Math.max(intensity, 0), 2.0);
 };
 
 /**
- * Retorna uma cor hsla apropriada para o espectro bioluminescente,
- * variando brilho (lightness) e opacidade (alpha) dependendo da intensidade.
- * @param intensity Intensidade calculada
- * @param baseHue Matiz de base
- * @returns String de cor hsl()
+ * Retorna uma cor hsla apropriada para o espectro bioluminescente.
  */
 export const getBioluminescenceColor = (
   intensity: number,
   baseHue: number
 ): string => {
-  // Limitar espectro bioluminescente entre 160 (verde) e 240 (azul escuro)
   let hue = baseHue % 360;
   if (hue < 160) hue = 160 + (hue % 80);
   if (hue > 240) hue = 240 - ((hue - 240) % 80);
 
-  // Intensidade altera a claridade (lightness) e alpha
-  // intensity vai de ~0 a 2.0
-  const lightness = Math.min(30 + intensity * 25, 90); // 30% a 90%
-  const alpha = Math.min(0.2 + intensity * 0.6, 1.0); // 0.2 a 1.0
+  const lightness = Math.min(30 + intensity * 25, 90);
+  const alpha = Math.min(0.2 + intensity * 0.6, 1.0);
 
   return `hsla(${Math.floor(hue)}, 100%, ${Math.floor(lightness)}%, ${alpha.toFixed(3)})`;
 };
 
 /**
  * Simple deterministic pseudo-random number generator (PRNG)
- * Based on a simple Linear Congruential Generator (LCG)
  */
 export class SeededRandom {
   private state: number;
@@ -754,13 +736,11 @@ export class SeededRandom {
     this.state = seed ? seed : Math.random();
   }
 
-  // Returns a pseudo-random number between 0 and 1
   next(): number {
     this.state = (this.state * 9301 + 49297) % 233280;
     return this.state / 233280;
   }
 
-  // Returns a pseudo-random number between min and max
   nextRange(min: number, max: number): number {
     return min + this.next() * (max - min);
   }
@@ -783,12 +763,6 @@ export interface GenerativeLayer {
 
 /**
  * Generates deterministic generative layers scaling from outside in.
- * @param numCamadas Number of total layers to generate
- * @param numPetalas Number of petals per layer (used to calculate tangent constraint)
- * @param baseRadius The maximum radius of the mandala
- * @param complexidade Modulation parameter to adjust the noise/perturbation levels
- * @param corBase Base hue color
- * @param seed Seed for deterministic randomness
  */
 export const generateGenerativeLayers = (
   numCamadas: number,
@@ -802,50 +776,37 @@ export const generateGenerativeLayers = (
   const layers: GenerativeLayer[] = [];
   const rng = new SeededRandom(seed);
 
-  // Angle of each petal based on total petals
   const angleRad = (Math.PI * 2) / numPetalas;
-
-  // Base curvature based on complexity: 1.0 is default, higher complexity adds more elasticity
   const curvatura = 1.0 + (complexidade - 1) * 0.2;
-
-  // Constraint function: Y_max = X * tan(angle/2) * curvatura
-  // Limit curvature strictly so petals don't heavily overlap
   const limitCurvature = Math.min(curvatura, 1.5);
   const calcMaxY = (x: number) => Math.max(2, x * Math.tan(angleRad / 2) * limitCurvature);
 
-  // Generate layers from outside (scale=1.0) to inside
   for (let layer = numCamadas; layer > 0; layer--) {
     const scale = fibonacciAdvancedMode ? calculateFibonacciRadius(layer, numCamadas) : layer / numCamadas;
-
-    // Perturbation factor based on complexity
     const pFact = (complexidade - 1) * 0.1;
 
-    // Generate anchor points relative to the base radius and current scale
-    const x4 = baseRadius * scale; // Tip of the petal
+    const x4 = baseRadius * scale;
 
     const x1Min = Math.max(0, baseRadius * (0.6 - pFact));
     const x1Max = Math.min(baseRadius * 0.9, baseRadius * (0.9 + pFact));
-    const x1 = rng.nextRange(x1Min, x1Max) * scale; // Base of the petal (closest to center)
+    const x1 = rng.nextRange(x1Min, x1Max) * scale;
 
     const x2Min = Math.max(0, baseRadius * (0.1 - pFact));
     const x2Max = Math.min(baseRadius * 0.8, baseRadius * (0.8 + pFact));
     const x2 = rng.nextRange(x2Min, x2Max) * scale;
 
-    // Ensure bounds are valid for RNG (min < max)
     const y2Max = calcMaxY(x2);
-    const y2Min = 2; // minimum safe Y
+    const y2Min = 2;
     const y2 = y2Max > y2Min ? rng.nextRange(y2Min, y2Max) : y2Min;
 
     const x3Min = Math.max(0, baseRadius * (0.2 - pFact));
-    const x3Max = x4; // Tip is max
+    const x3Max = x4;
     const x3 = x3Min < x3Max ? rng.nextRange(x3Min, x3Max) * scale : x3Max * scale;
 
     const y3Max = calcMaxY(x3);
     const y3Min = 2;
     const y3 = y3Max > y3Min ? rng.nextRange(y3Min, y3Max) : y3Min;
 
-    // Generate Hue based on base color with slight perturbations per layer for the watercolor effect
-    // Shift the hue slightly outwards using complexity and layer scale
     const hueShift = rng.nextRange(-20 * complexidade, 20 * complexidade);
     const layerHue = (corBase + hueShift + 360) % 360;
 
@@ -861,11 +822,6 @@ export const generateGenerativeLayers = (
 
 /**
  * Calculates a series of points for a single petal using polar equations.
- * @param baseRadius The base radius of the layer.
- * @param numPetals The total number of petals in the layer (determines the frequency 'k').
- * @param curveType The type of polar curve ('smooth' or 'sharp').
- * @param pointsPerPetal The resolution of the petal curve.
- * @returns An array of Cartesian points for the petal path.
  */
 export const calculatePolarPetalPoints = (
   baseRadius: number,
@@ -875,25 +831,17 @@ export const calculatePolarPetalPoints = (
 ): Point[] => {
   const points: Point[] = [];
   const anglePerPetal = (Math.PI * 2) / numPetals;
-
-  // A defines the amplitude (how far the petal sticks out from the base radius)
-  // We limit amplitude so it looks good relative to the base radius
   const A = baseRadius * 0.8;
 
   for (let i = 0; i <= pointsPerPetal; i++) {
-    // Theta goes from 0 to anglePerPetal
     const theta = (i / pointsPerPetal) * anglePerPetal;
-
-    // Normalize theta to 0..PI to represent one "bump" of the sine wave
     const normalizedTheta = (theta / anglePerPetal) * Math.PI;
 
     let r = baseRadius;
 
     if (curveType === 'smooth') {
-      // Polar Rose equation segment (smooth bump)
       r += A * Math.sin(normalizedTheta);
     } else if (curveType === 'sharp') {
-      // Powered sine wave creates a sharper peak (e.g., sin^4)
       r += A * Math.pow(Math.sin(normalizedTheta), 4);
     }
 
