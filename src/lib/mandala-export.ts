@@ -31,8 +31,8 @@ export const generateHighResDataURL = async (
 };
 
 /**
- * Triggers a download of the provided data URL.
- * @param dataUrl The data URL to download.
+ * Triggers a download of the provided data URL or text content.
+ * @param dataUrl The data URL or object URL to download.
  * @param filename The filename for the download.
  */
 export const triggerDownload = (dataUrl: string, filename: string): void => {
@@ -42,4 +42,17 @@ export const triggerDownload = (dataUrl: string, filename: string): void => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+/**
+ * Triggers a download of JSON text content as a file.
+ * @param jsonObject The object to export as JSON.
+ * @param filename The output filename.
+ */
+export const triggerJSONDownload = (jsonObject: object, filename: string): void => {
+  const jsonString = JSON.stringify(jsonObject, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  triggerDownload(url, filename);
+  URL.revokeObjectURL(url);
 };

@@ -3,14 +3,21 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
-- [ ] **Mapa Astral (Astrological Chart Overlay)**: Gerar e sobrepor um mapa astral na mandala baseado em uma data/hora fornecida.
-  - [ ] Criar documentação do recurso em `docs/features/astrological-chart.md`.
-  - [ ] Implementar testes unitários para cálculo de posições planetárias e aspectos astrológicos.
-  - [ ] Implementar as funções matemáticas puras `calculatePlanetaryPositions` e `calculateAstrologicalAspects` em `src/lib/mandala-math.ts`.
-  - [ ] Renderizar as órbitas, planetas, linhas de aspectos e o anel do zodíaco no Canvas em `src/lib/mandala-renderer.ts`.
-  - [ ] Adicionar controle de UI (data/hora, eventos históricos) em `src/components/MandalaGenerator.tsx`.
+- [ ] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
+  - [ ] Criar documentação do recurso em `docs/features/nft-metadata.md`.
+  - [ ] Implementar testes unitários para a geração de metadados e cálculo de raridade.
+  - [ ] Implementar as funções matemáticas puras `generateNFTMetadata` e `calculateMandalaRarity` em `src/lib/mandala-math.ts`.
+  - [ ] Adicionar função de download de JSON de metadados em `src/lib/mandala-export.ts`.
+  - [ ] Adicionar botão de exportação de NFT JSON na UI em `src/components/MandalaGenerator.tsx`.
 
 ## ✅ Concluído
+
+- [x] **Mapa Astral (Astrological Chart Overlay)**: Gerar e sobrepor um mapa astral na mandala baseado em uma data/hora fornecida.
+  - [x] Criar documentação do recurso em `docs/features/astrological-chart.md`.
+  - [x] Implementar testes unitários para cálculo de posições planetárias e aspectos astrológicos.
+  - [x] Implementar as funções matemáticas puras `calculatePlanetaryPositions` e `calculateAstrologicalAspects` em `src/lib/mandala-math.ts`.
+  - [x] Renderizar as órbitas, planetas, linhas de aspectos e o anel do zodíaco no Canvas em `src/lib/mandala-renderer.ts`.
+  - [x] Adicionar controle de UI (data/hora, eventos históricos) em `src/components/MandalaGenerator.tsx`.
 
 - [x] **Compartilhamento via URL (Share Link)**: Permitir salvar e compartilhar a configuração exata de uma mandala por meio de uma string codificada na URL.
   - [x] Criar documentação do recurso em `docs/features/share-link.md`.
@@ -111,14 +118,10 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 ### 📐 Matemática e Geometria
 
 ### 🌌 Cosmologia e Astrologia
-- **Mapa Astral**: Gerar mandalas baseadas na posição dos planetas em uma data/hora específica (Astrologia).
 
 ### 🔬 Ciência e Natureza
 
 ### 💎 Web3 e NFT
-- **Exportação de Metadados**: Gerar JSON com os atributos da mandala (raridade baseada na complexidade, cores, etc).
 - **Minting**: Integração simples para transformar a mandala gerada em um NFT (ex: na rede Polygon ou Ethereum).
 
 ### 🛠️ Melhorias Técnicas
-- **Alta Resolução**: Exportar em PNG/SVG de alta qualidade para impressão.
-- **Compartilhamento**: Gerar link único com os parâmetros da mandala.

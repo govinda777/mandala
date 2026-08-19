@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { getNearestFibonacci, calculatePulseScale, calculateAutoRotation, getPlanetaryConfig, PLANETARY_DATA, calculateMoonPhase, getMoonPhaseName, encodeMandalaConfig, decodeMandalaConfig } from '../lib/mandala-math';
+import {
+  getNearestFibonacci,
+  calculatePulseScale,
+  calculateAutoRotation,
+  getPlanetaryConfig,
+  PLANETARY_DATA,
+  calculateMoonPhase,
+  getMoonPhaseName,
+  encodeMandalaConfig,
+  decodeMandalaConfig,
+  generateNFTMetadata
+} from '../lib/mandala-math';
 import { drawMandala } from '../lib/mandala-renderer';
-import { generateHighResDataURL, triggerDownload } from '../lib/mandala-export';
+import { generateHighResDataURL, triggerDownload, triggerJSONDownload } from '../lib/mandala-export';
 
 export default function MandalaGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,7 +52,7 @@ export default function MandalaGenerator() {
   useEffect(() => {
     let animationId: number;
     let startTime: number | null = null;
-    let initialRotation = currentAutoRotation; // Keep track of the rotation when we paused/resumed
+    let initialRotation = currentAutoRotation;
 
     const animate = (time: number) => {
       let requiresNextFrame = false;
@@ -69,13 +80,12 @@ export default function MandalaGenerator() {
       animationId = requestAnimationFrame(animate);
     } else {
       if (!pulsing) setCurrentPulseScale(1);
-      // We don't reset currentAutoRotation so it stops where it is
     }
 
     return () => {
       if (animationId) cancelAnimationFrame(animationId);
     };
-  }, [pulsing, pulseFrequency, rotating, rotationSpeedRPM]); // Removed initialRotation and currentAutoRotation to avoid reset loops
+  }, [pulsing, pulseFrequency, rotating, rotationSpeedRPM]);
 
   useEffect(() => {
     if (modoFibonacci) {
@@ -110,8 +120,8 @@ export default function MandalaGenerator() {
       corBase,
       complexidade,
       rotacao,
-      width: 0, // Will be overridden
-      height: 0, // Will be overridden
+      width: 0,
+      height: 0,
       formaBase: formaBase > 0 ? formaBase : undefined,
       flowerOfLife,
       goldenSpiral,
@@ -135,6 +145,41 @@ export default function MandalaGenerator() {
     const height = 2048;
     const dataUrl = await generateHighResDataURL(config, width, height);
     triggerDownload(dataUrl, `mandala-${Date.now()}.png`);
+  };
+
+  const handleExportNFTMetadata = () => {
+    const config = {
+      numPetalas,
+      numCamadas,
+      corBase,
+      complexidade,
+      rotacao,
+      modoFibonacci,
+      modoFibonacciAvancado,
+      flowerOfLife,
+      goldenSpiral,
+      fractalMode,
+      tessellation,
+      pulsing,
+      pulseFrequency,
+      rotating,
+      rotationSpeedRPM,
+      useMoonPhase,
+      moonPhaseAge,
+      formaBase,
+      simetriaPersonalizada,
+      eixosSimetria,
+      cymaticsMode,
+      cymaticsN,
+      cymaticsM,
+      bioluminescenceMode,
+      polarCurveType,
+      astrologicalChart,
+      astrologicalDate
+    };
+
+    const metadata = generateNFTMetadata(config);
+    triggerJSONDownload(metadata, `mandala-nft-${Date.now()}.json`);
   };
 
   const handleShare = () => {
@@ -185,18 +230,18 @@ export default function MandalaGenerator() {
     if (modoFibonacci) {
       novasPetalas = getNearestFibonacci(novasPetalas);
     }
-    setNumPetalas(novasPetalas); // 6-24 pétalas (ou Fibonacci)
-    setNumCamadas(Math.floor(Math.random() * 6) + 4);  // 4-10 camadas
-    setCorBase(Math.floor(Math.random() * 360));       // Cor base aleatória
-    setComplexidade(Math.random() * 2 + 1);           // Complexidade entre 1-3
-    setRotacao(Math.random() * 360);                  // Rotação aleatória
+    setNumPetalas(novasPetalas);
+    setNumCamadas(Math.floor(Math.random() * 6) + 4);
+    setCorBase(Math.floor(Math.random() * 360));
+    setComplexidade(Math.random() * 2 + 1);
+    setRotacao(Math.random() * 360);
   };
-  
+
   // Função para desenhar a mandala
   const renderizarMandala = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -649,24 +694,30 @@ export default function MandalaGenerator() {
           height={1024}
           className="w-full max-w-[85vh] aspect-square rounded-2xl shadow-2xl border border-slate-800 bg-black/50"
         />
-        
+
         {/* Floating Action Bar */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-4 bg-slate-900/80 backdrop-blur-md border border-slate-700 p-3 rounded-2xl shadow-2xl z-10">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-wrap justify-center gap-3 bg-slate-900/80 backdrop-blur-md border border-slate-700 p-3 rounded-2xl shadow-2xl z-10">
           <button
             onClick={gerarMandalaAleatoria}
-            className="bg-purple-600 hover:bg-purple-500 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)]"
+            className="bg-purple-600 hover:bg-purple-500 text-white text-xs sm:text-sm font-semibold py-2 px-4 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(147,51,234,0.3)] hover:shadow-[0_0_25px_rgba(147,51,234,0.5)]"
           >
-            🎲 Gerar Aleatória
+            🎲 Aleatória
           </button>
           <button
             onClick={handleDownload}
-            className="bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300"
+            className="bg-slate-700 hover:bg-slate-600 text-white text-xs sm:text-sm font-semibold py-2 px-4 rounded-xl transition-all duration-300"
           >
-            💾 Exportar PNG
+            💾 PNG
+          </button>
+          <button
+            onClick={handleExportNFTMetadata}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-semibold py-2 px-4 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_25px_rgba(16,185,129,0.5)]"
+          >
+            💎 NFT JSON
           </button>
           <button
             onClick={handleShare}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold py-2.5 px-6 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold py-2 px-4 rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(37,99,235,0.3)] hover:shadow-[0_0_25px_rgba(37,99,235,0.5)]"
           >
             {copied ? '✅ Copiado!' : '🔗 Compartilhar'}
           </button>
