@@ -3,14 +3,15 @@
 Este documento rastreia as ideias e funcionalidades planejadas para evoluir o gerador de mandalas, focando em ciência, cosmologia, matemática, geometria e NFTs.
 
 ## 🚀 Em Progresso
-- [ ] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
-  - [ ] Criar documentação do recurso em `docs/features/nft-metadata.md`.
-  - [ ] Implementar testes unitários para a geração de metadados e cálculo de raridade.
-  - [ ] Implementar as funções matemáticas puras `generateNFTMetadata` e `calculateMandalaRarity` em `src/lib/mandala-math.ts`.
-  - [ ] Adicionar função de download de JSON de metadados em `src/lib/mandala-export.ts`.
-  - [ ] Adicionar botão de exportação de NFT JSON na UI em `src/components/MandalaGenerator.tsx`.
 
 ## ✅ Concluído
+
+- [x] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
+  - [x] Criar documentação do recurso em `docs/features/nft-metadata.md`.
+  - [x] Implementar testes unitários para a geração de metadados e cálculo de raridade.
+  - [x] Implementar as funções matemáticas puras `generateNFTMetadata` e `calculateMandalaRarity` em `src/lib/mandala-math.ts`.
+  - [x] Adicionar função de download de JSON de metadados em `src/lib/mandala-export.ts`.
+  - [x] Adicionar botão de exportação de NFT JSON na UI em `src/components/MandalaGenerator.tsx`.
 
 - [x] **Mapa Astral (Astrological Chart Overlay)**: Gerar e sobrepor um mapa astral na mandala baseado em uma data/hora fornecida.
   - [x] Criar documentação do recurso em `docs/features/astrological-chart.md`.

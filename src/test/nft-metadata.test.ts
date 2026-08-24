@@ -14,6 +14,38 @@ describe('NFT Metadata & Rarity Calculation', () => {
       expect(result.tier).toBe('Comum');
     });
 
+    it('should calculate Incomum rarity tier when score is between 80 and 139', () => {
+      const uncommonConfig: SharedMandalaConfig = {
+        ...DEFAULT_MANDALA_CONFIG,
+        numPetalas: 12,
+        numCamadas: 5,
+        complexidade: 1,
+        flowerOfLife: true,
+        goldenSpiral: true
+      };
+      const result = calculateMandalaRarity(uncommonConfig);
+      expect(result.score).toBeGreaterThanOrEqual(80);
+      expect(result.score).toBeLessThan(140);
+      expect(result.tier).toBe('Incomum');
+    });
+
+    it('should calculate Raro rarity tier when score is between 140 and 199', () => {
+      const rareConfig: SharedMandalaConfig = {
+        ...DEFAULT_MANDALA_CONFIG,
+        numPetalas: 12,
+        numCamadas: 5,
+        complexidade: 1,
+        flowerOfLife: true,
+        goldenSpiral: true,
+        bioluminescenceMode: true,
+        cymaticsMode: true
+      };
+      const result = calculateMandalaRarity(rareConfig);
+      expect(result.score).toBeGreaterThanOrEqual(140);
+      expect(result.score).toBeLessThan(200);
+      expect(result.tier).toBe('Raro');
+    });
+
     it('should calculate higher rarity tier for complex mandalas with multiple active overlays', () => {
       const complexConfig: SharedMandalaConfig = {
         ...DEFAULT_MANDALA_CONFIG,
