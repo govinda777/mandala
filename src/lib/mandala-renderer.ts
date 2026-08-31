@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, calculateMaurerRosePoints, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -27,6 +27,9 @@ export interface MandalaConfig {
   polarCurveType?: 'smooth' | 'sharp' | 'generative';
   astrologicalChart?: boolean;
   astrologicalDate?: string;
+  maurerRose?: boolean;
+  maurerN?: number;
+  maurerD?: number;
 }
 
 export const drawMandala = (
@@ -56,7 +59,10 @@ export const drawMandala = (
     cymaticsM,
     bioluminescenceMode,
     astrologicalChart,
-    astrologicalDate
+    astrologicalDate,
+    maurerRose,
+    maurerN,
+    maurerD
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -251,6 +257,13 @@ export const drawMandala = (
     ctx.save();
     ctx.translate(width / 2, height / 2);
     drawAstrologicalChartOverlay(ctx, tamanho, astrologicalDate || '2000-01-01T12:00', corBase);
+    ctx.restore();
+  }
+
+  if (maurerRose) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawMaurerRoseOverlay(ctx, maurerN || 6, maurerD || 29, tamanho, corBase);
     ctx.restore();
   }
 };
@@ -448,6 +461,44 @@ const drawAstrologicalChartOverlay = (
     ctx.font = 'bold 7px sans-serif';
     ctx.fillText(planet.name.substring(0, 2), px, py - 10);
   });
+
+  ctx.restore();
+};
+
+const drawMaurerRoseOverlay = (
+  ctx: CanvasRenderingContext2D,
+  n: number,
+  d: number,
+  radius: number,
+  corBase: number
+) => {
+  const points = calculateMaurerRosePoints(n, d, radius);
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+
+  // Draw connected lattice lines
+  ctx.strokeStyle = `hsla(${(corBase + 120) % 360}, 80%, 65%, 0.45)`;
+  ctx.lineWidth = 1;
+
+  ctx.beginPath();
+  points.forEach((p, index) => {
+    if (index === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.stroke();
+
+  // Draw the underlying polar rose outline (d = 1) for contrast
+  const roseOutline = calculateMaurerRosePoints(n, 1, radius);
+  ctx.strokeStyle = `hsla(${corBase}, 90%, 75%, 0.8)`;
+  ctx.lineWidth = 1.5;
+
+  ctx.beginPath();
+  roseOutline.forEach((p, index) => {
+    if (index === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  });
+  ctx.stroke();
 
   ctx.restore();
 };
