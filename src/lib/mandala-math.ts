@@ -219,6 +219,9 @@ export interface SharedMandalaConfig {
   polarCurveType: 'smooth' | 'sharp' | 'generative';
   astrologicalChart: boolean;
   astrologicalDate: string;
+  maurerRose: boolean;
+  maurerN: number;
+  maurerD: number;
 }
 
 export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
@@ -248,7 +251,10 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   bioluminescenceMode: false,
   polarCurveType: 'generative',
   astrologicalChart: false,
-  astrologicalDate: '2000-01-01T12:00'
+  astrologicalDate: '2000-01-01T12:00',
+  maurerRose: false,
+  maurerN: 6,
+  maurerD: 29
 };
 
 export interface RarityResult {
@@ -269,6 +275,7 @@ export const calculateMandalaRarity = (config: SharedMandalaConfig): RarityResul
   if (config.bioluminescenceMode) score += 40;
   if (config.cymaticsMode) score += 45;
   if (config.astrologicalChart) score += 50;
+  if (config.maurerRose) score += 35;
   if (config.simetriaPersonalizada) score += 20;
   if (config.useMoonPhase) score += 15;
   if (config.polarCurveType && config.polarCurveType !== 'generative') score += 15;
@@ -320,6 +327,7 @@ export const generateNFTMetadata = (
     { trait_type: 'Bioluminescence', value: config.bioluminescenceMode ? 'Active' : 'Inactive' },
     { trait_type: 'Cymatics', value: config.cymaticsMode ? 'Active' : 'Inactive' },
     { trait_type: 'Astrological Chart', value: config.astrologicalChart ? 'Active' : 'Inactive' },
+    { trait_type: 'Maurer Rose', value: config.maurerRose ? `Active (n=${config.maurerN || 6}, d=${config.maurerD || 29}°)` : 'Inactive' },
     { trait_type: 'Rarity Score', value: rarity.score },
     { trait_type: 'Rarity Tier', value: rarity.tier }
   ];
@@ -401,7 +409,10 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
         ? parsed.polarCurveType
         : DEFAULT_MANDALA_CONFIG.polarCurveType,
       astrologicalChart: typeof parsed.astrologicalChart === 'boolean' ? parsed.astrologicalChart : DEFAULT_MANDALA_CONFIG.astrologicalChart,
-      astrologicalDate: typeof parsed.astrologicalDate === 'string' ? parsed.astrologicalDate : DEFAULT_MANDALA_CONFIG.astrologicalDate
+      astrologicalDate: typeof parsed.astrologicalDate === 'string' ? parsed.astrologicalDate : DEFAULT_MANDALA_CONFIG.astrologicalDate,
+      maurerRose: typeof parsed.maurerRose === 'boolean' ? parsed.maurerRose : DEFAULT_MANDALA_CONFIG.maurerRose,
+      maurerN: typeof parsed.maurerN === 'number' ? parsed.maurerN : DEFAULT_MANDALA_CONFIG.maurerN,
+      maurerD: typeof parsed.maurerD === 'number' ? parsed.maurerD : DEFAULT_MANDALA_CONFIG.maurerD
     };
   } catch (error) {
     console.error('Failed to decode mandala config', error);
@@ -823,6 +834,36 @@ export const generateGenerativeLayers = (
 /**
  * Calculates a series of points for a single petal using polar equations.
  */
+/**
+ * Calculates points for a Maurer Rose curve.
+ * A Maurer rose consists of 361 lines connecting 361 points given by r = R * sin(n * k)
+ * where k = i * d (in degrees).
+ * @param n Number of petals parameter.
+ * @param d Jump angle parameter in degrees.
+ * @param radius Base radius of the rose.
+ * @returns Array of 361 Point objects.
+ */
+export const calculateMaurerRosePoints = (
+  n: number,
+  d: number,
+  radius: number
+): Point[] => {
+  const points: Point[] = [];
+
+  for (let i = 0; i <= 360; i++) {
+    const kDeg = i * d;
+    const kRad = (kDeg * Math.PI) / 180;
+    const r = radius * Math.sin(n * kRad);
+
+    const x = r * Math.cos(kRad);
+    const y = r * Math.sin(kRad);
+
+    points.push({ x, y });
+  }
+
+  return points;
+};
+
 export const calculatePolarPetalPoints = (
   baseRadius: number,
   numPetals: number,
