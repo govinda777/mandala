@@ -46,6 +46,9 @@ export default function MandalaGenerator() {
   const [polarCurveType, setPolarCurveType] = useState<'smooth' | 'sharp' | 'generative'>('generative');
   const [astrologicalChart, setAstrologicalChart] = useState(false);
   const [astrologicalDate, setAstrologicalDate] = useState('2000-01-01T12:00');
+  const [maurerRose, setMaurerRose] = useState(false);
+  const [maurerRoseN, setMaurerRoseN] = useState(6);
+  const [maurerRoseD, setMaurerRoseD] = useState(71);
   const [activeAccordion, setActiveAccordion] = useState<string>('estrutura');
 
   // Animation Loop
@@ -138,7 +141,10 @@ export default function MandalaGenerator() {
       bioluminescenceMode,
       polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined,
       astrologicalChart,
-      astrologicalDate
+      astrologicalDate,
+      maurerRose,
+      maurerRoseN,
+      maurerRoseD
     };
 
     const width = 2048;
@@ -175,7 +181,10 @@ export default function MandalaGenerator() {
       bioluminescenceMode,
       polarCurveType,
       astrologicalChart,
-      astrologicalDate
+      astrologicalDate,
+      maurerRose,
+      maurerRoseN,
+      maurerRoseD
     };
 
     const metadata = generateNFTMetadata(config);
@@ -269,14 +278,17 @@ export default function MandalaGenerator() {
       bioluminescenceMode,
       polarCurveType: polarCurveType !== 'generative' ? polarCurveType : undefined,
       astrologicalChart,
-      astrologicalDate
+      astrologicalDate,
+      maurerRose,
+      maurerRoseN,
+      maurerRoseD
     });
   };
 
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType, astrologicalChart, astrologicalDate]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType, astrologicalChart, astrologicalDate, maurerRose, maurerRoseN, maurerRoseD]);
 
   // Carregar estado compartilhado pela URL, se houver
   useEffect(() => {
@@ -312,6 +324,9 @@ export default function MandalaGenerator() {
         setPolarCurveType(decoded.polarCurveType);
         setAstrologicalChart(decoded.astrologicalChart);
         setAstrologicalDate(decoded.astrologicalDate);
+        setMaurerRose(decoded.maurerRose);
+        setMaurerRoseN(decoded.maurerRoseN);
+        setMaurerRoseD(decoded.maurerRoseD);
       } catch (e) {
         console.error('Failed to load shared state', e);
       }
@@ -482,6 +497,50 @@ export default function MandalaGenerator() {
                   <input type="checkbox" checked={modoFibonacciAvancado} onChange={(e) => setModoFibonacciAvancado(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
                   <span className="text-slate-300">Raio em Fibonacci</span>
                 </label>
+
+                <div className="pt-2 border-t border-slate-700">
+                  <label className="flex items-center space-x-2 cursor-pointer mb-2">
+                    <input
+                      type="checkbox"
+                      checked={maurerRose}
+                      onChange={(e) => setMaurerRose(e.target.checked)}
+                      className="w-4 h-4 accent-purple-500 rounded"
+                    />
+                    <span className="text-slate-300">Rosa de Maurer</span>
+                  </label>
+                  {maurerRose && (
+                    <div className="space-y-2 pl-6">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <label className="text-xs text-slate-400">Pétalas (n)</label>
+                          <span className="text-xs text-slate-400">{maurerRoseN}</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="20"
+                          value={maurerRoseN}
+                          onChange={(e) => setMaurerRoseN(parseInt(e.target.value))}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <label className="text-xs text-slate-400">Salto Angular (d°)</label>
+                          <span className="text-xs text-slate-400">{maurerRoseD}°</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="1"
+                          max="180"
+                          value={maurerRoseD}
+                          onChange={(e) => setMaurerRoseD(parseInt(e.target.value))}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
