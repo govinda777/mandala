@@ -6,6 +6,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Rosa de Maurer (Maurer Rose Overlay)**: Renderizar teias polares complexas formadas pela conexão de 361 pontos amostrados com saltos angulares de $d^\circ$ em rosas polares $r = R \sin(n \theta)$.
+  - [x] Criar documentação do recurso em `docs/features/maurer-rose.md`.
+  - [x] Criar testes unitários para a geração dos pontos da Rosa de Maurer.
+  - [x] Implementar a função matemática pura `calculateMaurerRosePoints` em `src/lib/mandala-math.ts`.
+  - [x] Implementar renderização no Canvas em `src/lib/mandala-renderer.ts`.
+  - [x] Adicionar controles UI para ativar a Rosa de Maurer e ajustar $n$ e $d$.
+
 - [x] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
   - [x] Criar documentação do recurso em `docs/features/nft-metadata.md`.
   - [x] Implementar testes unitários para a geração de metadados e cálculo de raridade.
