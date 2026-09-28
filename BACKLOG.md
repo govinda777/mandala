@@ -6,6 +6,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Rosa de Maurer (Maurer Rose Pattern)**: Renderizar o padrão geométrico polar da Rosa de Maurer (treliça rendilhada com parâmetros de pétala $n$ e salto de ângulo $d$).
+  - [x] Criar documentação do recurso em `docs/features/maurer-rose.md`.
+  - [x] Implementar testes unitários em `src/test/maurer-rose.test.ts`.
+  - [x] Implementar função matemática pura `calculateMaurerRosePoints` em `src/lib/mandala-math.ts`.
+  - [x] Renderizar overlay da Rosa de Maurer em `src/lib/mandala-renderer.ts`.
+  - [x] Adicionar controles de UI em `src/components/MandalaGenerator.tsx`.
+
 - [x] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
   - [x] Criar documentação do recurso em `docs/features/nft-metadata.md`.
   - [x] Implementar testes unitários para a geração de metadados e cálculo de raridade.
