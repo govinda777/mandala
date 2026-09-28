@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, calculateMaurerRosePoints, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -27,6 +27,9 @@ export interface MandalaConfig {
   polarCurveType?: 'smooth' | 'sharp' | 'generative';
   astrologicalChart?: boolean;
   astrologicalDate?: string;
+  maurerRose?: boolean;
+  maurerRoseN?: number;
+  maurerRoseD?: number;
 }
 
 export const drawMandala = (
@@ -56,7 +59,10 @@ export const drawMandala = (
     cymaticsM,
     bioluminescenceMode,
     astrologicalChart,
-    astrologicalDate
+    astrologicalDate,
+    maurerRose,
+    maurerRoseN,
+    maurerRoseD
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -253,6 +259,42 @@ export const drawMandala = (
     drawAstrologicalChartOverlay(ctx, tamanho, astrologicalDate || '2000-01-01T12:00', corBase);
     ctx.restore();
   }
+
+  if (maurerRose) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawMaurerRoseOverlay(ctx, maurerRoseN ?? 6, maurerRoseD ?? 71, tamanho, corBase);
+    ctx.restore();
+  }
+};
+
+const drawMaurerRoseOverlay = (
+  ctx: CanvasRenderingContext2D,
+  n: number,
+  d: number,
+  radius: number,
+  corBase: number
+) => {
+  const points = calculateMaurerRosePoints(n, d, radius);
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.strokeStyle = `hsla(${(corBase + 60) % 360}, 85%, 65%, 0.7)`;
+  ctx.lineWidth = 1.2;
+  ctx.shadowColor = `hsla(${(corBase + 60) % 360}, 100%, 75%, 0.5)`;
+  ctx.shadowBlur = 8;
+
+  ctx.beginPath();
+  points.forEach((p, i) => {
+    if (i === 0) {
+      ctx.moveTo(p.x, p.y);
+    } else {
+      ctx.lineTo(p.x, p.y);
+    }
+  });
+  ctx.stroke();
+
+  ctx.restore();
 };
 
 const drawFlowerOfLifeOverlay = (
