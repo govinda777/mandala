@@ -4,6 +4,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## 🚀 Em Progresso
 
+- [ ] **Rosa de Maurer (Maurer Rose Lattice)**: Adicionar sobreposição geométrica treliçada de Rosa de Maurer baseada em salto angular $d$ e frequência $n$.
+  - [x] Criar documentação do recurso em `docs/features/maurer-rose.md`.
+  - [ ] Criar testes unitários para o cálculo de pontos da Rosa de Maurer.
+  - [ ] Implementar a função matemática `calculateMaurerRosePoints` em `src/lib/mandala-math.ts`.
+  - [ ] Implementar a renderização no Canvas em `src/lib/mandala-renderer.ts`.
+  - [ ] Adicionar controles UI para ativar a Rosa de Maurer e configurar $n$ e $d$ em `src/components/MandalaGenerator.tsx`.
+
 ## ✅ Concluído
 
 - [x] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
