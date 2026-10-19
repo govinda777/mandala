@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateMetatronCenters, calculateMetatronLines, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -12,6 +12,7 @@ export interface MandalaConfig {
   height: number;
   formaBase?: number; // 0 for circle, 3 for triangle, 4 for square, etc.
   flowerOfLife?: boolean;
+  metatronCube?: boolean;
   goldenSpiral?: boolean;
   fractalMode?: boolean;
   pulseScale?: number;
@@ -43,6 +44,7 @@ export const drawMandala = (
     height,
     formaBase,
     flowerOfLife,
+    metatronCube,
     goldenSpiral,
     fractalMode,
     pulseScale = 1,
@@ -231,6 +233,13 @@ export const drawMandala = (
     ctx.restore();
   }
 
+  if (metatronCube) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawMetatronCubeOverlay(ctx, tamanho, corBase);
+    ctx.restore();
+  }
+
   if (cymaticsMode && cymaticsN && cymaticsM) {
     ctx.save();
     ctx.translate(width / 2, height / 2);
@@ -272,6 +281,40 @@ const drawFlowerOfLifeOverlay = (
   centers.forEach((center) => {
     ctx.beginPath();
     ctx.arc(center.x, center.y, circleRadius, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  ctx.restore();
+};
+
+const drawMetatronCubeOverlay = (
+  ctx: CanvasRenderingContext2D,
+  radius: number,
+  corBase: number
+) => {
+  const circleRadius = radius * 0.35;
+  const centers = calculateMetatronCenters(circleRadius);
+  const lines = calculateMetatronLines(centers);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+
+  // 1. Draw 78 interconnecting lines
+  ctx.strokeStyle = `hsla(${(corBase + 60) % 360}, 90%, 70%, 0.45)`;
+  ctx.lineWidth = 1.2;
+  lines.forEach((line) => {
+    ctx.beginPath();
+    ctx.moveTo(line.p1.x, line.p1.y);
+    ctx.lineTo(line.p2.x, line.p2.y);
+    ctx.stroke();
+  });
+
+  // 2. Draw 13 Fruit of Life circles
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.7)";
+  ctx.lineWidth = 1.8;
+  centers.forEach((c) => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, circleRadius, 0, Math.PI * 2);
     ctx.stroke();
   });
 
