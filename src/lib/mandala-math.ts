@@ -59,6 +59,62 @@ export interface Circle {
   radius: number;
 }
 
+export interface Line {
+  p1: Point;
+  p2: Point;
+}
+
+/**
+ * Calculates center points for the 13 circles of Fruit of Life / Metatron's Cube.
+ * @param circleRadius Radius of each circle / distance between adjacent circle centers.
+ * @returns Array of 13 {x, y} center coordinates.
+ */
+export const calculateMetatronCenters = (circleRadius: number): Point[] => {
+  const centers: Point[] = [];
+  // 1. Central circle center
+  centers.push({ x: 0, y: 0 });
+
+  const angle60 = Math.PI / 3;
+
+  // 2. Inner ring (6 circles at distance 1 * circleRadius)
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angle60;
+    centers.push({
+      x: circleRadius * Math.cos(angle),
+      y: circleRadius * Math.sin(angle)
+    });
+  }
+
+  // 3. Outer ring (6 circles at distance 2 * circleRadius)
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angle60;
+    centers.push({
+      x: 2 * circleRadius * Math.cos(angle),
+      y: 2 * circleRadius * Math.sin(angle)
+    });
+  }
+
+  return centers;
+};
+
+/**
+ * Calculates interconnecting lines between every unique pair of centers (13C2 = 78 lines).
+ * @param centers Array of center points.
+ * @returns Array of 78 Line objects.
+ */
+export const calculateMetatronLines = (centers: Point[]): Line[] => {
+  const lines: Line[] = [];
+  for (let i = 0; i < centers.length; i++) {
+    for (let j = i + 1; j < centers.length; j++) {
+      lines.push({
+        p1: centers[i],
+        p2: centers[j]
+      });
+    }
+  }
+  return lines;
+};
+
 /**
  * Calculates center points for a hexagonal packing of circles (Flower of Life pattern).
  * @param radius Radius of the circles (distance between centers).
@@ -200,6 +256,7 @@ export interface SharedMandalaConfig {
   modoFibonacci: boolean;
   modoFibonacciAvancado: boolean;
   flowerOfLife: boolean;
+  metatronCube: boolean;
   goldenSpiral: boolean;
   fractalMode: boolean;
   tessellation: boolean;
@@ -230,6 +287,7 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   modoFibonacci: false,
   modoFibonacciAvancado: false,
   flowerOfLife: false,
+  metatronCube: false,
   goldenSpiral: false,
   fractalMode: false,
   tessellation: false,
@@ -263,6 +321,7 @@ export const calculateMandalaRarity = (config: SharedMandalaConfig): RarityResul
   let score = config.numPetalas + (config.numCamadas * 5) + Math.round(config.complexidade * 10);
 
   if (config.flowerOfLife) score += 25;
+  if (config.metatronCube) score += 30;
   if (config.goldenSpiral) score += 30;
   if (config.tessellation) score += 20;
   if (config.modoFibonacci || config.modoFibonacciAvancado) score += 35;
@@ -314,6 +373,7 @@ export const generateNFTMetadata = (
     { trait_type: 'Base Form', value: config.formaBase === 0 ? 'Circle' : `${config.formaBase}-sided` },
     { trait_type: 'Petal Style', value: config.polarCurveType || 'generative' },
     { trait_type: 'Flower of Life', value: config.flowerOfLife ? 'Active' : 'Inactive' },
+    { trait_type: 'Metatron Cube', value: config.metatronCube ? 'Active' : 'Inactive' },
     { trait_type: 'Golden Spiral', value: config.goldenSpiral ? 'Active' : 'Inactive' },
     { trait_type: 'Hexagonal Grid', value: config.tessellation ? 'Active' : 'Inactive' },
     { trait_type: 'Fibonacci Mode', value: config.modoFibonacci || config.modoFibonacciAvancado ? 'Active' : 'Inactive' },
@@ -381,6 +441,7 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
       modoFibonacci: typeof parsed.modoFibonacci === 'boolean' ? parsed.modoFibonacci : DEFAULT_MANDALA_CONFIG.modoFibonacci,
       modoFibonacciAvancado: typeof parsed.modoFibonacciAvancado === 'boolean' ? parsed.modoFibonacciAvancado : DEFAULT_MANDALA_CONFIG.modoFibonacciAvancado,
       flowerOfLife: typeof parsed.flowerOfLife === 'boolean' ? parsed.flowerOfLife : DEFAULT_MANDALA_CONFIG.flowerOfLife,
+      metatronCube: typeof parsed.metatronCube === 'boolean' ? parsed.metatronCube : DEFAULT_MANDALA_CONFIG.metatronCube,
       goldenSpiral: typeof parsed.goldenSpiral === 'boolean' ? parsed.goldenSpiral : DEFAULT_MANDALA_CONFIG.goldenSpiral,
       fractalMode: typeof parsed.fractalMode === 'boolean' ? parsed.fractalMode : DEFAULT_MANDALA_CONFIG.fractalMode,
       tessellation: typeof parsed.tessellation === 'boolean' ? parsed.tessellation : DEFAULT_MANDALA_CONFIG.tessellation,
