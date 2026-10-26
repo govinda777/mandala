@@ -6,6 +6,13 @@ Este documento rastreia as ideias e funcionalidades planejadas para evoluir o ge
 
 ## ✅ Concluído
 
+- [x] **Geometria Sagrada - Cubo de Metatron (Metatron's Cube Overlay)**: Sobrepor o Cubo de Metatron (13 círculos do Fruto da Vida e 78 linhas interconectadas representando os 5 Sólidos Platônicos).
+  - [x] Criar documentação do recurso em `docs/features/metatron-cube.md`.
+  - [x] Implementar testes unitários para o cálculo dos centros e linhas em `src/test/metatron-cube.test.ts`.
+  - [x] Implementar funções matemáticas puras `calculateMetatronCenters` e `calculateMetatronLines` em `src/lib/mandala-math.ts`.
+  - [x] Renderizar círculos e linhas do Cubo de Metatron no Canvas em `src/lib/mandala-renderer.ts`.
+  - [x] Adicionar controle de UI (checkbox "Cubo de Metatron") em `src/components/MandalaGenerator.tsx`.
+
 - [x] **Exportação de Metadados de NFT (NFT Metadata Export)**: Gerar JSON de metadados no padrão OpenSea (ERC-721/ERC-1155) com pontuação de raridade e atributos visuais/numéricos da mandala.
   - [x] Criar documentação do recurso em `docs/features/nft-metadata.md`.
   - [x] Implementar testes unitários para a geração de metadados e cálculo de raridade.

@@ -1,4 +1,4 @@
-import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, Point } from './mandala-math';
+import { calculateFlowerOfLifeCenters, calculateGoldenSpiral, calculateHexagonGrid, calculatePolygonRadiusMultiplier, calculateMirroredAngle, calculateChladniPattern, generateGenerativeLayers, calculatePolarPetalPoints, calculatePlanetaryPositions, calculateAstrologicalAspects, calculateMetatronCenters, calculateMetatronLines, Point } from './mandala-math';
 
 import { getMoonIllumination, calculateBioluminescenceIntensity, getBioluminescenceColor } from './mandala-math';
 
@@ -27,6 +27,7 @@ export interface MandalaConfig {
   polarCurveType?: 'smooth' | 'sharp' | 'generative';
   astrologicalChart?: boolean;
   astrologicalDate?: string;
+  metatronCube?: boolean;
 }
 
 export const drawMandala = (
@@ -56,7 +57,8 @@ export const drawMandala = (
     cymaticsM,
     bioluminescenceMode,
     astrologicalChart,
-    astrologicalDate
+    astrologicalDate,
+    metatronCube
   } = config;
 
   const tamanho = (Math.min(width, height) * 0.9 / 2) * pulseScale;
@@ -224,6 +226,13 @@ export const drawMandala = (
     ctx.restore();
   }
 
+  if (metatronCube) {
+    ctx.save();
+    ctx.translate(width / 2, height / 2);
+    drawMetatronCubeOverlay(ctx, tamanho, corBase);
+    ctx.restore();
+  }
+
   if (flowerOfLife) {
     ctx.save();
     ctx.translate(width / 2, height / 2);
@@ -253,6 +262,44 @@ export const drawMandala = (
     drawAstrologicalChartOverlay(ctx, tamanho, astrologicalDate || '2000-01-01T12:00', corBase);
     ctx.restore();
   }
+};
+
+const drawMetatronCubeOverlay = (
+  ctx: CanvasRenderingContext2D,
+  radius: number,
+  corBase: number
+) => {
+  const circleRadius = radius / 5;
+  const centers = calculateMetatronCenters(circleRadius);
+  const lines = calculateMetatronLines(centers);
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+
+  // 1. Draw 78 interconnecting lines
+  ctx.strokeStyle = `hsla(${(corBase + 40) % 360}, 90%, 75%, 0.45)`;
+  ctx.lineWidth = 1.2;
+
+  lines.forEach((line) => {
+    ctx.beginPath();
+    ctx.moveTo(line.p1.x, line.p1.y);
+    ctx.lineTo(line.p2.x, line.p2.y);
+    ctx.stroke();
+  });
+
+  // 2. Draw 13 circles of Fruit of Life
+  ctx.strokeStyle = "rgba(255, 215, 0, 0.65)";
+  ctx.lineWidth = 1.8;
+  ctx.fillStyle = `hsla(${corBase}, 80%, 60%, 0.1)`;
+
+  centers.forEach((c) => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, circleRadius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  ctx.restore();
 };
 
 const drawFlowerOfLifeOverlay = (
