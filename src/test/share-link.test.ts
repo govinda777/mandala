@@ -30,7 +30,8 @@ describe('Share Link Serialization', () => {
       bioluminescenceMode: true,
       polarCurveType: 'smooth' as 'smooth' | 'sharp' | 'generative',
       astrologicalChart: false,
-      astrologicalDate: '2000-01-01T12:00'
+      astrologicalDate: '2000-01-01T12:00',
+      metatronCube: false
     };
 
     const encoded = encodeMandalaConfig(originalConfig);

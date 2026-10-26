@@ -59,6 +59,63 @@ export interface Circle {
   radius: number;
 }
 
+export interface LineSegment {
+  p1: Point;
+  p2: Point;
+}
+
+/**
+ * Calculates the 13 circle center points for Metatron's Cube / Fruit of Life structure.
+ * @param circleRadius Radius of each circle in the Fruit of Life layout.
+ * @returns Array of 13 Point objects (1 center, 6 inner layer, 6 outer layer).
+ */
+export const calculateMetatronCenters = (circleRadius: number): Point[] => {
+  const centers: Point[] = [{ x: 0, y: 0 }];
+
+  const angleStep = Math.PI / 3; // 60 degrees
+
+  // Inner layer: 6 circles at distance 2 * circleRadius
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angleStep;
+    centers.push({
+      x: 2 * circleRadius * Math.cos(angle),
+      y: 2 * circleRadius * Math.sin(angle)
+    });
+  }
+
+  // Outer layer: 6 circles at distance 4 * circleRadius
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angleStep;
+    centers.push({
+      x: 4 * circleRadius * Math.cos(angle),
+      y: 4 * circleRadius * Math.sin(angle)
+    });
+  }
+
+  return centers;
+};
+
+/**
+ * Calculates all 78 interconnecting lines between every pair of the 13 centers in Metatron's Cube.
+ * @param centers Array of center points.
+ * @returns Array of LineSegment objects connecting each pair of centers.
+ */
+export const calculateMetatronLines = (centers: Point[]): LineSegment[] => {
+  const lines: LineSegment[] = [];
+  const n = centers.length;
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      lines.push({
+        p1: centers[i],
+        p2: centers[j]
+      });
+    }
+  }
+
+  return lines;
+};
+
 /**
  * Calculates center points for a hexagonal packing of circles (Flower of Life pattern).
  * @param radius Radius of the circles (distance between centers).
@@ -219,6 +276,7 @@ export interface SharedMandalaConfig {
   polarCurveType: 'smooth' | 'sharp' | 'generative';
   astrologicalChart: boolean;
   astrologicalDate: string;
+  metatronCube?: boolean;
 }
 
 export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
@@ -248,7 +306,8 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   bioluminescenceMode: false,
   polarCurveType: 'generative',
   astrologicalChart: false,
-  astrologicalDate: '2000-01-01T12:00'
+  astrologicalDate: '2000-01-01T12:00',
+  metatronCube: false
 };
 
 export interface RarityResult {
@@ -262,6 +321,7 @@ export interface RarityResult {
 export const calculateMandalaRarity = (config: SharedMandalaConfig): RarityResult => {
   let score = config.numPetalas + (config.numCamadas * 5) + Math.round(config.complexidade * 10);
 
+  if (config.metatronCube) score += 30;
   if (config.flowerOfLife) score += 25;
   if (config.goldenSpiral) score += 30;
   if (config.tessellation) score += 20;
@@ -313,6 +373,7 @@ export const generateNFTMetadata = (
     { trait_type: 'Complexity', value: config.complexidade },
     { trait_type: 'Base Form', value: config.formaBase === 0 ? 'Circle' : `${config.formaBase}-sided` },
     { trait_type: 'Petal Style', value: config.polarCurveType || 'generative' },
+    { trait_type: "Metatron's Cube", value: config.metatronCube ? 'Active' : 'Inactive' },
     { trait_type: 'Flower of Life', value: config.flowerOfLife ? 'Active' : 'Inactive' },
     { trait_type: 'Golden Spiral', value: config.goldenSpiral ? 'Active' : 'Inactive' },
     { trait_type: 'Hexagonal Grid', value: config.tessellation ? 'Active' : 'Inactive' },
@@ -401,7 +462,8 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
         ? parsed.polarCurveType
         : DEFAULT_MANDALA_CONFIG.polarCurveType,
       astrologicalChart: typeof parsed.astrologicalChart === 'boolean' ? parsed.astrologicalChart : DEFAULT_MANDALA_CONFIG.astrologicalChart,
-      astrologicalDate: typeof parsed.astrologicalDate === 'string' ? parsed.astrologicalDate : DEFAULT_MANDALA_CONFIG.astrologicalDate
+      astrologicalDate: typeof parsed.astrologicalDate === 'string' ? parsed.astrologicalDate : DEFAULT_MANDALA_CONFIG.astrologicalDate,
+      metatronCube: typeof parsed.metatronCube === 'boolean' ? parsed.metatronCube : DEFAULT_MANDALA_CONFIG.metatronCube
     };
   } catch (error) {
     console.error('Failed to decode mandala config', error);

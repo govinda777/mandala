@@ -24,6 +24,7 @@ export default function MandalaGenerator() {
   const [rotacao, setRotacao] = useState(0);
   const [modoFibonacci, setModoFibonacci] = useState(false);
   const [modoFibonacciAvancado, setModoFibonacciAvancado] = useState(false);
+  const [metatronCube, setMetatronCube] = useState(false);
   const [flowerOfLife, setFlowerOfLife] = useState(false);
   const [goldenSpiral, setGoldenSpiral] = useState(false);
   const [fractalMode, setFractalMode] = useState(false);
@@ -123,6 +124,7 @@ export default function MandalaGenerator() {
       width: 0,
       height: 0,
       formaBase: formaBase > 0 ? formaBase : undefined,
+      metatronCube,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -156,6 +158,7 @@ export default function MandalaGenerator() {
       rotacao,
       modoFibonacci,
       modoFibonacciAvancado,
+      metatronCube,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -191,6 +194,7 @@ export default function MandalaGenerator() {
       rotacao,
       modoFibonacci,
       modoFibonacciAvancado,
+      metatronCube,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -254,6 +258,7 @@ export default function MandalaGenerator() {
       width: canvas.width,
       height: canvas.height,
       formaBase: formaBase > 0 ? formaBase : undefined,
+      metatronCube,
       flowerOfLife,
       goldenSpiral,
       fractalMode,
@@ -276,7 +281,7 @@ export default function MandalaGenerator() {
   // Redesenhar quando os parâmetros mudarem
   useEffect(() => {
     renderizarMandala();
-  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType, astrologicalChart, astrologicalDate]);
+  }, [numPetalas, numCamadas, corBase, complexidade, rotacao, currentAutoRotation, formaBase, metatronCube, flowerOfLife, goldenSpiral, fractalMode, tessellation, currentPulseScale, useMoonPhase, moonPhaseAge, modoFibonacciAvancado, simetriaPersonalizada, eixosSimetria, cymaticsMode, cymaticsN, cymaticsM, bioluminescenceMode, polarCurveType, astrologicalChart, astrologicalDate]);
 
   // Carregar estado compartilhado pela URL, se houver
   useEffect(() => {
@@ -292,6 +297,7 @@ export default function MandalaGenerator() {
         setRotacao(decoded.rotacao);
         setModoFibonacci(decoded.modoFibonacci);
         setModoFibonacciAvancado(decoded.modoFibonacciAvancado);
+        if (decoded.metatronCube !== undefined) setMetatronCube(decoded.metatronCube);
         setFlowerOfLife(decoded.flowerOfLife);
         setGoldenSpiral(decoded.goldenSpiral);
         setFractalMode(decoded.fractalMode);
@@ -453,6 +459,11 @@ export default function MandalaGenerator() {
 
             {activeAccordion === 'geometria' && (
               <div className="p-4 space-y-3 text-sm bg-slate-900/30">
+                <label className="flex items-center space-x-2 cursor-pointer">
+                  <input type="checkbox" checked={metatronCube} onChange={(e) => setMetatronCube(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
+                  <span className="text-slate-300">Cubo de Metatron</span>
+                </label>
+
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input type="checkbox" checked={flowerOfLife} onChange={(e) => setFlowerOfLife(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded" />
                   <span className="text-slate-300">Flor da Vida</span>
