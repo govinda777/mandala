@@ -13,6 +13,7 @@ describe('Share Link Serialization', () => {
       modoFibonacciAvancado: false,
       flowerOfLife: true,
       goldenSpiral: false,
+      metatronCube: false,
       fractalMode: true,
       tessellation: false,
       pulsing: true,

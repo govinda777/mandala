@@ -191,6 +191,69 @@ export const calculateAstrologicalAspects = (
   return aspects;
 };
 
+export interface LineSegment {
+  p1: Point;
+  p2: Point;
+}
+
+/**
+ * Calculates center points of the 13 circles that make up the Fruit of Life / Metatron's Cube.
+ * 1 center at (0,0), 6 circles at radius 2*r, and 6 circles at radius 4*r.
+ * @param outerRadius The total boundary radius for the Fruit of Life figure.
+ * @returns Array of 13 Point coordinates.
+ */
+export const calculateMetatronCenters = (outerRadius: number): Point[] => {
+  if (outerRadius <= 0) return [];
+
+  const points: Point[] = [];
+  // Center circle
+  points.push({ x: 0, y: 0 });
+
+  const circleRadius = outerRadius / 4;
+  const angle60 = Math.PI / 3;
+
+  // Inner ring: 6 circles at distance 2 * circleRadius
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angle60;
+    points.push({
+      x: 2 * circleRadius * Math.cos(angle),
+      y: 2 * circleRadius * Math.sin(angle)
+    });
+  }
+
+  // Outer ring: 6 circles at distance 4 * circleRadius
+  for (let i = 0; i < 6; i++) {
+    const angle = i * angle60;
+    points.push({
+      x: 4 * circleRadius * Math.cos(angle),
+      y: 4 * circleRadius * Math.sin(angle)
+    });
+  }
+
+  return points;
+};
+
+/**
+ * Calculates the 78 interconnecting lines between all pairs of the 13 centers in Metatron's Cube.
+ * @param centers Array of center points (usually 13).
+ * @returns Array of LineSegment objects connecting unique pairs.
+ */
+export const calculateMetatronLines = (centers: Point[]): LineSegment[] => {
+  if (!centers || centers.length < 2) return [];
+
+  const lines: LineSegment[] = [];
+  for (let i = 0; i < centers.length; i++) {
+    for (let j = i + 1; j < centers.length; j++) {
+      lines.push({
+        p1: centers[i],
+        p2: centers[j]
+      });
+    }
+  }
+
+  return lines;
+};
+
 export interface SharedMandalaConfig {
   numPetalas: number;
   numCamadas: number;
@@ -201,6 +264,7 @@ export interface SharedMandalaConfig {
   modoFibonacciAvancado: boolean;
   flowerOfLife: boolean;
   goldenSpiral: boolean;
+  metatronCube: boolean;
   fractalMode: boolean;
   tessellation: boolean;
   pulsing: boolean;
@@ -231,6 +295,7 @@ export const DEFAULT_MANDALA_CONFIG: SharedMandalaConfig = {
   modoFibonacciAvancado: false,
   flowerOfLife: false,
   goldenSpiral: false,
+  metatronCube: false,
   fractalMode: false,
   tessellation: false,
   pulsing: false,
@@ -264,6 +329,7 @@ export const calculateMandalaRarity = (config: SharedMandalaConfig): RarityResul
 
   if (config.flowerOfLife) score += 25;
   if (config.goldenSpiral) score += 30;
+  if (config.metatronCube) score += 35;
   if (config.tessellation) score += 20;
   if (config.modoFibonacci || config.modoFibonacciAvancado) score += 35;
   if (config.bioluminescenceMode) score += 40;
@@ -315,6 +381,7 @@ export const generateNFTMetadata = (
     { trait_type: 'Petal Style', value: config.polarCurveType || 'generative' },
     { trait_type: 'Flower of Life', value: config.flowerOfLife ? 'Active' : 'Inactive' },
     { trait_type: 'Golden Spiral', value: config.goldenSpiral ? 'Active' : 'Inactive' },
+    { trait_type: "Metatron's Cube", value: config.metatronCube ? 'Active' : 'Inactive' },
     { trait_type: 'Hexagonal Grid', value: config.tessellation ? 'Active' : 'Inactive' },
     { trait_type: 'Fibonacci Mode', value: config.modoFibonacci || config.modoFibonacciAvancado ? 'Active' : 'Inactive' },
     { trait_type: 'Bioluminescence', value: config.bioluminescenceMode ? 'Active' : 'Inactive' },
@@ -382,6 +449,7 @@ export const decodeMandalaConfig = (encoded: string): SharedMandalaConfig => {
       modoFibonacciAvancado: typeof parsed.modoFibonacciAvancado === 'boolean' ? parsed.modoFibonacciAvancado : DEFAULT_MANDALA_CONFIG.modoFibonacciAvancado,
       flowerOfLife: typeof parsed.flowerOfLife === 'boolean' ? parsed.flowerOfLife : DEFAULT_MANDALA_CONFIG.flowerOfLife,
       goldenSpiral: typeof parsed.goldenSpiral === 'boolean' ? parsed.goldenSpiral : DEFAULT_MANDALA_CONFIG.goldenSpiral,
+      metatronCube: typeof parsed.metatronCube === 'boolean' ? parsed.metatronCube : DEFAULT_MANDALA_CONFIG.metatronCube,
       fractalMode: typeof parsed.fractalMode === 'boolean' ? parsed.fractalMode : DEFAULT_MANDALA_CONFIG.fractalMode,
       tessellation: typeof parsed.tessellation === 'boolean' ? parsed.tessellation : DEFAULT_MANDALA_CONFIG.tessellation,
       pulsing: typeof parsed.pulsing === 'boolean' ? parsed.pulsing : DEFAULT_MANDALA_CONFIG.pulsing,
